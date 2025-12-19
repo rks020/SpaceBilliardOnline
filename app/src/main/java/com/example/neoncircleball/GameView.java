@@ -972,18 +972,18 @@ public class GameView extends SurfaceView implements Runnable {
             // STAGE CLEARED animasyonu
             if (showStageCleared) {
                 paint.setStyle(Paint.Style.FILL);
-                paint.setTextSize(screenWidth * 0.15f);
+                paint.setTextSize(screenWidth * 0.1f);
                 paint.setTextAlign(Paint.Align.CENTER);
                 paint.setColor(Color.rgb(0, 255, 100));
-                paint.setShadowLayer(30, 0, 0, Color.rgb(0, 255, 100));
+                paint.setShadowLayer(25, 0, 0, Color.rgb(0, 255, 100));
                 canvas.drawText("STAGE CLEARED!", centerX, centerY, paint);
                 paint.clearShadowLayer();
 
                 // Alt yazı
-                paint.setTextSize(screenWidth * 0.06f);
+                paint.setTextSize(screenWidth * 0.045f);
                 paint.setColor(Color.WHITE);
                 int currentStageNum = ((level - 1) % 10) + 1;
-                canvas.drawText("Stage " + currentStageNum + " Complete", centerX, centerY + screenHeight * 0.1f,
+                canvas.drawText("Stage " + currentStageNum + " Complete", centerX, centerY + screenHeight * 0.08f,
                         paint);
             }
 
@@ -1074,6 +1074,27 @@ public class GameView extends SurfaceView implements Runnable {
         }
 
         if (!gameStarted) {
+            // Arka plan paneli (Glassmorphism)
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(Color.argb(170, 25, 25, 50)); // Koyu mavi-mor
+            float panelWidth = screenWidth * 0.85f;
+            float panelHeight = screenHeight * 0.65f;
+            canvas.drawRoundRect(
+                    centerX - panelWidth / 2, centerY - panelHeight / 2,
+                    centerX + panelWidth / 2, centerY + panelHeight / 2,
+                    35, 35, paint);
+
+            // Panel kenarlığı (Neon glow)
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(3);
+            paint.setColor(Color.rgb(0, 243, 255));
+            paint.setShadowLayer(18, 0, 0, Color.CYAN);
+            canvas.drawRoundRect(
+                    centerX - panelWidth / 2, centerY - panelHeight / 2,
+                    centerX + panelWidth / 2, centerY + panelHeight / 2,
+                    35, 35, paint);
+            paint.clearShadowLayer();
+
             // Başlık
             paint.setTextAlign(Paint.Align.CENTER);
 
@@ -1115,7 +1136,7 @@ public class GameView extends SurfaceView implements Runnable {
                     20, 20, paint);
 
             paint.setStyle(Paint.Style.FILL);
-            paint.setTextSize(buttonTextSize);
+            paint.setTextSize(buttonTextSize * 0.85f);
             canvas.drawText("START GAME", centerX, startY + buttonTextSize / 3, paint);
             paint.clearShadowLayer();
 
@@ -1132,6 +1153,7 @@ public class GameView extends SurfaceView implements Runnable {
                     20, 20, paint);
 
             paint.setStyle(Paint.Style.FILL);
+            paint.setTextSize(buttonTextSize * 0.85f);
             canvas.drawText("HOW TO PLAY", centerX, howToY + buttonTextSize / 3, paint);
             paint.clearShadowLayer();
         }
