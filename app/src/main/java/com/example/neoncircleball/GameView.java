@@ -85,6 +85,12 @@ public class GameView extends SurfaceView implements Runnable {
     private boolean showStageCleared = false;
     private long stageClearedTime = 0;
 
+    // Elektrik topu ikinci sıçrama için
+    private boolean electricSecondBounce = false;
+    private long electricSecondBounceTime = 0;
+    private float electricFirstTargetX = 0;
+    private float electricFirstTargetY = 0;
+
     // Level Seçici
     private boolean showLevelSelector = false;
     private int selectorPage = 1;
@@ -391,6 +397,21 @@ public class GameView extends SurfaceView implements Runnable {
             return;
         }
 
+        // Elektrik topu ikinci sıçrama kontrolü
+        if (electricSecondBounce && System.currentTimeMillis() >= electricSecondBounceTime) {
+            electricSecondBounce = false;
+            if (coloredBalls.size() > 0) {
+                Ball target2 = coloredBalls.get(random.nextInt(coloredBalls.size()));
+                electricEffects
+                        .add(new ElectricEffect(electricFirstTargetX, electricFirstTargetY, target2.x, target2.y));
+                createParticles(target2.x, target2.y, target2.color);
+                score++;
+                comboCounter++;
+                playSound(soundElectric); // İkinci sıçrama sesi
+                coloredBalls.remove(target2);
+            }
+        }
+
         // Özel yetenekler zaman kontrolü
         if (barrierActive && currentTime > barrierEndTime)
             barrierActive = false;
@@ -416,8 +437,15 @@ public class GameView extends SurfaceView implements Runnable {
         for (int i = cloneBalls.size() - 1; i >= 0; i--) {
             Ball ball = cloneBalls.get(i);
 
-            // Süre kontrolü (8 saniye)
-            if (System.currentTimeMillis() - ball.creationTime > 8000) {
+            // Clone topu için ömür kontrolü
+            if (ball.isClone && ball.lifetime > 0) {
+                long elapsed = System.currentTimeMillis() - ball.creationTime;
+                if (elapsed > ball.lifetime) {
+                    cloneBalls.remove(i);
+                    continue;
+                }
+            } else if (System.currentTimeMillis() - ball.creationTime > 8000) {
+                // Eski clone toplar için (lifetime olmayan)
                 cloneBalls.remove(i);
                 continue;
             }
@@ -535,7 +563,11 @@ public class GameView extends SurfaceView implements Runnable {
 
         ArrayList<Ball> allWhiteBalls = new ArrayList<>();
         allWhiteBalls.add(whiteBall);
-        allWhiteBalls.addAll(cloneBalls);
+        try {
+            allWhiteBalls.addAll(cloneBalls);
+        } catch (Exception e) {
+            // ConcurrentModificationException önleme
+        }
 
         for (Ball wBall : allWhiteBalls) {
             // Renkli toplar
@@ -575,8 +607,12 @@ public class GameView extends SurfaceView implements Runnable {
                 }
             }
 
-            // Siyah toplar
-            for (Ball ball : blackBalls) {
+            // Siyah toplar (güvenli iterasyon)
+            for (int i = blackBalls.size() - 1; i >= 0; i--) {
+                if (i >= blackBalls.size())
+                    continue; // Güvenlik kontrolü
+                Ball ball = blackBalls.get(i);
+
                 // Dokunulmazlık kontrolü
                 if (System.currentTimeMillis() < immuneEndTime)
                     continue;
@@ -592,6 +628,9 @@ public class GameView extends SurfaceView implements Runnable {
                     } else {
                         lives--;
                         comboCounter = 0;
+
+                        // Siyah top patlama efekti (partikül)
+                        createParticles(ball.x, ball.y, Color.BLACK);
 
                         // Kamera sallanma efekti
                         shakeEndTime = System.currentTimeMillis() + 500;
@@ -660,7 +699,9 @@ public class GameView extends SurfaceView implements Runnable {
                 playSound(soundElectric);
                 break;
             case "clone":
-                Ball clone = new Ball(centerX, centerY, whiteBall.radius, Color.WHITE);
+                // Ghost mode aktifse orijinal boyutu kullan
+                float cloneRadius = ghostModeActive ? originalWhiteBallRadius : whiteBall.radius;
+                Ball clone = new Ball(centerX, centerY, cloneRadius, Color.WHITE, 5000); // 5 saniye ömür
                 cloneBalls.add(clone);
                 break;
             case "freeze":
@@ -712,16 +753,15 @@ public class GameView extends SurfaceView implements Runnable {
         createParticles(target1.x, target1.y, target1.color);
         score++;
         comboCounter++;
+        playSound(soundElectric); // İlk sıçrama sesi
         coloredBalls.remove(target1);
 
-        // İkinci hedef
+        // İkinci hedef için gecikme ayarla (0.4 saniye)
         if (coloredBalls.size() > 0) {
-            Ball target2 = coloredBalls.get(random.nextInt(coloredBalls.size()));
-            electricEffects.add(new ElectricEffect(target1.x, target1.y, target2.x, target2.y));
-            createParticles(target2.x, target2.y, target2.color);
-            score++;
-            comboCounter++;
-            coloredBalls.remove(target2);
+            electricFirstTargetX = target1.x;
+            electricFirstTargetY = target1.y;
+            electricSecondBounce = true;
+            electricSecondBounceTime = System.currentTimeMillis() + 400;
         }
     }
 
@@ -855,6 +895,24 @@ public class GameView extends SurfaceView implements Runnable {
 
             for (Ball ball : cloneBalls) {
                 drawBall(canvas, ball);
+
+                // Clone topu için geri sayım göster
+                if (ball.isClone && ball.lifetime > 0) {
+                    long elapsed = System.currentTimeMillis() - ball.creationTime;
+                    long remaining = ball.lifetime - elapsed;
+                    int seconds = (int) Math.ceil(remaining / 1000.0);
+
+                    if (seconds > 0 && seconds <= 5) {
+                        paint.setStyle(Paint.Style.FILL);
+                        paint.setTextSize(ball.radius * 1.2f);
+                        paint.setTextAlign(Paint.Align.CENTER);
+                        paint.setColor(Color.WHITE);
+                        paint.setShadowLayer(8, 0, 0, Color.BLACK);
+                        canvas.drawText(String.valueOf(seconds), ball.x + ball.radius * 0.8f,
+                                ball.y - ball.radius * 0.8f, paint);
+                        paint.clearShadowLayer();
+                    }
+                }
             }
 
             // Missiles
@@ -876,9 +934,10 @@ public class GameView extends SurfaceView implements Runnable {
             }
 
             // Sürükleme
-            if (isDragging && draggedBall != null) {
-                float dx = draggedBall.x - dragStartX;
-                float dy = draggedBall.y - dragStartY;
+            Ball currentDraggedBall = draggedBall; // Race condition önleme
+            if (isDragging && currentDraggedBall != null) {
+                float dx = currentDraggedBall.x - dragStartX;
+                float dy = currentDraggedBall.y - dragStartY;
                 float distance = Math.min((float) Math.sqrt(dx * dx + dy * dy), MAX_DRAG_DISTANCE);
                 float ratio = distance / MAX_DRAG_DISTANCE;
 
@@ -887,13 +946,13 @@ public class GameView extends SurfaceView implements Runnable {
                     float launchAngle = (float) Math.atan2(-dy, -dx);
 
                     // Çizgi ve Ok parametreleri
-                    float startDist = draggedBall.radius * 1.5f;
+                    float startDist = currentDraggedBall.radius * 1.5f;
                     float lineLen = 400 * ratio; // Güç arttıkça uzayan çizgi
 
-                    float startX = draggedBall.x + (float) Math.cos(launchAngle) * startDist;
-                    float startY = draggedBall.y + (float) Math.sin(launchAngle) * startDist;
-                    float endX = draggedBall.x + (float) Math.cos(launchAngle) * (startDist + lineLen);
-                    float endY = draggedBall.y + (float) Math.sin(launchAngle) * (startDist + lineLen);
+                    float startX = currentDraggedBall.x + (float) Math.cos(launchAngle) * startDist;
+                    float startY = currentDraggedBall.y + (float) Math.sin(launchAngle) * startDist;
+                    float endX = currentDraggedBall.x + (float) Math.cos(launchAngle) * (startDist + lineLen);
+                    float endY = currentDraggedBall.y + (float) Math.sin(launchAngle) * (startDist + lineLen);
 
                     // Kesikli çizgi (Trajectory)
                     paint.setStyle(Paint.Style.STROKE);
@@ -931,10 +990,11 @@ public class GameView extends SurfaceView implements Runnable {
                 paint.setStrokeWidth(3);
                 int powerColor = Color.rgb((int) (255 * ratio), (int) (255 * (1 - ratio)), 0);
                 paint.setColor(powerColor);
-                canvas.drawCircle(draggedBall.x, draggedBall.y, draggedBall.radius * (1 + ratio), paint);
+                canvas.drawCircle(currentDraggedBall.x, currentDraggedBall.y, currentDraggedBall.radius * (1 + ratio),
+                        paint);
 
                 // Güç barı - topun etrafında dairesel
-                float arcRadius = draggedBall.radius * 2.5f;
+                float arcRadius = currentDraggedBall.radius * 2.5f;
                 float sweepAngle = 360 * ratio;
 
                 // Arka plan çember (gri)
@@ -942,7 +1002,7 @@ public class GameView extends SurfaceView implements Runnable {
                 paint.setStrokeWidth(8);
                 paint.setColor(Color.rgb(60, 60, 60));
                 paint.setAlpha(150);
-                canvas.drawCircle(draggedBall.x, draggedBall.y, arcRadius, paint);
+                canvas.drawCircle(currentDraggedBall.x, currentDraggedBall.y, arcRadius, paint);
                 paint.setAlpha(255);
 
                 // Dolu kısım (mavi glow)
@@ -952,8 +1012,8 @@ public class GameView extends SurfaceView implements Runnable {
                 paint.setColor(Color.rgb(0, 180, 255));
                 paint.setShadowLayer(20, 0, 0, Color.rgb(0, 180, 255));
                 canvas.drawArc(
-                        draggedBall.x - arcRadius, draggedBall.y - arcRadius,
-                        draggedBall.x + arcRadius, draggedBall.y + arcRadius,
+                        currentDraggedBall.x - arcRadius, currentDraggedBall.y - arcRadius,
+                        currentDraggedBall.x + arcRadius, currentDraggedBall.y + arcRadius,
                         -90, sweepAngle, false, paint);
                 paint.clearShadowLayer();
             }
@@ -1256,33 +1316,105 @@ public class GameView extends SurfaceView implements Runnable {
         canvas.drawRect(0, 0, screenWidth, screenHeight, paint);
         paint.setAlpha(255);
 
+        // Ana panel (Glassmorphism)
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.argb(170, 25, 25, 50)); // Koyu mavi-mor
+        float panelWidth = screenWidth * 0.9f;
+        float panelHeight = screenHeight * 0.75f;
+        canvas.drawRoundRect(
+                centerX - panelWidth / 2, centerY - panelHeight / 2,
+                centerX + panelWidth / 2, centerY + panelHeight / 2,
+                35, 35, paint);
+
+        // Panel kenarlığı (Neon glow)
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(3);
+        paint.setColor(Color.rgb(0, 243, 255));
+        paint.setShadowLayer(18, 0, 0, Color.CYAN);
+        canvas.drawRoundRect(
+                centerX - panelWidth / 2, centerY - panelHeight / 2,
+                centerX + panelWidth / 2, centerY + panelHeight / 2,
+                35, 35, paint);
+        paint.clearShadowLayer();
+
         // Başlık
+        paint.setStyle(Paint.Style.FILL);
         paint.setTextSize(screenWidth * 0.08f);
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setColor(Color.rgb(0, 243, 255));
-        canvas.drawText("HOW TO PLAY", centerX, screenHeight * 0.15f, paint);
+        canvas.drawText("HOW TO PLAY", centerX, screenHeight * 0.2f, paint);
 
-        // Talimatlar
-        paint.setTextSize(screenWidth * 0.04f);
-        paint.setColor(Color.WHITE);
-        float y = screenHeight * 0.25f;
-        float lineSpacing = screenHeight * 0.06f;
-
-        canvas.drawText("• Drag white ball to launch", centerX, y, paint);
-        y += lineSpacing;
-        canvas.drawText("• Collect colored balls = +1 point", centerX, y, paint);
-        y += lineSpacing;
-        canvas.drawText("• Avoid black balls = -1 life", centerX, y, paint);
-        y += lineSpacing;
-        canvas.drawText("• Special balls give powers:", centerX, y, paint);
-        y += lineSpacing;
-
+        // Talimatlar - Renkli toplar ve açıklamalar
         paint.setTextSize(screenWidth * 0.035f);
-        canvas.drawText("B=BlackHole T=Time P=Power S=Shield", centerX, y, paint);
-        y += lineSpacing * 0.8f;
-        canvas.drawText("L=Lightning C=Clone F=Freeze M=Missile", centerX, y, paint);
-        y += lineSpacing * 0.8f;
-        canvas.drawText("T=Teleport X=Boom G=Ghost", centerX, y, paint);
+        paint.setTextAlign(Paint.Align.LEFT); // Sola hizalı
+        paint.setColor(Color.WHITE);
+        float y = screenHeight * 0.3f;
+        float lineSpacing = screenHeight * 0.055f;
+        float ballSize = screenWidth * 0.04f;
+        float ballX = centerX - screenWidth * 0.35f; // Top pozisyonu
+        float textX = ballX + ballSize * 1.5f; // Yazı topun sağında başlasın
+
+        // Extra Time
+        paint.setColor(Color.rgb(255, 165, 0));
+        canvas.drawCircle(ballX, y, ballSize, paint);
+        paint.setColor(Color.WHITE);
+        canvas.drawText("Extra Time: +5 Seconds.", textX, y + ballSize * 0.4f, paint);
+        y += lineSpacing;
+
+        // Power Boost
+        paint.setColor(Color.rgb(255, 215, 0));
+        canvas.drawCircle(ballX, y, ballSize, paint);
+        paint.setColor(Color.WHITE);
+        canvas.drawText("Power Boost: Kinetic surge.", textX, y + ballSize * 0.4f, paint);
+        y += lineSpacing;
+
+        // Barrier
+        paint.setColor(Color.BLUE);
+        canvas.drawCircle(ballX, y, ballSize, paint);
+        paint.setColor(Color.WHITE);
+        canvas.drawText("Barrier: Shield activation.", textX, y + ballSize * 0.4f, paint);
+        y += lineSpacing;
+
+        // Electric
+        paint.setColor(Color.CYAN);
+        canvas.drawCircle(ballX, y, ballSize, paint);
+        paint.setColor(Color.WHITE);
+        canvas.drawText("Electric: Chain lightning.", textX, y + ballSize * 0.4f, paint);
+        y += lineSpacing;
+
+        // Clone
+        paint.setColor(Color.rgb(255, 192, 203));
+        canvas.drawCircle(ballX, y, ballSize, paint);
+        paint.setColor(Color.WHITE);
+        canvas.drawText("Clone: Duplicate orb.", textX, y + ballSize * 0.4f, paint);
+        y += lineSpacing;
+
+        // Freeze
+        paint.setColor(Color.rgb(173, 216, 230));
+        canvas.drawCircle(ballX, y, ballSize, paint);
+        paint.setColor(Color.WHITE);
+        canvas.drawText("Freeze: Stasis field.", textX, y + ballSize * 0.4f, paint);
+        y += lineSpacing;
+
+        // Missile
+        paint.setColor(Color.RED);
+        canvas.drawCircle(ballX, y, ballSize, paint);
+        paint.setColor(Color.WHITE);
+        canvas.drawText("Missile: Homing projectile.", textX, y + ballSize * 0.4f, paint);
+        y += lineSpacing;
+
+        // Teleport
+        paint.setColor(Color.GREEN);
+        canvas.drawCircle(ballX, y, ballSize, paint);
+        paint.setColor(Color.WHITE);
+        canvas.drawText("Teleport: Quantum jump.", textX, y + ballSize * 0.4f, paint);
+        y += lineSpacing;
+
+        // Boom
+        paint.setColor(Color.rgb(139, 0, 0));
+        canvas.drawCircle(ballX, y, ballSize, paint);
+        paint.setColor(Color.WHITE);
+        canvas.drawText("Boom: Shockwave.", textX, y + ballSize * 0.4f, paint);
 
         // Close butonu
         paint.setTextSize(screenWidth * 0.06f);
@@ -1298,11 +1430,33 @@ public class GameView extends SurfaceView implements Runnable {
         canvas.drawRect(0, 0, screenWidth, screenHeight, paint);
         paint.setAlpha(255);
 
+        // Ana panel (Glassmorphism)
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.argb(170, 25, 25, 50)); // Koyu mavi-mor
+        float panelWidth = screenWidth * 0.85f;
+        float panelHeight = screenHeight * 0.6f;
+        canvas.drawRoundRect(
+                centerX - panelWidth / 2, centerY - panelHeight / 2,
+                centerX + panelWidth / 2, centerY + panelHeight / 2,
+                35, 35, paint);
+
+        // Panel kenarlığı (Neon glow)
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(3);
+        paint.setColor(Color.rgb(255, 215, 0));
+        paint.setShadowLayer(18, 0, 0, Color.rgb(255, 215, 0));
+        canvas.drawRoundRect(
+                centerX - panelWidth / 2, centerY - panelHeight / 2,
+                centerX + panelWidth / 2, centerY + panelHeight / 2,
+                35, 35, paint);
+        paint.clearShadowLayer();
+
         // Başlık
+        paint.setStyle(Paint.Style.FILL);
         paint.setTextSize(screenWidth * 0.1f);
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setColor(Color.rgb(255, 215, 0));
-        canvas.drawText("HIGH SCORE", centerX, screenHeight * 0.3f, paint);
+        canvas.drawText("HALL OF FAME", centerX, centerY - screenHeight * 0.2f, paint);
 
         // Skorlar
         paint.setTextSize(screenWidth * 0.07f);
@@ -1551,6 +1705,8 @@ public class GameView extends SurfaceView implements Runnable {
         float x, y, vx, vy, radius;
         int color;
         long creationTime;
+        long lifetime; // Clone topları için yaşam süresi (ms)
+        boolean isClone; // Clone topu mu?
 
         Ball(float x, float y, float radius, int color) {
             this.x = x;
@@ -1560,6 +1716,14 @@ public class GameView extends SurfaceView implements Runnable {
             this.vx = 0;
             this.vy = 0;
             this.creationTime = System.currentTimeMillis();
+            this.lifetime = 0;
+            this.isClone = false;
+        }
+
+        Ball(float x, float y, float radius, int color, long lifetime) {
+            this(x, y, radius, color);
+            this.lifetime = lifetime;
+            this.isClone = true;
         }
     }
 
