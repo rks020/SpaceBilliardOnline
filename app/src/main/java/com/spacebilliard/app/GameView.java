@@ -3328,6 +3328,11 @@ public class GameView extends SurfaceView implements Runnable {
         return coins;
     }
 
+    public void refreshCoins() {
+        SharedPreferences prefs = getContext().getSharedPreferences("SpaceBilliard", Context.MODE_PRIVATE);
+        coins = prefs.getInt("coins", 0);
+    }
+
     private void drawLevelSelector(Canvas canvas) {
         // Arka planı karart
         paint.setStyle(Paint.Style.FILL);

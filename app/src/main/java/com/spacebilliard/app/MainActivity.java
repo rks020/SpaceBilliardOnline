@@ -174,9 +174,15 @@ public class MainActivity extends Activity {
         super.onResume();
         gameView.resume();
 
-        // Refresh coin display when returning from shop
+        // Refresh coin from SharedPreferences and update both GameView and panel
         if (gameView != null && infoPanel != null) {
-            int currentCoins = gameView.getCoins();
+            android.content.SharedPreferences prefs = getSharedPreferences("SpaceBilliard", MODE_PRIVATE);
+            int currentCoins = prefs.getInt("coins", 0);
+
+            // Update GameView's internal coin value
+            gameView.refreshCoins();
+
+            // Update panel display
             infoPanel.setCoins(String.valueOf(currentCoins));
         }
     }
