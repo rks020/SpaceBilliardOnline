@@ -33,6 +33,11 @@ public class ShopActivity extends Activity {
         private TextView coinText; // Coin balance display
         private NeonButton btnSkins, btnTrails, btnSights, btnEffects;
 
+        // Selected item for purchase
+        private String selectedItemId = null;
+        private int selectedItemPrice = 0;
+        private boolean selectedItemOwned = false;
+
         @Override
         protected void onCreate(Bundle savedInstanceState) {
                 super.onCreate(savedInstanceState);
@@ -429,43 +434,30 @@ public class ShopActivity extends Activity {
                         descriptionText.setText(description);
                         descriptionText.setTextColor(color);
 
-                        // Get current balances
+                        // Get current ownership status
                         android.content.SharedPreferences currentPrefs = getSharedPreferences("SpaceBilliard",
                                         android.content.Context.MODE_PRIVATE);
-                        int currentCoins = currentPrefs.getInt("coins", 0);
                         boolean owned = currentPrefs.getBoolean("owned_" + finalSkinId, finalIsDefaultItem);
 
-                        // Purchase/Equip Logic
-                        if (finalSkinId != null) {
-                                if (!owned) {
-                                        // Need to purchase
-                                        if (currentCoins >= finalPrice) {
-                                                // Purchase successful
-                                                currentPrefs.edit()
-                                                                .putBoolean("owned_" + finalSkinId, true)
-                                                                .putInt("coins", currentCoins - finalPrice)
-                                                                .apply();
+                        if (owned) {
+                                // ALREADY OWNED -> EQUIP IMMEDIATELY
+                                equipItem(finalSkinId, currentPrefs);
+                                refreshGrid();
 
-                                                // Update coin display
-                                                if (coinText != null) {
-                                                        coinText.setText("💰 " + (currentCoins - finalPrice));
-                                                }
+                                descriptionText.setText(description + "\n\n✓ EQUIPPED");
 
-                                                // Equip the item
-                                                equipItem(finalSkinId, currentPrefs);
-                                                refreshGrid();
-                                        } else {
-                                                // Insufficient balance
-                                                descriptionText.setText(
-                                                                "⚠️ INSUFFICIENT COINS! Need " + finalPrice
-                                                                                + " coins.");
-                                                descriptionText.setTextColor(Color.RED);
-                                        }
-                                } else {
-                                        // Already owned, just equip
-                                        equipItem(finalSkinId, currentPrefs);
-                                        refreshGrid();
-                                }
+                                // Clear selection for purchase since we just equipped
+                                selectedItemId = null;
+                                selectedItemPrice = 0;
+                                selectedItemOwned = true;
+                        } else {
+                                // NOT OWNED -> SELECT FOR PURCHASE
+                                selectedItemId = finalSkinId;
+                                selectedItemPrice = finalPrice;
+                                selectedItemOwned = false;
+
+                                descriptionText.setText(description + "\n\n💰 " + finalPrice
+                                                + " coins - Press BUY to purchase");
                         }
                 });
 
@@ -501,6 +493,11 @@ public class ShopActivity extends Activity {
                 footer.setGravity(Gravity.CENTER);
                 footer.setPadding(0, 20, 0, 40);
 
+                // BUY BUTTON
+                NeonButton buyBtn = new NeonButton(this, "BUY", Color.rgb(0, 255, 100));
+                buyBtn.setOnClickListener(v -> handlePurchase());
+
+                // BACK BUTTON
                 NeonButton back = new NeonButton(this, "BACK", Color.rgb(255, 50, 255));
                 back.setOnClickListener(v -> finish());
 
@@ -509,7 +506,55 @@ public class ShopActivity extends Activity {
                                 (int) (45 * getResources().getDisplayMetrics().density));
                 btnParams.setMargins(20, 0, 20, 0);
 
+                footer.addView(buyBtn, btnParams);
                 footer.addView(back, btnParams);
                 parent.addView(footer);
+        }
+
+        private void handlePurchase() {
+                if (selectedItemId == null) {
+                        descriptionText.setText("⚠️ Please select an item first!");
+                        descriptionText.setTextColor(Color.YELLOW);
+                        return;
+                }
+
+                if (selectedItemOwned) {
+                        // Already owned, just equip
+                        android.content.SharedPreferences prefs = getSharedPreferences("SpaceBilliard",
+                                        android.content.Context.MODE_PRIVATE);
+                        equipItem(selectedItemId, prefs);
+                        descriptionText.setText("✓ Item equipped!");
+                        descriptionText.setTextColor(Color.GREEN);
+                        refreshGrid();
+                        return;
+                }
+
+                // Need to purchase
+                android.content.SharedPreferences prefs = getSharedPreferences("SpaceBilliard",
+                                android.content.Context.MODE_PRIVATE);
+                int currentCoins = prefs.getInt("coins", 0);
+
+                if (currentCoins >= selectedItemPrice) {
+                        // Purchase successful
+                        prefs.edit()
+                                        .putBoolean("owned_" + selectedItemId, true)
+                                        .putInt("coins", currentCoins - selectedItemPrice)
+                                        .apply();
+
+                        // Update coin display
+                        if (coinText != null) {
+                                coinText.setText("💰 " + (currentCoins - selectedItemPrice));
+                        }
+
+                        // Equip the item
+                        equipItem(selectedItemId, prefs);
+                        descriptionText.setText("✓ Purchase successful!");
+                        descriptionText.setTextColor(Color.GREEN);
+                        refreshGrid();
+                } else {
+                        // Insufficient balance
+                        descriptionText.setText("⚠️ INSUFFICIENT COINS! Need " + selectedItemPrice + " coins.");
+                        descriptionText.setTextColor(Color.RED);
+                }
         }
 }

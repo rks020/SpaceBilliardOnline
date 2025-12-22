@@ -43,51 +43,52 @@
 28-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:13:9-54
 29        android:supportsRtl="true"
 29-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:14:9-35
-30        android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-30-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:15:9-67
-31        android:usesCleartextTraffic="true" >
-31-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:16:9-44
-32        <activity
-32-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:18:9-27:20
-33            android:name="com.spacebilliard.app.SplashActivity"
-33-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:19:13-64
-34            android:exported="true"
-34-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:20:13-36
-35            android:screenOrientation="portrait"
-35-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:21:13-49
-36            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
-36-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:22:13-71
-37            <intent-filter>
-37-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:23:13-26:29
-38                <action android:name="android.intent.action.MAIN" />
-38-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:24:17-69
-38-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:24:25-66
-39
-40                <category android:name="android.intent.category.LAUNCHER" />
-40-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:25:17-77
-40-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:25:27-74
-41            </intent-filter>
-42        </activity>
-43        <activity
-43-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:29:9-34:74
-44            android:name="com.spacebilliard.app.MainActivity"
-44-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:30:13-62
-45            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
-45-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:32:13-87
-46            android:exported="true"
-46-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:31:13-36
-47            android:screenOrientation="portrait"
-47-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:33:13-49
-48            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
-48-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:34:13-71
-49        <activity
-49-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:36:9-39:73
-50            android:name="com.spacebilliard.app.ShopActivity"
-50-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:37:13-62
-51            android:screenOrientation="portrait"
-51-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:38:13-49
-52            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
-52-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:39:13-71
-53    </application>
-54
-55</manifest>
+30        android:testOnly="true"
+31        android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+31-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:15:9-67
+32        android:usesCleartextTraffic="true" >
+32-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:16:9-44
+33        <activity
+33-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:18:9-27:20
+34            android:name="com.spacebilliard.app.SplashActivity"
+34-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:19:13-64
+35            android:exported="true"
+35-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:20:13-36
+36            android:screenOrientation="portrait"
+36-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:21:13-49
+37            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
+37-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:22:13-71
+38            <intent-filter>
+38-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:23:13-26:29
+39                <action android:name="android.intent.action.MAIN" />
+39-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:24:17-69
+39-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:24:25-66
+40
+41                <category android:name="android.intent.category.LAUNCHER" />
+41-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:25:17-77
+41-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:25:27-74
+42            </intent-filter>
+43        </activity>
+44        <activity
+44-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:29:9-34:74
+45            android:name="com.spacebilliard.app.MainActivity"
+45-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:30:13-62
+46            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+46-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:32:13-87
+47            android:exported="true"
+47-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:31:13-36
+48            android:screenOrientation="portrait"
+48-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:33:13-49
+49            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+49-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:34:13-71
+50        <activity
+50-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:36:9-39:73
+51            android:name="com.spacebilliard.app.ShopActivity"
+51-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:37:13-62
+52            android:screenOrientation="portrait"
+52-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:38:13-49
+53            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+53-->C:\Users\raufk\OneDrive\Desktop\SpaceBillard\app\src\main\AndroidManifest.xml:39:13-71
+54    </application>
+55
+56</manifest>
