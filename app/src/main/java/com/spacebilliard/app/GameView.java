@@ -58,6 +58,7 @@ public class GameView extends SurfaceView implements Runnable {
     // Oyun durumu
     private boolean gameStarted = false;
     private boolean gameOver = false;
+    private boolean gameCompleted = false;
     private int score = 0;
     private int lives = 3;
     private Bitmap menuBgBitmap;
@@ -90,9 +91,8 @@ public class GameView extends SurfaceView implements Runnable {
     private int comboHits = 0;
     private long lastHitTime = 0;
     private final long COMBO_TIMEOUT = 2000; // 2 saniye
-    private String comboText = "";
-    private long comboTextEndTime = 0;
     private int maxCombo = 0; // Combo rekoru
+    private ArrayList<FloatingText> floatingTexts; // Animasyonlu metinler için liste
 
     // Stage Cleared animasyonu
     private boolean showStageCleared = false;
@@ -143,22 +143,39 @@ public class GameView extends SurfaceView implements Runnable {
 
     // MainActivity reference for updating UI panels
     private MainActivity mainActivity;
-    private android.view.View startBtn, howToBtn, shopBtn;
+    private android.view.View startBtn, howToBtn, shopBtn, hallOfFameBtn;
     private android.graphics.Rect startBtnBounds, howToBtnBounds, shopBtnBounds;
 
-    public void setMenuButtons(android.view.View start, android.view.View howTo, android.view.View shop) {
+    public void setMenuButtons(android.view.View start, android.view.View howTo, android.view.View shop,
+            android.view.View hallOfFame) {
         this.startBtn = start;
         this.howToBtn = howTo;
         this.shopBtn = shop;
+        this.hallOfFameBtn = hallOfFame;
+    }
+
+    public void reloadPreferences() {
+        SharedPreferences prefs = getContext().getSharedPreferences("SpaceBilliard", Context.MODE_PRIVATE);
+        selectedSkin = prefs.getString("selectedSkin", "default");
+        selectedTrail = prefs.getString("selectedTrail", "none");
+        selectedAura = prefs.getString("selectedAura", "none");
+        selectedTrajectory = prefs.getString("selectedTrajectory", "dashed");
+        selectedImpact = prefs.getString("selectedImpact", "classic");
     }
 
     public void startGame() {
+        reloadPreferences(); // Ensure prefs are fresh when game starts
         showLevelSelector = true;
         updateMenuButtonsVisibility();
     }
 
     public void showInstructions() {
         showInstructions = true;
+        updateMenuButtonsVisibility();
+    }
+
+    public void showHighScore() {
+        showHighScore = true;
         updateMenuButtonsVisibility();
     }
 
@@ -172,13 +189,16 @@ public class GameView extends SurfaceView implements Runnable {
     private void updateMenuButtonsVisibility() {
         if (mainActivity != null) {
             mainActivity.runOnUiThread(() -> {
-                boolean show = !gameStarted && !showLevelSelector && !showInstructions && !showHighScore;
+                boolean show = !gameStarted && !showLevelSelector && !showInstructions && !showHighScore
+                        && !gameCompleted;
                 if (startBtn != null)
                     startBtn.setVisibility(show ? View.VISIBLE : View.GONE);
                 if (howToBtn != null)
                     howToBtn.setVisibility(show ? View.VISIBLE : View.GONE);
                 if (shopBtn != null)
                     shopBtn.setVisibility(show ? View.VISIBLE : View.GONE);
+                if (hallOfFameBtn != null)
+                    hallOfFameBtn.setVisibility(show ? View.VISIBLE : View.GONE);
             });
         }
     }
@@ -202,7 +222,11 @@ public class GameView extends SurfaceView implements Runnable {
         impactArcs = new ArrayList<>();
         missiles = new ArrayList<>();
         electricEffects = new ArrayList<>();
+        electricEffects = new ArrayList<>();
         stars = new ArrayList<>();
+        floatingTexts = new ArrayList<>();
+
+        cachedXfermode = new android.graphics.PorterDuffXfermode(android.graphics.PorterDuff.Mode.SRC_ATOP);
 
         // Kayıtlı skoru yükle
         SharedPreferences prefs = context.getSharedPreferences("SpaceBilliard", Context.MODE_PRIVATE);
@@ -278,6 +302,53 @@ public class GameView extends SurfaceView implements Runnable {
         // Initialize Simple Background Shader (High Performance)
         nebula1 = new RadialGradient(centerX, centerY, Math.max(screenWidth, screenHeight),
                 new int[] { Color.rgb(30, 10, 50), Color.rgb(5, 5, 10) }, null, Shader.TileMode.CLAMP);
+
+        initGiantMeteorGraphics();
+    }
+
+    // Optimization Fields
+    private android.graphics.Path cachedMeteorPath;
+    private android.graphics.Path cachedMeteorCracks;
+    private RadialGradient cachedMeteorAura;
+    private RadialGradient cachedMeteorShading;
+    private android.graphics.PorterDuffXfermode cachedXfermode;
+
+    private void initGiantMeteorGraphics() {
+        float meteorRadius = screenWidth * 0.18f;
+        float meteorX = screenWidth * 0.85f;
+        float meteorY = screenHeight * 0.85f;
+
+        cachedMeteorPath = new android.graphics.Path();
+        float[] irregularOffsets = { 1.0f, 0.9f, 1.05f, 0.95f, 1.1f, 0.9f, 1.0f, 0.85f, 1.05f, 0.95f, 1.0f, 1.1f };
+        for (int i = 0; i < 12; i++) {
+            float theta = (float) (i * 2 * Math.PI / 12);
+            float r = meteorRadius * irregularOffsets[i % irregularOffsets.length];
+            float px = meteorX + (float) Math.cos(theta) * r;
+            float py = meteorY + (float) Math.sin(theta) * r;
+            if (i == 0)
+                cachedMeteorPath.moveTo(px, py);
+            else
+                cachedMeteorPath.lineTo(px, py);
+        }
+        cachedMeteorPath.close();
+
+        cachedMeteorCracks = new android.graphics.Path();
+        cachedMeteorCracks.moveTo(meteorX - meteorRadius * 0.5f, meteorY + meteorRadius * 0.1f);
+        cachedMeteorCracks.lineTo(meteorX - meteorRadius * 0.2f, meteorY - meteorRadius * 0.1f);
+        cachedMeteorCracks.lineTo(meteorX + meteorRadius * 0.3f, meteorY);
+        cachedMeteorCracks.lineTo(meteorX + meteorRadius * 0.5f, meteorY + meteorRadius * 0.4f);
+
+        cachedMeteorCracks.moveTo(meteorX + meteorRadius * 0.1f, meteorY - meteorRadius * 0.6f);
+        cachedMeteorCracks.lineTo(meteorX, meteorY - meteorRadius * 0.3f);
+        cachedMeteorCracks.lineTo(meteorX - meteorRadius * 0.1f, meteorY - meteorRadius * 0.1f);
+
+        cachedMeteorAura = new RadialGradient(meteorX, meteorY, meteorRadius * 1.6f,
+                new int[] { Color.argb(100, 255, 69, 0), Color.TRANSPARENT },
+                null, Shader.TileMode.CLAMP);
+
+        cachedMeteorShading = new RadialGradient(meteorX - meteorRadius * 0.3f, meteorY - meteorRadius * 0.3f,
+                meteorRadius * 1.5f,
+                Color.argb(0, 0, 0, 0), Color.argb(200, 0, 0, 0), Shader.TileMode.CLAMP);
     }
 
     private void updatePositionsAfterResize() {
@@ -321,7 +392,9 @@ public class GameView extends SurfaceView implements Runnable {
         cloneBalls.clear();
         particles.clear();
         missiles.clear();
+        missiles.clear();
         electricEffects.clear();
+        floatingTexts.clear();
 
         whiteBall.x = centerX;
         whiteBall.y = centerY;
@@ -391,9 +464,10 @@ public class GameView extends SurfaceView implements Runnable {
             }
 
             long frameTime = System.currentTimeMillis() - startTime;
-            if (frameTime < 16) {
+            // Target ~144 FPS (approx 7ms)
+            if (frameTime < 7) {
                 try {
-                    Thread.sleep(16 - frameTime);
+                    Thread.sleep(7 - frameTime);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -464,13 +538,21 @@ public class GameView extends SurfaceView implements Runnable {
                 saveProgress();
 
                 // New Space Unlocked? (Level 11, 21, etc.)
-                if (maxUnlockedLevel % 10 == 1 && maxUnlockedLevel > 1) {
+                if (maxUnlockedLevel % 10 == 1 && maxUnlockedLevel > 1 && maxUnlockedLevel <= 100) {
                     gameStarted = false;
                     showLevelSelector = true;
                     selectorPage = (maxUnlockedLevel - 1) / 10 + 1;
                     // Stop here, don't init next level immediately
                     return;
                 }
+            }
+
+            // Check for Game Completion (Level > 500 stages = 100 Levels)
+            if (level > 500) {
+                gameCompleted = true;
+                gameStarted = false;
+                updateMenuButtonsVisibility();
+                return;
             }
 
             initLevel(level);
@@ -603,6 +685,14 @@ public class GameView extends SurfaceView implements Runnable {
                 impactArcs.remove(i);
         }
 
+        // Floating texts update
+        for (int i = floatingTexts.size() - 1; i >= 0; i--) {
+            FloatingText ft = floatingTexts.get(i);
+            ft.update();
+            if (ft.isDead())
+                floatingTexts.remove(i);
+        }
+
         // Yıldızları güncelle
         if (stars != null) {
             for (Star star : stars) {
@@ -695,12 +785,13 @@ public class GameView extends SurfaceView implements Runnable {
                         comboHits++;
                         if (comboHits > maxCombo)
                             maxCombo = comboHits; // Rekor kontrolü
-                        if (comboHits >= 2) {
-                            comboText = "COMBO x" + (comboHits + 1);
-                            comboTextEndTime = currentTime + 1500;
+                        if (comboHits >= 3) {
+                            // Yeni animasyonlu combo yazısı ekle
+                            floatingTexts.add(new FloatingText("COMBO x" + (comboHits), centerX,
+                                    centerY - screenHeight * 0.15f, Color.rgb(255, 215, 0)));
                         }
                     } else {
-                        comboHits = 0;
+                        comboHits = 1;
                     }
                     lastHitTime = currentTime;
 
@@ -986,6 +1077,33 @@ public class GameView extends SurfaceView implements Runnable {
                     impactArcs.add(new ImpactArc(x, y, angle, length, color));
                 }
                 break;
+            case "ripple":
+                particles.add(new Particle(x, y, 0, 0, color, ParticleType.RIPPLE));
+                break;
+            case "confetti":
+                for (int i = 0; i < 15; i++) {
+                    float angle = random.nextFloat() * (float) (2 * Math.PI);
+                    float speed = random.nextFloat() * 5 + 3;
+                    int confettiColor = Color.rgb(random.nextInt(256), random.nextInt(256), random.nextInt(256));
+                    particles.add(new Particle(x, y, angle, speed, confettiColor, ParticleType.CONFETTI));
+                }
+                break;
+            case "vortex":
+                for (int i = 0; i < 25; i++) {
+                    float angle = (float) (random.nextFloat() * Math.PI * 2);
+                    float speed = random.nextFloat() * 10 + 5;
+                    int pColor = Color.rgb(100 + random.nextInt(155), 0, 255); // Purple nuances
+                    particles.add(new Particle(x, y, angle, speed, pColor));
+                }
+                break;
+            case "shatter":
+                for (int i = 0; i < 20; i++) {
+                    float angle = (float) (random.nextFloat() * Math.PI * 2);
+                    float speed = random.nextFloat() * 20 + 10;
+                    int pColor = Color.rgb(200 + random.nextInt(55), 200 + random.nextInt(55), 255); // White/Blueish
+                    particles.add(new Particle(x, y, angle, speed, pColor));
+                }
+                break;
             default:
                 // Classic: Just circles (already added)
                 break;
@@ -1000,22 +1118,61 @@ public class GameView extends SurfaceView implements Runnable {
             canvas.save();
             canvas.translate(cameraShakeX, cameraShakeY);
 
-            // Arka plan
+            // Arka plan - 10 Space progression
             int currentSpace = ((level - 1) / 50) + 1;
-            if (currentSpace >= 2) {
-                // Space 2: Dark + Moon + Comets
-                canvas.drawColor(Color.rgb(10, 5, 20)); // Deep dark
-                drawMoon(canvas); // Draw Moon background
-                for (Comet c : comets) {
-                    c.update(screenWidth, screenHeight);
-                    c.draw(canvas, paint);
-                }
-            } else {
-                // Space 1: Dark + Stars
-                canvas.drawColor(Color.rgb(5, 5, 16));
-                for (Star star : stars) {
-                    star.draw(canvas, paint);
-                }
+
+            // Cycle backgrounds for Spaces 1-10
+            switch (currentSpace) {
+                case 1:
+                case 5:
+                    // Space 1 & 5: Dark + Stars
+                    canvas.drawColor(Color.rgb(5, 5, 16));
+                    for (Star star : stars) {
+                        star.draw(canvas, paint);
+                    }
+                    break;
+
+                case 2:
+                case 6:
+                    // Space 2 & 6: Dark + Moon + Comets
+                    canvas.drawColor(Color.rgb(10, 5, 20)); // Deep dark
+                    drawMoon(canvas);
+                    for (Comet c : comets) {
+                        c.update(screenWidth, screenHeight);
+                        c.draw(canvas, paint);
+                    }
+                    break;
+
+                case 3:
+                case 4:
+                case 8:
+                case 9:
+                case 10:
+                    // Space 3, 4, 8, 9, 10: Reddish Dark + Giant Meteor + Comets
+                    canvas.drawColor(Color.rgb(25, 5, 10)); // Reddish dark background
+                    drawGiantMeteor(canvas);
+                    for (Comet c : comets) {
+                        c.update(screenWidth, screenHeight);
+                        c.draw(canvas, paint);
+                    }
+                    break;
+
+                case 7:
+                    // Space 7: Aurora Nebula (New unique background)
+                    drawAuroraNebula(canvas);
+                    for (Star star : stars) {
+                        star.update(screenWidth, screenHeight);
+                        star.draw(canvas, paint);
+                    }
+                    break;
+
+                default:
+                    // Fallback to stars for any space beyond 10
+                    canvas.drawColor(Color.rgb(5, 5, 16));
+                    for (Star star : stars) {
+                        star.draw(canvas, paint);
+                    }
+                    break;
             }
 
             // Çember
@@ -1197,6 +1354,83 @@ public class GameView extends SurfaceView implements Runnable {
                         }
                         paint.setAlpha(255);
                         paint.clearShadowLayer();
+                    } else if (selectedTrajectory.equals("arrow")) {
+                        // Green Arrow
+                        paint.setAlpha(255);
+                        paint.setShadowLayer(15, 0, 0, Color.GREEN);
+                        paint.setStrokeWidth(6);
+                        paint.setColor(Color.GREEN);
+                        canvas.drawLine(startX, startY, vEndX, vEndY, paint);
+
+                        // Small arrowheads along the line
+                        paint.setStyle(Paint.Style.FILL);
+                        int arrows = 3;
+                        for (int i = 1; i <= arrows; i++) {
+                            float t = (float) i / arrows;
+                            float ax = startX + (vEndX - startX) * t;
+                            float ay = startY + (vEndY - startY) * t;
+                            // Simple arrowhead
+                            // ... (We draw the main head at the end anyway, maybe just dots or small
+                            // chevrons here?)
+                            // Let's just keep the main line green and rely on the big arrow at the end.
+                        }
+                        paint.clearShadowLayer();
+                    } else if (selectedTrajectory.equals("wave")) {
+                        // Cyan Wave
+                        paint.setAlpha(255);
+                        paint.setStrokeWidth(4);
+                        paint.setColor(Color.CYAN);
+                        paint.setStyle(Paint.Style.STROKE);
+
+                        android.graphics.Path path = new android.graphics.Path();
+                        path.moveTo(startX, startY);
+                        int segs = 20;
+                        for (int i = 1; i <= segs; i++) {
+                            float t = (float) i / segs;
+                            float px = startX + (vEndX - startX) * t;
+                            float py = startY + (vEndY - startY) * t;
+
+                            // Sine wave
+                            float offset = (float) Math.sin(t * Math.PI * 4 - System.currentTimeMillis() * 0.01) * 20;
+                            float perpX = -(endY - startY) / lineLen;
+                            float perpY = (endX - startX) / lineLen;
+
+                            path.lineTo(px + perpX * offset, py + perpY * offset);
+                        }
+                        canvas.drawPath(path, paint);
+                    } else if (selectedTrajectory.equals("grid")) {
+                        // Projected Grid Guide
+                        paint.setAlpha(150);
+                        paint.setStrokeWidth(2);
+                        paint.setColor(Color.WHITE);
+                        paint.setStyle(Paint.Style.STROKE);
+
+                        // Draw a "ladder" or grid projection
+                        int steps = 15;
+                        for (int i = 0; i <= steps; i++) {
+                            float t = (float) i / steps;
+                            float px = startX + (vEndX - startX) * t;
+                            float py = startY + (vEndY - startY) * t;
+
+                            // Cross lines
+                            float perpX = -(endY - startY) / lineLen * 10 * (1 + t); // Widens at end
+                            float perpY = (endX - startX) / lineLen * 10 * (1 + t);
+
+                            canvas.drawLine(px - perpX, py - perpY, px + perpX, py + perpY, paint);
+                        }
+                        // Side lines
+                        canvas.drawLine(startX, startY, vEndX, vEndY, paint);
+
+                    } else if (selectedTrajectory.equals("pulse")) {
+                        // Pulsating Line
+                        float pulse = (float) (Math.sin(System.currentTimeMillis() * 0.02) * 0.5 + 0.5);
+                        paint.setAlpha(255);
+                        paint.setStrokeWidth(4 + 4 * pulse);
+                        paint.setColor(Color.rgb(255, 50, 50));
+                        paint.setShadowLayer(15 * pulse, 0, 0, Color.RED);
+                        canvas.drawLine(startX, startY, vEndX, vEndY, paint);
+                        paint.clearShadowLayer();
+
                     } else {
                         // Default dashed
                         paint.setPathEffect(new android.graphics.DashPathEffect(new float[] { 20, 20 }, 0));
@@ -1274,15 +1508,9 @@ public class GameView extends SurfaceView implements Runnable {
                 paint.clearShadowLayer();
             }
 
-            // Combo text göster
-            if (System.currentTimeMillis() < comboTextEndTime && !comboText.isEmpty()) {
-                paint.setStyle(Paint.Style.FILL);
-                paint.setTextSize(screenWidth * 0.12f);
-                paint.setTextAlign(Paint.Align.CENTER);
-                paint.setColor(Color.rgb(255, 215, 0));
-                paint.setShadowLayer(15, 0, 0, Color.rgb(255, 215, 0));
-                canvas.drawText(comboText, centerX, centerY - screenHeight * 0.2f, paint);
-                paint.clearShadowLayer();
+            // Combo text göster (Floating texts)
+            for (FloatingText ft : floatingTexts) {
+                ft.draw(canvas, paint);
             }
 
             // STAGE CLEARED animasyonu
@@ -1294,7 +1522,10 @@ public class GameView extends SurfaceView implements Runnable {
                     int completedLevel = ((level - 1) / 5) + 1;
                     int nextLevelToUnlock = completedLevel + 1;
 
-                    if (nextLevelToUnlock <= maxUnlockedLevel) {
+                    // If game is completed (or about to be), don't show unlock text for next level
+                    if (nextLevelToUnlock > 100) {
+                        canvas.drawText("FINAL STAGE CLEARED!", centerX, centerY, paint);
+                    } else if (nextLevelToUnlock <= maxUnlockedLevel) {
                         paint.setTextSize(screenWidth * 0.06f); // Smaller text
                         canvas.drawText("LEVEL " + nextLevelToUnlock, centerX, centerY - screenHeight * 0.04f, paint);
                         canvas.drawText("ALREADY UNLOCKED", centerX, centerY + screenHeight * 0.04f, paint);
@@ -1324,6 +1555,10 @@ public class GameView extends SurfaceView implements Runnable {
 
             // UI
             drawUI(canvas);
+
+            if (gameCompleted) {
+                drawGameCompleted(canvas);
+            }
 
             canvas.restore();
             holder.unlockCanvasAndPost(canvas);
@@ -1375,6 +1610,21 @@ public class GameView extends SurfaceView implements Runnable {
                 case "ireland":
                 case "canada":
                 case "brazil":
+                case "japan":
+                case "korea":
+                case "china":
+                case "russia":
+                case "india":
+                case "mexico":
+                case "argentina":
+                case "azerbaijan":
+                case "ukraine":
+                case "egypt":
+                case "australia":
+                case "south_africa":
+                case "saudi_arabia":
+                case "pakistan":
+                case "indonesia":
                     drawCountryFlagBall(canvas, ball, selectedSkin);
                     return;
                 case "cyber_core":
@@ -1581,6 +1831,21 @@ public class GameView extends SurfaceView implements Runnable {
         } else if (selectedTrail.equals("rainbow")) {
             drawRainbowTrail(canvas, ball);
             return;
+        } else if (selectedTrail.equals("ghost")) {
+            drawGhostTrail(canvas, ball);
+            return;
+        } else if (selectedTrail.equals("bubble")) {
+            drawBubbleTrail(canvas, ball);
+            return;
+        } else if (selectedTrail.equals("pixel")) {
+            drawPixelTrail(canvas, ball);
+            return;
+        } else if (selectedTrail.equals("dna")) {
+            drawDNATrail(canvas, ball);
+            return;
+        } else if (selectedTrail.equals("sparkle")) {
+            drawSparkleTrail(canvas, ball);
+            return;
         }
 
         paint.setStyle(Paint.Style.FILL);
@@ -1626,6 +1891,49 @@ public class GameView extends SurfaceView implements Runnable {
         }
         paint.setAlpha(255);
         paint.clearShadowLayer();
+    }
+
+    private void drawDNATrail(Canvas canvas, Ball ball) {
+        paint.setStyle(Paint.Style.FILL);
+        for (int i = 0; i < ball.trail.size(); i++) {
+            TrailPoint p = ball.trail.get(i);
+            float ratio = 1.0f - (float) i / MAX_TRAIL_POINTS;
+
+            // DNA Helix structure
+            float offset = (float) Math.sin(i * 0.5 + System.currentTimeMillis() * 0.005) * 20;
+
+            paint.setColor(Color.MAGENTA);
+            paint.setAlpha((int) (200 * ratio));
+            canvas.drawCircle(p.x + offset, p.y + offset, 4 * ratio, paint);
+
+            paint.setColor(Color.CYAN);
+            canvas.drawCircle(p.x - offset, p.y - offset, 4 * ratio, paint);
+
+            // Connector
+            if (i % 2 == 0) {
+                paint.setColor(Color.WHITE);
+                paint.setAlpha((int) (100 * ratio));
+                paint.setStrokeWidth(2);
+                canvas.drawLine(p.x + offset, p.y + offset, p.x - offset, p.y - offset, paint);
+                paint.setStyle(Paint.Style.FILL); // Reset
+            }
+        }
+    }
+
+    private void drawSparkleTrail(Canvas canvas, Ball ball) {
+        paint.setStyle(Paint.Style.FILL);
+        for (int i = 0; i < ball.trail.size(); i++) {
+            TrailPoint p = ball.trail.get(i);
+            float ratio = 1.0f - (float) i / MAX_TRAIL_POINTS;
+
+            if (random.nextFloat() > 0.3f) {
+                paint.setColor(Color.YELLOW);
+                paint.setAlpha((int) (255 * ratio));
+                float size = 5 * ratio * (random.nextFloat() + 0.5f);
+                drawStarPath(canvas, p.x + (random.nextFloat() - 0.5f) * 30, p.y + (random.nextFloat() - 0.5f) * 30,
+                        size);
+            }
+        }
     }
 
     private void drawCosmicTrail(Canvas canvas, Ball ball) {
@@ -1705,6 +2013,59 @@ public class GameView extends SurfaceView implements Runnable {
             paint.setColor(rainbow[i % rainbow.length]);
             paint.setAlpha((int) (180 * ratio));
             canvas.drawCircle(p.x, p.y, p.radius * (1.2f - ratio * 0.5f), paint);
+        }
+    }
+
+    private void drawGhostTrail(Canvas canvas, Ball ball) {
+        paint.setStyle(Paint.Style.FILL);
+        // fill
+        for (int i = 0; i < ball.trail.size(); i++) {
+            TrailPoint p = ball.trail.get(i);
+            float ratio = 1.0f - (float) i / MAX_TRAIL_POINTS;
+
+            // Draw a ghost ball at each point
+            paint.setColor(Color.WHITE);
+            paint.setAlpha((int) (120 * ratio));
+            canvas.drawCircle(p.x, p.y, p.radius * ratio, paint);
+        }
+    }
+
+    private void drawBubbleTrail(Canvas canvas, Ball ball) {
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(3);
+        paint.setColor(Color.CYAN);
+
+        for (int i = 0; i < ball.trail.size(); i++) {
+            TrailPoint p = ball.trail.get(i);
+            float ratio = 1.0f - (float) i / MAX_TRAIL_POINTS;
+
+            paint.setAlpha((int) (200 * ratio));
+            canvas.drawCircle(p.x, p.y, p.radius * ratio, paint);
+
+            // Shine spot
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(Color.WHITE);
+            paint.setAlpha((int) (150 * ratio));
+            canvas.drawCircle(p.x - p.radius * ratio * 0.3f, p.y - p.radius * ratio * 0.3f, p.radius * ratio * 0.3f,
+                    paint);
+
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setColor(Color.CYAN);
+        }
+        paint.setStyle(Paint.Style.FILL);
+    }
+
+    private void drawPixelTrail(Canvas canvas, Ball ball) {
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.GREEN);
+
+        for (int i = 0; i < ball.trail.size(); i++) {
+            TrailPoint p = ball.trail.get(i);
+            float ratio = 1.0f - (float) i / MAX_TRAIL_POINTS;
+            float r = p.radius * ratio;
+
+            paint.setAlpha((int) (180 * ratio));
+            canvas.drawRect(p.x - r, p.y - r, p.x + r, p.y + r, paint);
         }
     }
 
@@ -1865,6 +2226,142 @@ public class GameView extends SurfaceView implements Runnable {
                 canvas.drawPath(diamond, paint);
                 paint.setColor(Color.rgb(0, 39, 118));
                 canvas.drawCircle(bx, by, r * 0.35f, paint);
+                break;
+            case "japan":
+                paint.setColor(Color.WHITE);
+                canvas.drawCircle(bx, by, r, paint);
+                paint.setColor(Color.RED);
+                canvas.drawCircle(bx, by, r * 0.4f, paint);
+                break;
+            case "korea":
+                paint.setColor(Color.WHITE);
+                canvas.drawCircle(bx, by, r, paint);
+                paint.setColor(Color.RED);
+                canvas.drawArc(bx - r * 0.5f, by - r * 0.5f, bx + r * 0.5f, by + r * 0.5f, -90, 180, true, paint);
+                paint.setColor(Color.BLUE);
+                canvas.drawArc(bx - r * 0.5f, by - r * 0.5f, bx + r * 0.5f, by + r * 0.5f, 90, 180, true, paint);
+                break;
+            case "china":
+                paint.setColor(Color.RED);
+                canvas.drawCircle(bx, by, r, paint);
+                paint.setColor(Color.YELLOW);
+                drawStarPath(canvas, bx - r * 0.2f, by - r * 0.2f, r * 0.25f);
+                break;
+            case "russia":
+                drawHorizStripes(canvas, bx, by, r, Color.WHITE, Color.BLUE, Color.RED);
+                break;
+            case "india":
+                drawHorizStripes(canvas, bx, by, r, Color.rgb(255, 153, 51), Color.WHITE, Color.rgb(19, 136, 8));
+                paint.setColor(Color.BLUE);
+                paint.setStyle(Paint.Style.STROKE);
+                paint.setStrokeWidth(2);
+                canvas.drawCircle(bx, by, r * 0.15f, paint);
+                break;
+            case "mexico":
+                drawVertStripes(canvas, bx, by, r, Color.rgb(0, 104, 71), Color.WHITE, Color.RED);
+                paint.setColor(Color.rgb(139, 69, 19));
+                paint.setStyle(Paint.Style.FILL);
+                canvas.drawCircle(bx, by, r * 0.15f, paint);
+                break;
+            case "argentina":
+                drawHorizStripes(canvas, bx, by, r, Color.rgb(117, 170, 219), Color.WHITE, Color.rgb(117, 170, 219));
+                paint.setColor(Color.YELLOW);
+                canvas.drawCircle(bx, by, r * 0.15f, paint);
+                break;
+            case "azerbaijan":
+                drawHorizStripes(canvas, bx, by, r, Color.rgb(0, 181, 226), Color.RED, Color.GREEN);
+                paint.setColor(Color.WHITE);
+                paint.setStyle(Paint.Style.FILL);
+                canvas.drawCircle(bx, by, r * 0.12f, paint);
+                break;
+            case "ukraine":
+                drawHorizStripes(canvas, bx, by, r, Color.rgb(0, 87, 183), Color.rgb(255, 215, 0));
+                break;
+            case "egypt":
+                drawHorizStripes(canvas, bx, by, r, Color.RED, Color.WHITE, Color.BLACK);
+                paint.setColor(Color.rgb(192, 147, 0)); // Gold
+                canvas.drawCircle(bx, by, r * 0.15f, paint);
+                break;
+            case "australia":
+                paint.setColor(Color.rgb(0, 0, 139)); // Blue
+                canvas.drawCircle(bx, by, r, paint);
+                // Union Jack (simplified)
+                paint.setColor(Color.RED);
+                canvas.drawRect(bx - r, by - r, bx, by, paint); // Red base for corner
+                paint.setColor(Color.WHITE);
+                canvas.drawLine(bx - r, by - r, bx, by, paint); // Cross
+                canvas.drawLine(bx - r, by, bx, by - r, paint);
+                // Stars
+                paint.setColor(Color.WHITE);
+                drawStarPath(canvas, bx, by + r * 0.6f, r * 0.2f); // Commonwealth
+                drawStarPath(canvas, bx + r * 0.6f, by, r * 0.15f); // Southern Cross main
+                break;
+            case "south_africa":
+                paint.setColor(Color.WHITE);
+                canvas.drawCircle(bx, by, r, paint); // White base for borders
+
+                // Green Y
+                paint.setColor(Color.rgb(0, 122, 77));
+                android.graphics.Path yPath = new android.graphics.Path();
+                yPath.moveTo(bx - r, by - r * 0.2f);
+                yPath.lineTo(bx, by);
+                yPath.lineTo(bx + r, by);
+                yPath.lineTo(bx + r, by - 0.2f); // Thickness hack
+                // Actually simple shapes:
+                canvas.drawRect(bx, by - r * 0.15f, bx + r, by + r * 0.15f, paint); // Middle bar
+                // Triangles for Y arms? Complex. Let's simplify:
+                // Green Horizontal
+                canvas.drawRect(bx - r, by - r * 0.15f, bx + r, by + r * 0.15f, paint);
+                // Black Triangle Left
+                paint.setColor(Color.BLACK);
+                android.graphics.Path tri = new android.graphics.Path();
+                tri.moveTo(bx - r, by - r * 0.5f);
+                tri.lineTo(bx - r * 0.3f, by);
+                tri.lineTo(bx - r, by + r * 0.5f);
+                tri.close();
+                canvas.drawPath(tri, paint);
+                // Yellow Border
+                paint.setStyle(Paint.Style.STROKE);
+                paint.setStrokeWidth(5);
+                paint.setColor(Color.YELLOW);
+                canvas.drawPath(tri, paint);
+                paint.setStyle(Paint.Style.FILL);
+
+                // Red Top
+                paint.setColor(Color.RED);
+                canvas.drawRect(bx - r, by - r, bx + r, by - r * 0.25f, paint);
+                // Blue Bottom
+                paint.setColor(Color.BLUE);
+                canvas.drawRect(bx - r, by + r * 0.25f, bx + r, by + r, paint);
+                break;
+            case "saudi_arabia":
+                paint.setColor(Color.rgb(0, 100, 0)); // Green
+                canvas.drawCircle(bx, by, r, paint);
+                paint.setColor(Color.WHITE);
+                // Sword
+                canvas.drawLine(bx - r * 0.6f, by + r * 0.3f, bx + r * 0.6f, by + r * 0.3f, paint);
+                // Text squiggle
+                paint.setStrokeWidth(3);
+                canvas.drawLine(bx - r * 0.4f, by - r * 0.1f, bx + r * 0.4f, by - r * 0.1f, paint);
+                canvas.drawCircle(bx, by - r * 0.2f, 2, paint);
+                break;
+            case "pakistan":
+                paint.setColor(Color.rgb(0, 64, 26)); // Dark Green
+                canvas.drawCircle(bx, by, r, paint);
+                paint.setColor(Color.WHITE);
+                // White stripe left
+                canvas.drawRect(bx - r, by - r, bx - r * 0.5f, by + r, paint);
+                // Crescent
+                paint.setColor(Color.WHITE);
+                canvas.drawCircle(bx + r * 0.1f, by, r * 0.35f, paint);
+                paint.setColor(Color.rgb(0, 64, 26)); // Mask
+                canvas.drawCircle(bx + r * 0.18f, by - r * 0.05f, r * 0.3f, paint);
+                // Star
+                paint.setColor(Color.WHITE);
+                drawStarPath(canvas, bx + r * 0.3f, by - r * 0.2f, r * 0.1f);
+                break;
+            case "indonesia":
+                drawHorizStripes(canvas, bx, by, r, Color.RED, Color.WHITE);
                 break;
         }
         canvas.restore();
@@ -2444,7 +2941,7 @@ public class GameView extends SurfaceView implements Runnable {
                     float rightX = screenWidth * 0.75f;
                     float distRight = (float) Math
                             .sqrt((touchX - rightX) * (touchX - rightX) + (touchY - arrowY) * (touchY - arrowY));
-                    if (distRight < arrowRadius * 1.5f) {
+                    if (distRight < arrowRadius * 1.5f && selectorPage < 10) { // Limit to 10 pages
                         selectorPage++;
                         playSound(soundLaunch);
                         return true;
@@ -2532,6 +3029,22 @@ public class GameView extends SurfaceView implements Runnable {
                         score = 0;
                         initLevel(1);
                         updateMenuButtonsVisibility();
+                        return true;
+                    }
+
+                } else if (gameCompleted) {
+                    float btnW = screenWidth * 0.5f;
+                    float btnH = screenHeight * 0.07f;
+                    float btnY = screenHeight * 0.75f;
+
+                    if (Math.abs(touchX - centerX) < btnW / 2 && Math.abs(touchY - btnY) < btnH / 2) {
+                        gameCompleted = false;
+                        gameStarted = false;
+                        score = 0;
+                        initLevel(1);
+                        maxUnlockedLevel = Math.min(maxUnlockedLevel, 100); // just safety
+                        updateMenuButtonsVisibility();
+                        playSound(soundLaunch);
                         return true;
                     }
                 } else {
@@ -2624,6 +3137,7 @@ public class GameView extends SurfaceView implements Runnable {
         }
 
         return true;
+
     }
 
     public void pause() {
@@ -2638,13 +3152,8 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     public void resume() {
+        reloadPreferences();
         isPlaying = true;
-        SharedPreferences prefs = getContext().getSharedPreferences("SpaceBilliard", Context.MODE_PRIVATE);
-        selectedSkin = prefs.getString("selectedSkin", "default");
-        selectedTrail = prefs.getString("selectedTrail", "none");
-        selectedAura = prefs.getString("selectedAura", "none");
-        selectedTrajectory = prefs.getString("selectedTrajectory", "dashed");
-        selectedImpact = prefs.getString("selectedImpact", "classic");
         gameThread = new Thread(this);
         gameThread.start();
     }
@@ -2920,9 +3429,11 @@ public class GameView extends SurfaceView implements Runnable {
             drawPremiumArrowButton(canvas, leftX, arrowY, arrowRadius, true);
         }
 
-        // Right Arrow (always visible for navigation)
-        float rightX = screenWidth * 0.75f;
-        drawPremiumArrowButton(canvas, rightX, arrowY, arrowRadius, false);
+        // Right Arrow (Limit to 10 pages)
+        if (selectorPage < 10) {
+            float rightX = screenWidth * 0.75f;
+            drawPremiumArrowButton(canvas, rightX, arrowY, arrowRadius, false);
+        }
 
         // Premium BACK Button (Neon style matching reference)
         float backBtnW = screenWidth * 0.5f;
@@ -3175,7 +3686,7 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     enum ParticleType {
-        CIRCLE, STAR, FLAME
+        CIRCLE, STAR, FLAME, CONFETTI, RIPPLE
     }
 
     class Particle {
@@ -3205,6 +3716,18 @@ public class GameView extends SurfaceView implements Runnable {
                 // Flames move mostly up
                 this.vx = (random.nextFloat() - 0.5f) * 2f;
                 this.vy = -random.nextFloat() * 4f - 2f;
+            } else if (type == ParticleType.CONFETTI) {
+                this.vRotation = (random.nextFloat() - 0.5f) * 0.5f;
+                this.maxLife = 50;
+                this.life = 50;
+                // Confetti slows down
+                this.vx *= 0.8f;
+                this.vy *= 0.8f;
+            } else if (type == ParticleType.RIPPLE) {
+                this.vx = 0;
+                this.vy = 0; // Ripples stay in place
+                this.maxLife = 40;
+                this.life = 40;
             }
         }
 
@@ -3213,6 +3736,13 @@ public class GameView extends SurfaceView implements Runnable {
             y += vy;
             rotation += vRotation;
             life--;
+
+            if (type == ParticleType.CONFETTI) {
+                // Gravityish/Air resistance
+                vx *= 0.95f;
+                vy *= 0.95f;
+                vy += 0.2f; // Gravity
+            }
         }
 
         boolean isDead() {
@@ -3236,6 +3766,23 @@ public class GameView extends SurfaceView implements Runnable {
                 paint.setShadowLayer(15 * ratio, 0, 0, Color.rgb(r, g, b));
                 canvas.drawCircle(x, y, 12 * ratio, paint);
                 paint.clearShadowLayer();
+            } else if (type == ParticleType.CONFETTI) {
+                paint.setColor(color);
+                canvas.save();
+                canvas.rotate((float) Math.toDegrees(rotation), x, y);
+                canvas.drawRect(x - 5, y - 5, x + 5, y + 5, paint);
+                canvas.restore();
+            } else if (type == ParticleType.RIPPLE) {
+                paint.setStyle(Paint.Style.STROKE);
+                paint.setStrokeWidth(5 * (life / (float) maxLife));
+                paint.setColor(color);
+                float radius = 100 * (1.0f - life / (float) maxLife);
+                canvas.drawCircle(x, y, radius, paint);
+                // Second ripple
+                if (life < maxLife - 10) {
+                    float radius2 = 100 * (1.0f - (life + 10) / (float) maxLife);
+                    canvas.drawCircle(x, y, radius2 * 0.7f, paint);
+                }
             } else {
                 paint.setColor(color);
                 canvas.drawCircle(x, y, 4, paint);
@@ -3554,6 +4101,166 @@ public class GameView extends SurfaceView implements Runnable {
         canvas.restore();
     }
 
+    private void drawGiantMeteor(Canvas canvas) {
+        float meteorRadius = screenWidth * 0.18f;
+        float meteorX = screenWidth * 0.85f;
+        float meteorY = screenHeight * 0.85f;
+
+        // Rotation
+        float angle = (System.currentTimeMillis() % 25000) / 25000f * 360f;
+
+        canvas.save();
+        canvas.rotate(angle, meteorX, meteorY);
+
+        // 1. Fiery Aura/Tail effect behind
+        paint.setStyle(Paint.Style.FILL);
+        if (cachedMeteorAura != null)
+            paint.setShader(cachedMeteorAura);
+        canvas.drawCircle(meteorX, meteorY, meteorRadius * 1.6f, paint);
+        paint.setShader(null);
+
+        // 2. Main Rock Shape (Irregular Polygon)
+        // Fill Rock
+        paint.setColor(Color.rgb(60, 50, 45)); // Dark Grey-Brown
+        paint.setShadowLayer(20, 0, 0, Color.BLACK);
+        if (cachedMeteorPath != null)
+            canvas.drawPath(cachedMeteorPath, paint);
+        paint.clearShadowLayer();
+
+        // 3. Shading (Gradient overlay for 3D effect)
+        paint.setStyle(Paint.Style.FILL);
+        if (cachedMeteorShading != null)
+            paint.setShader(cachedMeteorShading);
+        if (cachedXfermode != null)
+            paint.setXfermode(cachedXfermode);
+        if (cachedMeteorPath != null)
+            canvas.drawPath(cachedMeteorPath, paint);
+        paint.setXfermode(null);
+        paint.setShader(null);
+
+        // 4. Craters (Darker spots)
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.rgb(40, 30, 25));
+        canvas.drawCircle(meteorX - meteorRadius * 0.4f, meteorY - meteorRadius * 0.2f, meteorRadius * 0.25f, paint);
+        canvas.drawCircle(meteorX + meteorRadius * 0.3f, meteorY + meteorRadius * 0.4f, meteorRadius * 0.2f, paint);
+        canvas.drawCircle(meteorX + meteorRadius * 0.1f, meteorY - meteorRadius * 0.5f, meteorRadius * 0.15f, paint);
+        canvas.drawCircle(meteorX - meteorRadius * 0.2f, meteorY + meteorRadius * 0.3f, meteorRadius * 0.1f, paint);
+
+        // 5. Molten Cracks (Glowing Orange/Yellow)
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeCap(Paint.Cap.ROUND);
+        paint.setStrokeWidth(meteorRadius * 0.05f);
+        paint.setColor(Color.rgb(255, 140, 0)); // Intense Orange
+        paint.setShadowLayer(15, 0, 0, Color.RED);
+
+        if (cachedMeteorCracks != null)
+            canvas.drawPath(cachedMeteorCracks, paint);
+        paint.clearShadowLayer();
+
+        canvas.restore();
+    }
+
+    private void drawAuroraNebula(Canvas canvas) {
+        // Dynamic Aurora/Nebula effect for Space 7
+        long time = System.currentTimeMillis();
+        float wave1 = (float) Math.sin(time * 0.001) * 0.5f + 0.5f;
+        float wave2 = (float) Math.cos(time * 0.0015) * 0.5f + 0.5f;
+
+        // Deep space purple-blue gradient background
+        paint.setStyle(Paint.Style.FILL);
+        RadialGradient nebulaGradient = new RadialGradient(
+                centerX, centerY * 0.5f, screenHeight,
+                new int[] {
+                        Color.rgb(20, 10, 40), // Deep purple
+                        Color.rgb(5, 10, 30), // Dark blue
+                        Color.rgb(5, 5, 15) // Almost black
+                },
+                new float[] { 0f, 0.6f, 1f },
+                Shader.TileMode.CLAMP);
+        paint.setShader(nebulaGradient);
+        canvas.drawRect(0, 0, screenWidth, screenHeight, paint);
+        paint.setShader(null);
+
+        // Aurora wave 1 (Green-Cyan)
+        paint.setStyle(Paint.Style.FILL);
+        int auroraColor1 = Color.argb(
+                (int) (80 * wave1),
+                0,
+                (int) (200 + 55 * wave1),
+                (int) (150 + 105 * wave1));
+
+        RadialGradient aurora1 = new RadialGradient(
+                centerX, centerY + (wave1 * 200 - 100),
+                screenWidth * 0.8f,
+                auroraColor1,
+                Color.TRANSPARENT,
+                Shader.TileMode.CLAMP);
+        paint.setShader(aurora1);
+        canvas.drawCircle(centerX, centerY, screenWidth * 0.6f, paint);
+        paint.setShader(null);
+
+        // Aurora wave 2 (Purple-Magenta)
+        int auroraColor2 = Color.argb(
+                (int) (70 * wave2),
+                (int) (150 + 105 * wave2),
+                50,
+                (int) (200 + 55 * wave2));
+
+        RadialGradient aurora2 = new RadialGradient(
+                centerX * 0.7f, centerY - (wave2 * 150 - 75),
+                screenWidth * 0.7f,
+                auroraColor2,
+                Color.TRANSPARENT,
+                Shader.TileMode.CLAMP);
+        paint.setShader(aurora2);
+        canvas.drawCircle(centerX, centerY, screenWidth * 0.5f, paint);
+        paint.setShader(null);
+
+        // Aurora wave 3 (Blue-White shimmer)
+        float wave3 = (float) Math.sin(time * 0.002 + Math.PI) * 0.5f + 0.5f;
+        int auroraColor3 = Color.argb(
+                (int) (60 * wave3),
+                (int) (100 + 155 * wave3),
+                (int) (150 + 105 * wave3),
+                255);
+
+        RadialGradient aurora3 = new RadialGradient(
+                centerX * 1.3f, centerY + (wave3 * 180 - 90),
+                screenWidth * 0.6f,
+                auroraColor3,
+                Color.TRANSPARENT,
+                Shader.TileMode.CLAMP);
+        paint.setShader(aurora3);
+        canvas.drawCircle(centerX, centerY, screenWidth * 0.55f, paint);
+        paint.setShader(null);
+
+        // Nebula clouds (flowing particles effect)
+        paint.setStyle(Paint.Style.FILL);
+        for (int i = 0; i < 8; i++) {
+            float angle = (time * 0.00005f * (i + 1)) + (i * (float) Math.PI / 4);
+            float distance = 300 + (i * 50);
+            float cloudX = centerX + (float) Math.cos(angle) * distance;
+            float cloudY = centerY + (float) Math.sin(angle) * distance;
+            float cloudSize = 80 + (i * 15);
+
+            int cloudAlpha = (int) (30 + 20 * Math.sin(time * 0.001 + i));
+            int cloudColor = Color.argb(
+                    cloudAlpha,
+                    100 + (i * 15),
+                    50 + (i * 20),
+                    200 - (i * 10));
+
+            RadialGradient cloudGradient = new RadialGradient(
+                    cloudX, cloudY, cloudSize,
+                    cloudColor,
+                    Color.TRANSPARENT,
+                    Shader.TileMode.CLAMP);
+            paint.setShader(cloudGradient);
+            canvas.drawCircle(cloudX, cloudY, cloudSize, paint);
+        }
+        paint.setShader(null);
+    }
+
     // Kuyruklu Yıldız Sınıfı
     private class Comet {
         float x, y, vx, vy, size;
@@ -3724,21 +4431,98 @@ public class GameView extends SurfaceView implements Runnable {
         paint.clearShadowLayer();
     }
 
-    private void drawMenuDecoration(Canvas canvas, float cx, float cy, float size) {
-        // Heart/gem decoration
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.MAGENTA);
-        paint.setShadowLayer(15, 0, 0, Color.MAGENTA);
+    // Floating Text Class for animated UI labels
+    class FloatingText {
+        String text;
+        float x, y;
+        int color;
+        int life = 60; // Frames
+        int maxLife = 60;
+        float floatSpeed = 3f;
 
-        // Simple diamond shape
-        Path diamond = new Path();
-        diamond.moveTo(cx, cy - size);
-        diamond.lineTo(cx + size * 0.6f, cy);
-        diamond.lineTo(cx, cy + size);
-        diamond.lineTo(cx - size * 0.6f, cy);
-        diamond.close();
+        FloatingText(String text, float x, float y, int color) {
+            this.text = text;
+            this.x = x;
+            this.y = y;
+            this.color = color;
+        }
 
-        canvas.drawPath(diamond, paint);
+        void update() {
+            y -= floatSpeed; // Move up
+            life--;
+        }
+
+        boolean isDead() {
+            return life <= 0;
+        }
+
+        void draw(Canvas canvas, Paint paint) {
+            paint.setStyle(Paint.Style.FILL);
+            paint.setTextAlign(Paint.Align.CENTER);
+            paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD_ITALIC));
+
+            // Calculate sizes and alpha
+            float ratio = (float) life / maxLife;
+            paint.setTextSize(screenWidth * 0.12f * (0.8f + 0.2f * ratio)); // Shrink slightly as it fades? Or grow?
+                                                                            // Let's stay mostly constant or subtle pop
+            paint.setAlpha((int) (255 * ratio)); // Fade out
+
+            // Text Color
+            paint.setColor(color);
+            paint.setShadowLayer(10, 0, 0, color);
+
+            canvas.drawText(text, x, y, paint);
+
+            paint.clearShadowLayer();
+            paint.setAlpha(255);
+            paint.setTypeface(Typeface.DEFAULT);
+        }
+    }
+
+    private void drawGameCompleted(Canvas canvas) {
+        // Darken background
+        canvas.drawColor(Color.argb(200, 0, 0, 0));
+
+        float centerX = screenWidth / 2f;
+        float centerY = screenHeight / 2f;
+
+        // Pulsing Text Effect
+        float pulse = (float) (Math.sin(System.currentTimeMillis() * 0.005) * 0.1 + 1.0);
+
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+
+        // "CONGRATULATIONS"
+        paint.setTextSize(screenWidth * 0.10f * pulse); // Reduced from 0.12f
+        paint.setColor(Color.rgb(255, 215, 0)); // Gold
+        paint.setShadowLayer(20, 0, 0, Color.RED);
+        canvas.drawText("CONGRATULATIONS", centerX, centerY - screenHeight * 0.1f, paint);
         paint.clearShadowLayer();
+
+        // "YOU MASTERED THE GALAXY"
+        paint.setTextSize(screenWidth * 0.05f);
+        paint.setColor(Color.WHITE);
+        canvas.drawText("YOU MASTERED THE GALAXY", centerX, centerY + screenHeight * 0.05f, paint);
+
+        // "Space 10 - Level 100 Completed"
+        paint.setTextSize(screenWidth * 0.04f);
+        paint.setColor(Color.CYAN);
+        canvas.drawText("Level 100 Completed", centerX, centerY + screenHeight * 0.12f, paint);
+
+        // Restart info ?
+        // Restart info ?
+        /*
+         * paint.setTextSize(screenWidth * 0.035f);
+         * paint.setColor(Color.LTGRAY);
+         * paint.setTypeface(Typeface.DEFAULT);
+         * canvas.drawText("(Restart App to Play Again)", centerX, centerY +
+         * screenHeight * 0.25f, paint);
+         */
+
+        // BACK TO MENU Button
+        float btnW = screenWidth * 0.5f;
+        float btnH = screenHeight * 0.07f;
+        float btnY = screenHeight * 0.75f;
+        drawNeonButton(canvas, "BACK TO MENU", centerX, btnY, btnW, btnH, Color.rgb(255, 100, 100));
     }
 }
