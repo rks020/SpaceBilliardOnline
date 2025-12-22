@@ -58,7 +58,6 @@ public class GameView extends SurfaceView implements Runnable {
     // Oyun durumu
     private boolean gameStarted = false;
     private boolean gameOver = false;
-    private ArrayList<FloatingText> floatingTexts = new ArrayList<>();
     private int score = 0;
     private int lives = 3;
     private Bitmap menuBgBitmap;
@@ -144,16 +143,13 @@ public class GameView extends SurfaceView implements Runnable {
 
     // MainActivity reference for updating UI panels
     private MainActivity mainActivity;
-    private android.view.View startBtn, howToBtn, shopBtn, highScoreBtn;
+    private android.view.View startBtn, howToBtn, shopBtn;
     private android.graphics.Rect startBtnBounds, howToBtnBounds, shopBtnBounds;
 
-    public void setMenuButtons(android.view.View start, android.view.View howTo, android.view.View shop,
-            android.view.View highScore) {
+    public void setMenuButtons(android.view.View start, android.view.View howTo, android.view.View shop) {
         this.startBtn = start;
         this.howToBtn = howTo;
         this.shopBtn = shop;
-        this.highScoreBtn = highScore;
-        updateMenuButtonsVisibility();
     }
 
     public void startGame() {
@@ -163,11 +159,6 @@ public class GameView extends SurfaceView implements Runnable {
 
     public void showInstructions() {
         showInstructions = true;
-        updateMenuButtonsVisibility();
-    }
-
-    public void showHighScore() {
-        showHighScore = true;
         updateMenuButtonsVisibility();
     }
 
@@ -182,16 +173,12 @@ public class GameView extends SurfaceView implements Runnable {
         if (mainActivity != null) {
             mainActivity.runOnUiThread(() -> {
                 boolean show = !gameStarted && !showLevelSelector && !showInstructions && !showHighScore;
-                int visibility = show ? View.VISIBLE : View.GONE;
-
                 if (startBtn != null)
-                    startBtn.setVisibility(visibility);
+                    startBtn.setVisibility(show ? View.VISIBLE : View.GONE);
                 if (howToBtn != null)
-                    howToBtn.setVisibility(visibility);
+                    howToBtn.setVisibility(show ? View.VISIBLE : View.GONE);
                 if (shopBtn != null)
-                    shopBtn.setVisibility(visibility);
-                if (highScoreBtn != null)
-                    highScoreBtn.setVisibility(visibility);
+                    shopBtn.setVisibility(show ? View.VISIBLE : View.GONE);
             });
         }
     }
@@ -709,7 +696,8 @@ public class GameView extends SurfaceView implements Runnable {
                         if (comboHits > maxCombo)
                             maxCombo = comboHits; // Rekor kontrolü
                         if (comboHits >= 2) {
-                            addFloatingText("COMBO x" + (comboHits + 1), ball.x, ball.y, Color.rgb(255, 215, 0));
+                            comboText = "COMBO x" + (comboHits + 1);
+                            comboTextEndTime = currentTime + 1500;
                         }
                     } else {
                         comboHits = 0;
@@ -1286,14 +1274,15 @@ public class GameView extends SurfaceView implements Runnable {
                 paint.clearShadowLayer();
             }
 
-            // Floating Texts (Combos, etc.)
-            for (int i = floatingTexts.size() - 1; i >= 0; i--) {
-                FloatingText ft = floatingTexts.get(i);
-                ft.update();
-                ft.draw(canvas, paint);
-                if (ft.isDead()) {
-                    floatingTexts.remove(i);
-                }
+            // Combo text göster
+            if (System.currentTimeMillis() < comboTextEndTime && !comboText.isEmpty()) {
+                paint.setStyle(Paint.Style.FILL);
+                paint.setTextSize(screenWidth * 0.12f);
+                paint.setTextAlign(Paint.Align.CENTER);
+                paint.setColor(Color.rgb(255, 215, 0));
+                paint.setShadowLayer(15, 0, 0, Color.rgb(255, 215, 0));
+                canvas.drawText(comboText, centerX, centerY - screenHeight * 0.2f, paint);
+                paint.clearShadowLayer();
             }
 
             // STAGE CLEARED animasyonu
@@ -2006,8 +1995,8 @@ public class GameView extends SurfaceView implements Runnable {
             paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
             paint.setColor(Color.MAGENTA);
             paint.setShadowLayer(30, 0, 0, Color.MAGENTA);
-            // Position well visible in the header area - moved down to fix overflow
-            canvas.drawText("MENU", centerX, menuTop + headerCurveHeight + 140, paint);
+            // Position well visible in the header area
+            canvas.drawText("MENU", centerX, menuTop + headerCurveHeight + 50, paint);
             paint.clearShadowLayer();
             paint.setTypeface(Typeface.DEFAULT);
 
@@ -2071,7 +2060,7 @@ public class GameView extends SurfaceView implements Runnable {
             paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
             paint.setColor(Color.RED);
             paint.setShadowLayer(30, 0, 0, Color.RED);
-            canvas.drawText("GAME OVER", centerX, menuTop + headerCurveHeight + 140, paint);
+            canvas.drawText("GAME OVER", centerX, menuTop + headerCurveHeight + 50, paint);
             paint.clearShadowLayer();
             paint.setTypeface(Typeface.DEFAULT);
 
@@ -3665,49 +3654,6 @@ public class GameView extends SurfaceView implements Runnable {
                             lives);
                 }
             });
-        }
-    }
-
-    private void addFloatingText(String text, float x, float y, int color) {
-        floatingTexts.add(new FloatingText(text, x, y, color));
-    }
-
-    class FloatingText {
-        String text;
-        float x, y;
-        int color;
-        int alpha = 255;
-        float textSize;
-
-        FloatingText(String text, float x, float y, int color) {
-            this.text = text;
-            this.x = x;
-            this.y = y;
-            this.color = color;
-            this.textSize = screenWidth * 0.08f;
-        }
-
-        void update() {
-            y -= 2; // Rise up
-            alpha -= 3; // Fade out
-            if (alpha < 0)
-                alpha = 0;
-        }
-
-        boolean isDead() {
-            return alpha <= 0;
-        }
-
-        void draw(Canvas canvas, Paint paint) {
-            paint.setStyle(Paint.Style.FILL);
-            paint.setColor(color);
-            paint.setAlpha(alpha);
-            paint.setTextSize(textSize);
-            paint.setTextAlign(Paint.Align.CENTER);
-            paint.setShadowLayer(10, 0, 0, color);
-            canvas.drawText(text, x, y, paint);
-            paint.clearShadowLayer(); // Reset
-            paint.setAlpha(255);
         }
     }
 
