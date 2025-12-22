@@ -27,13 +27,17 @@ import com.spacebilliard.app.ui.NeonShopItem;
 
 public class ShopActivity extends Activity {
 
+        private int currentCategory = 0; // 0: SKINS, 1: TRAILS, 2: SIGHTS, 3: EFFECTS
+        private GridLayout grid;
+        private TextView descriptionText;
+        private NeonButton btnSkins, btnTrails, btnSights, btnEffects;
+
         @Override
         protected void onCreate(Bundle savedInstanceState) {
                 super.onCreate(savedInstanceState);
 
                 requestWindowFeature(Window.FEATURE_NO_TITLE);
-                getWindow().setFlags(
-                                WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
                 // 1. Root Container with Space Background
@@ -46,21 +50,24 @@ public class ShopActivity extends Activity {
 
                 FrameLayout.LayoutParams panelParams = new FrameLayout.LayoutParams(
                                 (int) (getResources().getDisplayMetrics().widthPixels * 0.9f),
-                                (int) (getResources().getDisplayMetrics().heightPixels * 0.85f));
+                                (int) (getResources().getDisplayMetrics().heightPixels * 0.9f)); // Slightly
+                                                                                                 // taller
                 panelParams.gravity = Gravity.CENTER;
                 mainPanel.setLayoutParams(panelParams);
 
-                // Custom Background for the main panel (Rounded rect with neon border)
+                // Custom Background
                 GradientDrawable panelBg = new GradientDrawable();
                 panelBg.setColor(Color.argb(230, 10, 20, 40));
                 panelBg.setCornerRadius(80f);
-                panelBg.setStroke(6, Color.rgb(0, 255, 255)); // Neon Cyan border
+                panelBg.setStroke(6, Color.rgb(0, 255, 255)); // Neon
+                                                              // Cyan
+                                                              // border
                 mainPanel.setBackground(panelBg);
 
-                // 3. Header View (Top Bar)
+                // 3. Header View
                 setupHeader(mainPanel);
 
-                // 4. Awning View (The stripes)
+                // 4. Awning View
                 View awning = new View(this) {
                         @Override
                         protected void onDraw(Canvas canvas) {
@@ -73,50 +80,132 @@ public class ShopActivity extends Activity {
                                 for (int i = 0; i < stripes; i++) {
                                         p.setColor(i % 2 == 0 ? Color.WHITE : Color.rgb(0, 180, 200));
                                         canvas.drawRect(i * stripeW, 0, (i + 1) * stripeW, h - 20, p);
-
-                                        // Semi-circle bottom effect
                                         canvas.drawCircle(i * stripeW + stripeW / 2, h - 20, stripeW / 2, p);
                                 }
                         }
                 };
                 LinearLayout.LayoutParams awningParams = new LinearLayout.LayoutParams(
                                 ViewGroup.LayoutParams.MATCH_PARENT,
-                                (int) (60 * getResources().getDisplayMetrics().density));
+                                (int) (50 * getResources().getDisplayMetrics().density));
                 mainPanel.addView(awning, awningParams);
 
-                // 5. Scrollable Grid Area
+                // 5. Category Tabs
+                LinearLayout tabsLayout = new LinearLayout(this);
+                tabsLayout.setOrientation(LinearLayout.HORIZONTAL);
+                tabsLayout.setGravity(Gravity.CENTER);
+                tabsLayout.setPadding(0, 20, 0, 10);
+
+                btnSkins = createTabButton("SKINS", Color.CYAN);
+                btnTrails = createTabButton("TRAILS", Color.GRAY);
+                btnSights = createTabButton("SIGHTS", Color.GRAY);
+                btnEffects = createTabButton("EFFECTS", Color.GRAY);
+
+                btnSkins.setOnClickListener(v -> setCategory(0));
+                btnTrails.setOnClickListener(v -> setCategory(1));
+                btnSights.setOnClickListener(v -> setCategory(2));
+                btnEffects.setOnClickListener(v -> setCategory(3));
+
+                tabsLayout.addView(btnSkins);
+                tabsLayout.addView(btnTrails);
+                tabsLayout.addView(btnSights);
+                tabsLayout.addView(btnEffects);
+                mainPanel.addView(tabsLayout);
+
+                // 6. Description / Preview Panel
+                LinearLayout infoPanel = new LinearLayout(this);
+                infoPanel.setOrientation(LinearLayout.VERTICAL);
+                infoPanel.setGravity(Gravity.CENTER);
+                infoPanel.setPadding(20, 10, 20, 10);
+
+                descriptionText = new TextView(this);
+                descriptionText.setText("SELECT AN ITEM TO PREVIEW");
+                descriptionText.setTextColor(Color.YELLOW);
+                descriptionText.setTextSize(16);
+                descriptionText.setTypeface(Typeface.SERIF, Typeface.ITALIC);
+                descriptionText.setGravity(Gravity.CENTER);
+                infoPanel.addView(descriptionText);
+                mainPanel.addView(infoPanel);
+
+                // 7. Scrollable Grid Area
                 ScrollView scrollView = new ScrollView(this);
-                scrollView.setPadding(30, 20, 30, 20);
+                scrollView.setPadding(30, 10, 30, 20);
                 scrollView.setVerticalScrollBarEnabled(false);
                 LinearLayout.LayoutParams scrollParams = new LinearLayout.LayoutParams(
                                 ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f);
                 mainPanel.addView(scrollView, scrollParams);
 
-                GridLayout grid = new GridLayout(this);
+                grid = new GridLayout(this);
                 grid.setColumnCount(3);
                 grid.setAlignmentMode(GridLayout.ALIGN_BOUNDS);
                 scrollView.addView(grid);
 
-                // Populate items like in the image
-                addItemsToGrid(grid);
+                // Initial Load
+                setCategory(0);
 
-                // 6. Footer Layout for Buttons
+                // 8. Footer
                 setupFooter(mainPanel);
 
                 root.addView(mainPanel);
                 setContentView(root);
         }
 
+        private NeonButton createTabButton(String text, int color) {
+                NeonButton btn = new NeonButton(this, text, color);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                (int) (70 * getResources().getDisplayMetrics().density), // Reduced width
+                                (int) (35 * getResources().getDisplayMetrics().density)); // Reduced height
+                params.setMargins(5, 0, 5, 0);
+                btn.setLayoutParams(params);
+                return btn;
+        }
+
+        private void setCategory(int cat) {
+                this.currentCategory = cat;
+                // Update styling
+                btnSkins.setThemeColor(cat == 0 ? Color.CYAN : Color.GRAY);
+                btnTrails.setThemeColor(cat == 1 ? Color.GREEN : Color.GRAY);
+                btnSights.setThemeColor(cat == 2 ? Color.WHITE : Color.GRAY);
+                btnEffects.setThemeColor(cat == 3 ? Color.rgb(255, 100, 100) : Color.GRAY);
+
+                btnSkins.postInvalidate();
+                btnTrails.postInvalidate();
+                btnSights.postInvalidate();
+                btnEffects.postInvalidate();
+
+                // Update Description with Category Info
+                if (descriptionText != null) {
+                        switch (cat) {
+                                case 0:
+                                        descriptionText.setText("Change the appearance of your ball.");
+                                        descriptionText.setTextColor(Color.CYAN);
+                                        break;
+                                case 1:
+                                        descriptionText.setText("A trail follows the ball as it moves.");
+                                        descriptionText.setTextColor(Color.GREEN);
+                                        break;
+                                case 2:
+                                        descriptionText.setText("Change the aiming guide style.");
+                                        descriptionText.setTextColor(Color.WHITE);
+                                        break;
+                                case 3:
+                                        descriptionText.setText("Explosion effects when hitting balls.");
+                                        descriptionText.setTextColor(Color.rgb(255, 100, 100));
+                                        break;
+                        }
+                }
+
+                refreshGrid();
+        }
+
         private void setupHeader(LinearLayout parent) {
                 FrameLayout header = new FrameLayout(this);
                 LinearLayout.LayoutParams headerParams = new LinearLayout.LayoutParams(
                                 ViewGroup.LayoutParams.MATCH_PARENT,
-                                (int) (70 * getResources().getDisplayMetrics().density));
+                                (int) (60 * getResources().getDisplayMetrics().density));
                 header.setLayoutParams(headerParams);
 
                 // Header Background
-                GradientDrawable headerBg = new GradientDrawable(
-                                GradientDrawable.Orientation.LEFT_RIGHT,
+                GradientDrawable headerBg = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
                                 new int[] { Color.rgb(100, 50, 255), Color.rgb(50, 200, 255) });
                 headerBg.setCornerRadii(new float[] { 80f, 80f, 80f, 80f, 0, 0, 0, 0 });
                 header.setBackground(headerBg);
@@ -124,10 +213,10 @@ public class ShopActivity extends Activity {
                 TextView title = new TextView(this);
                 title.setText("NEON SHOP");
                 title.setTextColor(Color.WHITE);
-                title.setTextSize(28);
+                title.setTextSize(24);
                 title.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
-                FrameLayout.LayoutParams titleParams = new FrameLayout.LayoutParams(
-                                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                FrameLayout.LayoutParams titleParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                                ViewGroup.LayoutParams.WRAP_CONTENT);
                 titleParams.gravity = Gravity.CENTER;
                 header.addView(title, titleParams);
 
@@ -137,8 +226,8 @@ public class ShopActivity extends Activity {
                 closeBtn.setTextColor(Color.argb(150, 0, 0, 0));
                 closeBtn.setTextSize(24);
                 closeBtn.setTypeface(Typeface.DEFAULT_BOLD);
-                FrameLayout.LayoutParams closeParams = new FrameLayout.LayoutParams(
-                                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                FrameLayout.LayoutParams closeParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                                ViewGroup.LayoutParams.WRAP_CONTENT);
                 closeParams.gravity = Gravity.END | Gravity.CENTER_VERTICAL;
                 closeParams.rightMargin = 40;
                 closeBtn.setOnClickListener(v -> finish());
@@ -147,182 +236,184 @@ public class ShopActivity extends Activity {
                 parent.addView(header);
         }
 
-        private void addItemsToGrid(GridLayout grid) {
+        private void refreshGrid() {
+                grid.removeAllViews();
                 android.content.SharedPreferences prefs = getSharedPreferences("SpaceBilliard",
                                 android.content.Context.MODE_PRIVATE);
-                String currentSkin = prefs.getString("selectedSkin", "default");
 
-                // Skins
-                addItem(grid, "DEFAULT BALL", currentSkin.equals("default") ? "EQUIPPED" : "SELECT", Color.WHITE,
-                                "SKIN", "NONE", "default");
-                addItem(grid, "TR FLAG BALL", currentSkin.equals("tr_flag") ? "EQUIPPED" : "SELECT", Color.RED, "SKIN",
-                                "NONE", "tr_flag");
-                addItem(grid, "SOCCER BALL", currentSkin.equals("soccer") ? "EQUIPPED" : "SELECT",
-                                Color.rgb(200, 200, 200), "SKIN", "NONE", "soccer");
-                addItem(grid, "NEON PULSE", currentSkin.equals("neon_pulse") ? "EQUIPPED" : "SELECT", Color.CYAN,
-                                "SKIN", "NONE", "neon_pulse");
+                if (currentCategory == 0) { // SKINS
+                        String current = prefs.getString("selectedSkin", "default");
+                        addItem(grid, "DEFAULT", current.equals("default"), Color.WHITE, "Classic White Ball",
+                                        "default");
+                        addItem(grid, "TR FLAG", current.equals("tr_flag"), Color.RED, "Turkish Flag Skin", "tr_flag");
+                        addItem(grid, "SOCCER", current.equals("soccer"), Color.LTGRAY, "Classic Football Design",
+                                        "soccer");
+                        addItem(grid, "NEON", current.equals("neon_pulse"), Color.CYAN, "Pulsing Neon Light",
+                                        "neon_pulse");
+                        // Countries
+                        addItem(grid, "USA", current.equals("usa"), Color.BLUE, "USA Flag", "usa");
+                        addItem(grid, "GERMANY", current.equals("germany"), Color.YELLOW, "Germany Flag", "germany");
+                        addItem(grid, "FRANCE", current.equals("france"), Color.BLUE, "France Flag", "france");
+                        addItem(grid, "ITALY", current.equals("italy"), Color.GREEN, "Italy Flag", "italy");
+                        addItem(grid, "UK", current.equals("uk"), Color.BLUE, "United Kingdom Flag", "uk");
+                        addItem(grid, "BRAZIL", current.equals("brazil"), Color.GREEN, "Brazil Flag", "brazil");
+                        addItem(grid, "SPAIN", current.equals("spain"), Color.RED, "Spain Flag", "spain");
+                        addItem(grid, "PORTUGAL", current.equals("portugal"), Color.GREEN, "Portugal Flag", "portugal");
+                        addItem(grid, "NETHERLANDS", current.equals("netherlands"), Color.RED, "Netherlands Flag",
+                                        "netherlands");
+                        addItem(grid, "BELGIUM", current.equals("belgium"), Color.YELLOW, "Belgium Flag", "belgium");
+                        addItem(grid, "SWITZERLAND", current.equals("switzerland"), Color.RED, "Switzerland Flag",
+                                        "switzerland");
+                        addItem(grid, "AUSTRIA", current.equals("austria"), Color.RED, "Austria Flag", "austria");
+                        addItem(grid, "SWEDEN", current.equals("sweden"), Color.BLUE, "Sweden Flag", "sweden");
+                        addItem(grid, "NORWAY", current.equals("norway"), Color.RED, "Norway Flag", "norway");
+                        addItem(grid, "DENMARK", current.equals("denmark"), Color.RED, "Denmark Flag", "denmark");
+                        addItem(grid, "FINLAND", current.equals("finland"), Color.BLUE, "Finland Flag", "finland");
+                        addItem(grid, "POLAND", current.equals("poland"), Color.RED, "Poland Flag", "poland");
+                        addItem(grid, "GREECE", current.equals("greece"), Color.BLUE, "Greece Flag", "greece");
+                        addItem(grid, "IRELAND", current.equals("ireland"), Color.GREEN, "Ireland Flag", "ireland");
+                        addItem(grid, "CANADA", current.equals("canada"), Color.RED, "Canada Flag", "canada");
+                        addItem(grid, "JAPAN", current.equals("japan"), Color.RED, "Japan Flag", "japan");
+                        addItem(grid, "KOREA", current.equals("korea"), Color.BLUE, "South Korea Flag", "korea");
+                        addItem(grid, "CHINA", current.equals("china"), Color.RED, "China Flag", "china");
+                        addItem(grid, "RUSSIA", current.equals("russia"), Color.BLUE, "Russia Flag", "russia");
+                        addItem(grid, "INDIA", current.equals("india"), Color.rgb(255, 153, 51), "India Flag", "india");
+                        addItem(grid, "MEXICO", current.equals("mexico"), Color.GREEN, "Mexico Flag", "mexico");
+                        addItem(grid, "ARGENTINA", current.equals("argentina"), Color.CYAN, "Argentina Flag",
+                                        "argentina");
+                        addItem(grid, "AZERBAIJAN", current.equals("azerbaijan"), Color.CYAN, "Azerbaijan Flag",
+                                        "azerbaijan");
+                        addItem(grid, "UKRAINE", current.equals("ukraine"), Color.YELLOW, "Ukraine Flag", "ukraine");
+                        addItem(grid, "EGYPT", current.equals("egypt"), Color.RED, "Egypt Flag", "egypt");
 
-                // Additional Countries
-                addItem(grid, "USA", currentSkin.equals("usa") ? "EQUIPPED" : "SELECT", Color.rgb(0, 40, 104), "SKIN",
-                                "NONE", "usa");
-                addItem(grid, "GERMANY", currentSkin.equals("germany") ? "EQUIPPED" : "SELECT", Color.BLACK, "SKIN",
-                                "NONE", "germany");
-                addItem(grid, "FRANCE", currentSkin.equals("france") ? "EQUIPPED" : "SELECT", Color.BLUE, "SKIN",
-                                "NONE", "france");
-                addItem(grid, "ITALY", currentSkin.equals("italy") ? "EQUIPPED" : "SELECT", Color.GREEN, "SKIN", "NONE",
-                                "italy");
-                addItem(grid, "UK", currentSkin.equals("uk") ? "EQUIPPED" : "SELECT", Color.rgb(1, 33, 105), "SKIN",
-                                "NONE", "uk");
-                addItem(grid, "SPAIN", currentSkin.equals("spain") ? "EQUIPPED" : "SELECT", Color.RED, "SKIN", "NONE",
-                                "spain");
-                addItem(grid, "PORTUGAL", currentSkin.equals("portugal") ? "EQUIPPED" : "SELECT", Color.RED, "SKIN",
-                                "NONE", "portugal");
-                addItem(grid, "NETHERLANDS", currentSkin.equals("netherlands") ? "EQUIPPED" : "SELECT",
-                                Color.rgb(174, 28, 40), "SKIN", "NONE", "netherlands");
-                addItem(grid, "BELGIUM", currentSkin.equals("belgium") ? "EQUIPPED" : "SELECT", Color.BLACK, "SKIN",
-                                "NONE", "belgium");
-                addItem(grid, "SWITZERLAND", currentSkin.equals("switzerland") ? "EQUIPPED" : "SELECT", Color.RED,
-                                "SKIN", "NONE", "switzerland");
-                addItem(grid, "AUSTRIA", currentSkin.equals("austria") ? "EQUIPPED" : "SELECT", Color.RED, "SKIN",
-                                "NONE", "austria");
-                addItem(grid, "SWEDEN", currentSkin.equals("sweden") ? "EQUIPPED" : "SELECT", Color.BLUE, "SKIN",
-                                "NONE", "sweden");
-                addItem(grid, "NORWAY", currentSkin.equals("norway") ? "EQUIPPED" : "SELECT", Color.RED, "SKIN", "NONE",
-                                "norway");
-                addItem(grid, "DENMARK", currentSkin.equals("denmark") ? "EQUIPPED" : "SELECT", Color.RED, "SKIN",
-                                "NONE", "denmark");
-                addItem(grid, "FINLAND", currentSkin.equals("finland") ? "EQUIPPED" : "SELECT", Color.WHITE, "SKIN",
-                                "NONE", "finland");
-                addItem(grid, "POLAND", currentSkin.equals("poland") ? "EQUIPPED" : "SELECT", Color.WHITE, "SKIN",
-                                "NONE", "poland");
-                addItem(grid, "GREECE", currentSkin.equals("greece") ? "EQUIPPED" : "SELECT", Color.BLUE, "SKIN",
-                                "NONE", "greece");
-                addItem(grid, "IRELAND", currentSkin.equals("ireland") ? "EQUIPPED" : "SELECT", Color.GREEN, "SKIN",
-                                "NONE", "ireland");
-                addItem(grid, "CANADA", currentSkin.equals("canada") ? "EQUIPPED" : "SELECT", Color.RED, "SKIN", "NONE",
-                                "canada");
-                addItem(grid, "BRAZIL", currentSkin.equals("brazil") ? "EQUIPPED" : "SELECT", Color.GREEN, "SKIN",
-                                "NONE", "brazil");
+                        // New Countries
+                        addItem(grid, "AUSTRALIA", current.equals("australia"), Color.BLUE, "Australia Flag",
+                                        "australia");
+                        addItem(grid, "S.AFRICA", current.equals("south_africa"), Color.GREEN, "South Africa Flag",
+                                        "south_africa");
+                        addItem(grid, "S.ARABIA", current.equals("saudi_arabia"), Color.GREEN, "Saudi Arabia Flag",
+                                        "saudi_arabia");
+                        addItem(grid, "PAKISTAN", current.equals("pakistan"), Color.GREEN, "Pakistan Flag", "pakistan");
+                        addItem(grid, "INDONESIA", current.equals("indonesia"), Color.RED, "Indonesia Flag",
+                                        "indonesia");
 
-                // Premium Skins
-                addItem(grid, "CYBER CORE", currentSkin.equals("cyber_core") ? "EQUIPPED" : "SELECT", Color.CYAN,
-                                "SKIN",
-                                "GEM", "cyber_core");
-                addItem(grid, "SOLAR FLARE", currentSkin.equals("solar_flare") ? "EQUIPPED" : "SELECT", Color.YELLOW,
-                                "SKIN",
-                                "GEM", "solar_flare");
-                addItem(grid, "FROST BITE", currentSkin.equals("frost_bite") ? "EQUIPPED" : "SELECT",
-                                Color.rgb(200, 240, 255), "SKIN",
-                                "GEM", "frost_bite");
+                        // Premium
+                        addItem(grid, "CYBER", current.equals("cyber_core"), Color.CYAN, "Metallic Cyber Core",
+                                        "cyber_core");
+                        addItem(grid, "SOLAR", current.equals("solar_flare"), Color.YELLOW, "Burning Solar Surface",
+                                        "solar_flare");
+                        addItem(grid, "FROST", current.equals("frost_bite"), Color.rgb(200, 240, 255),
+                                        "Icy Frozen Core", "frost_bite");
 
-                // Items
-                // Removed items as requested by user
+                } else if (currentCategory == 1) { // TRAILS
+                        String currentTrail = prefs.getString("selectedTrail", "none");
+                        addItem(grid, "RED TRAIL", currentTrail.equals("red"), Color.RED, "Basic Red Path",
+                                        "trail_red");
+                        addItem(grid, "BLUE TRAIL", currentTrail.equals("blue"), Color.BLUE, "Basic Blue Path",
+                                        "trail_blue");
+                        addItem(grid, "GREEN TRAIL", currentTrail.equals("green"), Color.GREEN, "Basic Green Path",
+                                        "trail_green");
+                        addItem(grid, "GOLD TRAIL", currentTrail.equals("gold"), Color.rgb(255, 215, 0),
+                                        "Golden Luxury Path", "trail_gold");
+                        addItem(grid, "NEON TRAIL", currentTrail.equals("neon"), Color.CYAN, "Bright Neon Light",
+                                        "trail_neon");
+                        addItem(grid, "COSMIC", currentTrail.equals("cosmic"), Color.MAGENTA, "Cosmic Dust",
+                                        "trail_cosmic");
+                        addItem(grid, "LAVA", currentTrail.equals("lava"), Color.rgb(255, 69, 0), "Lava Trail",
+                                        "trail_lava");
+                        addItem(grid, "ELECTRIC", currentTrail.equals("electric"), Color.CYAN, "Electric Spark Path",
+                                        "trail_electric");
+                        addItem(grid, "RAINBOW", currentTrail.equals("rainbow"), Color.WHITE, "Rainbow Path",
+                                        "trail_rainbow");
+                        addItem(grid, "GHOST", currentTrail.equals("ghost"), Color.WHITE, "Ghost Fade Path",
+                                        "trail_ghost");
+                        addItem(grid, "BUBBLE", currentTrail.equals("bubble"), Color.CYAN, "Blue Bubble Path",
+                                        "trail_bubble");
+                        addItem(grid, "PIXEL", currentTrail.equals("pixel"), Color.GREEN, "Green Pixel Path",
+                                        "trail_pixel");
+                        // New Trails
+                        addItem(grid, "DNA", currentTrail.equals("dna"), Color.MAGENTA, "Double Helix Trails",
+                                        "trail_dna");
+                        addItem(grid, "SPARKLE", currentTrail.equals("sparkle"), Color.YELLOW, "Glittering Sparkles",
+                                        "trail_sparkle");
 
-                // Trails (6 new colors)
-                String currentTrail = prefs.getString("selectedTrail", "none");
+                } else if (currentCategory == 2) { // SIGHTS
+                        String currentTraj = prefs.getString("selectedTrajectory", "dashed");
+                        addItem(grid, "LASER SIGHT", currentTraj.equals("laser"), Color.RED, "Solid Red Laser Guide",
+                                        "traj_laser");
+                        addItem(grid, "ELEC SIGHT", currentTraj.equals("electric"), Color.CYAN, "Electric Guide Line",
+                                        "traj_electric");
+                        addItem(grid, "PEARL SIGHT", currentTraj.equals("dots"), Color.YELLOW, "Dotted Pearl Guide",
+                                        "traj_dots");
+                        addItem(grid, "PLASMA SIGHT", currentTraj.equals("plasma"), Color.MAGENTA,
+                                        "Glowing Plasma Guide", "traj_plasma");
+                        addItem(grid, "ARROW SIGHT", currentTraj.equals("arrow"), Color.GREEN, "Arrow Guide",
+                                        "traj_arrow");
+                        addItem(grid, "WAVE SIGHT", currentTraj.equals("wave"), Color.CYAN, "Sine Wave Guide",
+                                        "traj_wave");
+                        // New Sights
+                        addItem(grid, "GRID SIGHT", currentTraj.equals("grid"), Color.WHITE, "Projected Grid Guide",
+                                        "traj_grid");
+                        addItem(grid, "PULSE SIGHT", currentTraj.equals("pulse"), Color.RED, "Pulsating Line Guide",
+                                        "traj_pulse");
 
-                addItem(grid, "RED TRAIL", currentTrail.equals("red") ? "EQUIPPED" : "SELECT", Color.RED, "TRAIL",
-                                "GEM", "trail_red");
-                addItem(grid, "BLUE TRAIL", currentTrail.equals("blue") ? "EQUIPPED" : "SELECT", Color.BLUE, "TRAIL",
-                                "GEM", "trail_blue");
-                addItem(grid, "GREEN TRAIL", currentTrail.equals("green") ? "EQUIPPED" : "SELECT", Color.GREEN, "TRAIL",
-                                "GEM", "trail_green");
-                addItem(grid, "GOLD TRAIL", currentTrail.equals("gold") ? "EQUIPPED" : "SELECT", Color.rgb(255, 215, 0),
-                                "TRAIL", "GEM", "trail_gold");
-                addItem(grid, "PURPLE TRAIL", currentTrail.equals("purple") ? "EQUIPPED" : "SELECT",
-                                Color.rgb(160, 32, 240), "TRAIL", "GEM", "trail_purple");
-                addItem(grid, "PINK TRAIL", currentTrail.equals("pink") ? "EQUIPPED" : "SELECT",
-                                Color.rgb(255, 105, 180), "TRAIL", "GEM", "trail_pink");
-                addItem(grid, "NEON TRAIL", currentTrail.equals("neon") ? "EQUIPPED" : "SELECT", Color.CYAN, "TRAIL",
-                                "GEM", "trail_neon");
-
-                // Premium Trails
-                addItem(grid, "COSMIC TRAIL", currentTrail.equals("cosmic") ? "EQUIPPED" : "SELECT",
-                                Color.rgb(100, 100, 255), "TRAIL",
-                                "GEM", "trail_cosmic");
-                addItem(grid, "LAVA TRAIL", currentTrail.equals("lava") ? "EQUIPPED" : "SELECT", Color.rgb(255, 69, 0),
-                                "TRAIL",
-                                "GEM", "trail_lava");
-                addItem(grid, "ELECTRIC TRAIL", currentTrail.equals("electric") ? "EQUIPPED" : "SELECT", Color.CYAN,
-                                "TRAIL",
-                                "GEM", "trail_electric");
-                addItem(grid, "RAINBOW TRAIL", currentTrail.equals("rainbow") ? "EQUIPPED" : "SELECT", Color.MAGENTA,
-                                "TRAIL",
-                                "GEM", "trail_rainbow");
-
-                // Auras
-                String currentAura = prefs.getString("selectedAura", "none");
-                addItem(grid, "NO AURA", currentAura.equals("none") ? "EQUIPPED" : "SELECT", Color.GRAY, "AURA", "NONE",
-                                "aura_none");
-                addItem(grid, "NEON AURA", currentAura.equals("neon") ? "EQUIPPED" : "SELECT", Color.rgb(0, 255, 100),
-                                "AURA", "GEM", "aura_neon");
-
-                // Trajectory
-                String currentTraj = prefs.getString("selectedTrajectory", "dashed");
-                addItem(grid, "LASER SIGHT", currentTraj.equals("laser") ? "EQUIPPED" : "SELECT", Color.RED, "SIGHT",
-                                "GEM", "traj_laser");
-                addItem(grid, "ELECTRIC SIGHT", currentTraj.equals("electric") ? "EQUIPPED" : "SELECT", Color.CYAN,
-                                "SIGHT", "GEM", "traj_electric");
-                addItem(grid, "PEARL SIGHT", currentTraj.equals("dots") ? "EQUIPPED" : "SELECT", Color.rgb(255, 215, 0),
-                                "SIGHT", "GEM", "traj_dots");
-                addItem(grid, "PLASMA SIGHT", currentTraj.equals("plasma") ? "EQUIPPED" : "SELECT", Color.MAGENTA,
-                                "SIGHT", "GEM", "traj_plasma");
-
-                // Impact Effects (BOOM)
-                String currentBoom = prefs.getString("selectedImpact", "classic");
-                addItem(grid, "STAR BURST", currentBoom.equals("stars") ? "EQUIPPED" : "SELECT", Color.YELLOW,
-                                "BOOM", "GEM", "impact_stars");
-                addItem(grid, "ELECTRIC BOOM", currentBoom.equals("electric") ? "EQUIPPED" : "SELECT", Color.CYAN,
-                                "BOOM", "GEM", "impact_electric");
+                } else if (currentCategory == 3) { // EFFECTS
+                        String currentBoom = prefs.getString("selectedImpact", "classic");
+                        addItem(grid, "STAR BURST", currentBoom.equals("stars"), Color.YELLOW, "Explode into Stars!",
+                                        "impact_stars");
+                        addItem(grid, "ELEC BOOM", currentBoom.equals("electric"), Color.CYAN, "Electric Shockwave!",
+                                        "impact_electric");
+                        addItem(grid, "RIPPLE", currentBoom.equals("ripple"), Color.BLUE, "Water Ripple",
+                                        "impact_ripple");
+                        addItem(grid, "CONFETTI", currentBoom.equals("confetti"), Color.MAGENTA, "Party Confetti",
+                                        "impact_confetti");
+                        // New Effects
+                        addItem(grid, "VORTEX", currentBoom.equals("vortex"), Color.rgb(100, 0, 255), "Swirling Vortex",
+                                        "impact_vortex");
+                        addItem(grid, "SHATTER", currentBoom.equals("shatter"), Color.WHITE, "Glass Shatter Effect",
+                                        "impact_shatter");
+                }
         }
 
-        private void addItem(GridLayout grid, String name, String price, int color, String qty, String pIcon,
+        private void addItem(GridLayout grid, String name, boolean equipped, int color, String description,
                         String skinId) {
-                NeonShopItem item = new NeonShopItem(this, name, price, color, qty, pIcon);
+                // Price is hidden or default for now since we are focusing on categories
+                NeonShopItem item = new NeonShopItem(this, name, equipped ? "EQUIPPED" : "SELECT", color, "x1", "GEM",
+                                description);
                 item.setSkinId(skinId);
 
                 item.setOnClickListener(v -> {
+                        descriptionText.setText(description);
+                        descriptionText.setTextColor(color);
+
+                        // Equip Logic
                         if (skinId != null) {
                                 android.content.SharedPreferences prefs = getSharedPreferences("SpaceBilliard",
                                                 android.content.Context.MODE_PRIVATE);
                                 if (skinId.startsWith("trail_")) {
                                         String type = skinId.substring(6);
                                         if (prefs.getString("selectedTrail", "none").equals(type)) {
-                                                prefs.edit().putString("selectedTrail", "none").apply();
+                                                // Keep equipped
                                         } else {
                                                 prefs.edit().putString("selectedTrail", type).apply();
                                         }
                                 } else if (skinId.startsWith("aura_")) {
                                         String type = skinId.substring(5);
-                                        if (prefs.getString("selectedAura", "none").equals(type)) {
-                                                prefs.edit().putString("selectedAura", "none").apply();
-                                        } else {
-                                                prefs.edit().putString("selectedAura", type).apply();
-                                        }
+                                        prefs.edit().putString("selectedAura", type).apply();
                                 } else if (skinId.startsWith("traj_")) {
                                         String type = skinId.substring(5);
-                                        if (prefs.getString("selectedTrajectory", "dashed").equals(type)) {
-                                                prefs.edit().putString("selectedTrajectory", "dashed").apply();
-                                        } else {
-                                                prefs.edit().putString("selectedTrajectory", type).apply();
-                                        }
+                                        prefs.edit().putString("selectedTrajectory", type).apply();
                                 } else if (skinId.startsWith("impact_")) {
                                         String type = skinId.substring(7);
-                                        if (prefs.getString("selectedImpact", "classic").equals(type)) {
-                                                prefs.edit().putString("selectedImpact", "classic").apply();
-                                        } else {
-                                                prefs.edit().putString("selectedImpact", type).apply();
-                                        }
+                                        prefs.edit().putString("selectedImpact", type).apply();
                                 } else {
-                                        if (prefs.getString("selectedSkin", "default").equals(skinId)) {
-                                                prefs.edit().putString("selectedSkin", "default").apply();
-                                        } else {
-                                                prefs.edit().putString("selectedSkin", skinId).apply();
-                                        }
+                                        prefs.edit().putString("selectedSkin", skinId).apply();
                                 }
-                                // Refresh grid to show equipped status
-                                grid.removeAllViews();
-                                addItemsToGrid(grid);
+                                // Refresh grid to show new equipped status
+                                refreshGrid();
+
+                                // Add visual feedback like small shake or highlighting (handled by grid refresh
+                                // opacity maybe)
                         }
                 });
 
@@ -343,16 +434,12 @@ public class ShopActivity extends Activity {
                 NeonButton back = new NeonButton(this, "BACK", Color.rgb(255, 50, 255));
                 back.setOnClickListener(v -> finish());
 
-                NeonButton select = new NeonButton(this, "SELECT", Color.rgb(255, 200, 50));
-
                 LinearLayout.LayoutParams btnParams = new LinearLayout.LayoutParams(
                                 (int) (120 * getResources().getDisplayMetrics().density),
                                 (int) (45 * getResources().getDisplayMetrics().density));
                 btnParams.setMargins(20, 0, 20, 0);
 
                 footer.addView(back, btnParams);
-                footer.addView(select, btnParams);
-
                 parent.addView(footer);
         }
 }
