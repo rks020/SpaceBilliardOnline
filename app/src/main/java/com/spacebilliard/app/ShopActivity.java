@@ -30,6 +30,7 @@ public class ShopActivity extends Activity {
         private int currentCategory = 0; // 0: SKINS, 1: TRAILS, 2: SIGHTS, 3: EFFECTS
         private GridLayout grid;
         private TextView descriptionText;
+        private TextView coinText; // Coin balance display
         private NeonButton btnSkins, btnTrails, btnSights, btnEffects;
 
         @Override
@@ -220,6 +221,22 @@ public class ShopActivity extends Activity {
                 titleParams.gravity = Gravity.CENTER;
                 header.addView(title, titleParams);
 
+                // Coin Display (Left side)
+                android.content.SharedPreferences prefs = getSharedPreferences("SpaceBilliard",
+                                android.content.Context.MODE_PRIVATE);
+                int coins = prefs.getInt("coins", 0);
+
+                coinText = new TextView(this);
+                coinText.setText("💰 " + coins);
+                coinText.setTextColor(Color.rgb(255, 215, 0)); // Gold
+                coinText.setTextSize(18);
+                coinText.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
+                FrameLayout.LayoutParams coinParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                                ViewGroup.LayoutParams.WRAP_CONTENT);
+                coinParams.gravity = Gravity.START | Gravity.CENTER_VERTICAL;
+                coinParams.leftMargin = 40;
+                header.addView(coinText, coinParams);
+
                 // Close Button (X)
                 TextView closeBtn = new TextView(this);
                 closeBtn.setText("X");
@@ -377,43 +394,78 @@ public class ShopActivity extends Activity {
 
         private void addItem(GridLayout grid, String name, boolean equipped, int color, String description,
                         String skinId) {
-                // Price is hidden or default for now since we are focusing on categories
-                NeonShopItem item = new NeonShopItem(this, name, equipped ? "EQUIPPED" : "SELECT", color, "x1", "GEM",
+                // Determine price based on category
+                int price = 0;
+                boolean isDefaultItem = skinId.equals("default");
+
+                if (!isDefaultItem) {
+                        if (currentCategory == 0)
+                                price = 10; // Skins
+                        else if (currentCategory == 1)
+                                price = 20; // Trails
+                        else if (currentCategory == 2)
+                                price = 5; // Sights
+                        else if (currentCategory == 3)
+                                price = 15; // Effects
+                }
+
+                // Check if already owned
+                android.content.SharedPreferences prefs = getSharedPreferences("SpaceBilliard",
+                                android.content.Context.MODE_PRIVATE);
+                boolean isOwned = prefs.getBoolean("owned_" + skinId, isDefaultItem);
+
+                String statusText = equipped ? "EQUIPPED" : (isOwned ? "SELECT" : price + " 💰");
+
+                NeonShopItem item = new NeonShopItem(this, name, statusText, color, "x1", "GEM",
                                 description);
                 item.setSkinId(skinId);
+
+                // Make variables final for lambda
+                final int finalPrice = price;
+                final boolean finalIsDefaultItem = isDefaultItem;
+                final String finalSkinId = skinId;
 
                 item.setOnClickListener(v -> {
                         descriptionText.setText(description);
                         descriptionText.setTextColor(color);
 
-                        // Equip Logic
-                        if (skinId != null) {
-                                android.content.SharedPreferences prefs = getSharedPreferences("SpaceBilliard",
-                                                android.content.Context.MODE_PRIVATE);
-                                if (skinId.startsWith("trail_")) {
-                                        String type = skinId.substring(6);
-                                        if (prefs.getString("selectedTrail", "none").equals(type)) {
-                                                // Keep equipped
-                                        } else {
-                                                prefs.edit().putString("selectedTrail", type).apply();
-                                        }
-                                } else if (skinId.startsWith("aura_")) {
-                                        String type = skinId.substring(5);
-                                        prefs.edit().putString("selectedAura", type).apply();
-                                } else if (skinId.startsWith("traj_")) {
-                                        String type = skinId.substring(5);
-                                        prefs.edit().putString("selectedTrajectory", type).apply();
-                                } else if (skinId.startsWith("impact_")) {
-                                        String type = skinId.substring(7);
-                                        prefs.edit().putString("selectedImpact", type).apply();
-                                } else {
-                                        prefs.edit().putString("selectedSkin", skinId).apply();
-                                }
-                                // Refresh grid to show new equipped status
-                                refreshGrid();
+                        // Get current balances
+                        android.content.SharedPreferences currentPrefs = getSharedPreferences("SpaceBilliard",
+                                        android.content.Context.MODE_PRIVATE);
+                        int currentCoins = currentPrefs.getInt("coins", 0);
+                        boolean owned = currentPrefs.getBoolean("owned_" + finalSkinId, finalIsDefaultItem);
 
-                                // Add visual feedback like small shake or highlighting (handled by grid refresh
-                                // opacity maybe)
+                        // Purchase/Equip Logic
+                        if (finalSkinId != null) {
+                                if (!owned) {
+                                        // Need to purchase
+                                        if (currentCoins >= finalPrice) {
+                                                // Purchase successful
+                                                currentPrefs.edit()
+                                                                .putBoolean("owned_" + finalSkinId, true)
+                                                                .putInt("coins", currentCoins - finalPrice)
+                                                                .apply();
+
+                                                // Update coin display
+                                                if (coinText != null) {
+                                                        coinText.setText("💰 " + (currentCoins - finalPrice));
+                                                }
+
+                                                // Equip the item
+                                                equipItem(finalSkinId, currentPrefs);
+                                                refreshGrid();
+                                        } else {
+                                                // Insufficient balance
+                                                descriptionText.setText(
+                                                                "⚠️ INSUFFICIENT COINS! Need " + finalPrice
+                                                                                + " coins.");
+                                                descriptionText.setTextColor(Color.RED);
+                                        }
+                                } else {
+                                        // Already owned, just equip
+                                        equipItem(finalSkinId, currentPrefs);
+                                        refreshGrid();
+                                }
                         }
                 });
 
@@ -423,6 +475,24 @@ public class ShopActivity extends Activity {
                 params.height = (int) (130 * getResources().getDisplayMetrics().density);
                 item.setLayoutParams(params);
                 grid.addView(item);
+        }
+
+        private void equipItem(String skinId, android.content.SharedPreferences prefs) {
+                if (skinId.startsWith("trail_")) {
+                        String type = skinId.substring(6);
+                        prefs.edit().putString("selectedTrail", type).apply();
+                } else if (skinId.startsWith("aura_")) {
+                        String type = skinId.substring(5);
+                        prefs.edit().putString("selectedAura", type).apply();
+                } else if (skinId.startsWith("traj_")) {
+                        String type = skinId.substring(5);
+                        prefs.edit().putString("selectedTrajectory", type).apply();
+                } else if (skinId.startsWith("impact_")) {
+                        String type = skinId.substring(7);
+                        prefs.edit().putString("selectedImpact", type).apply();
+                } else {
+                        prefs.edit().putString("selectedSkin", skinId).apply();
+                }
         }
 
         private void setupFooter(LinearLayout parent) {
