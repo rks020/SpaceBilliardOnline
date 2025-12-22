@@ -186,6 +186,7 @@ public class MainActivity extends Activity {
             powerPanel.setStage(stage);
             powerPanel.setLevelInfo(levelInfo);
             powerPanel.setLives(lives);
+            powerPanel.setCoins(coins); // Coin'i de güncelle
         }
     }
 }

@@ -237,6 +237,8 @@ public class GameView extends SurfaceView implements Runnable {
         maxCombo = prefs.getInt("maxCombo", 0);
         // maxUnlockedLevel'ı yükle (ilerlemeyi kaydet)
         maxUnlockedLevel = prefs.getInt("maxUnlockedLevel", 1);
+        // Coinleri yükle
+        coins = prefs.getInt("coins", 0);
 
         // SoundPool Başlatma
         AudioAttributes audioAttributes = new AudioAttributes.Builder()
@@ -511,6 +513,10 @@ public class GameView extends SurfaceView implements Runnable {
             levelCompleted = true;
             showStageCleared = true;
             stageClearedTime = System.currentTimeMillis();
+
+            // Her stage tamamlandığında 5 coin kazan
+            coins += 5;
+            saveProgress(); // Coin'i kaydet
 
             // Siyah topları yok et
             blackBalls.clear();
@@ -1125,7 +1131,8 @@ public class GameView extends SurfaceView implements Runnable {
             switch (currentSpace) {
                 case 1:
                 case 5:
-                    // Space 1 & 5: Dark + Stars
+                case 8:
+                    // Space 1, 5, 8: Dark + Stars
                     canvas.drawColor(Color.rgb(5, 5, 16));
                     for (Star star : stars) {
                         star.draw(canvas, paint);
@@ -1134,7 +1141,8 @@ public class GameView extends SurfaceView implements Runnable {
 
                 case 2:
                 case 6:
-                    // Space 2 & 6: Dark + Moon + Comets
+                case 9:
+                    // Space 2, 6, 9: Dark + Moon + Comets
                     canvas.drawColor(Color.rgb(10, 5, 20)); // Deep dark
                     drawMoon(canvas);
                     for (Comet c : comets) {
@@ -1145,10 +1153,8 @@ public class GameView extends SurfaceView implements Runnable {
 
                 case 3:
                 case 4:
-                case 8:
-                case 9:
                 case 10:
-                    // Space 3, 4, 8, 9, 10: Reddish Dark + Giant Meteor + Comets
+                    // Space 3, 4, 10: Reddish Dark + Giant Meteor + Comets
                     canvas.drawColor(Color.rgb(25, 5, 10)); // Reddish dark background
                     drawGiantMeteor(canvas);
                     for (Comet c : comets) {
@@ -1158,7 +1164,7 @@ public class GameView extends SurfaceView implements Runnable {
                     break;
 
                 case 7:
-                    // Space 7: Aurora Nebula (New unique background)
+                    // Space 7: Static Aurora (no animation)
                     drawAuroraNebula(canvas);
                     for (Star star : stars) {
                         star.update(screenWidth, screenHeight);
@@ -3311,7 +3317,15 @@ public class GameView extends SurfaceView implements Runnable {
         editor.putInt("maxUnlockedLevel", maxUnlockedLevel);
 
         editor.putInt("maxCombo", maxCombo);
+
+        // Coin'leri kaydet
+        editor.putInt("coins", coins);
+
         editor.apply();
+    }
+
+    public int getCoins() {
+        return coins;
     }
 
     private void drawLevelSelector(Canvas canvas) {

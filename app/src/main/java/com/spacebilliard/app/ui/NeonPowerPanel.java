@@ -27,6 +27,7 @@ public class NeonPowerPanel extends View {
     private String stage = "1/5";
     private String levelInfo = "SPACE 1 - LEVEL 1";
     private int lives = 3;
+    private int coins = 0; // Coin balance
 
     private int themeColor = Color.CYAN;
     private Paint energyCorePaint;
@@ -117,6 +118,11 @@ public class NeonPowerPanel extends View {
         powerBarFillPaint.setShadowLayer(10, 0, 0, color);
         stageTextPaint.setColor(color);
         livesTextPaint.setColor(color);
+        invalidate();
+    }
+
+    public void setCoins(int coins) {
+        this.coins = coins;
         invalidate();
     }
 
@@ -223,6 +229,14 @@ public class NeonPowerPanel extends View {
         canvas.drawText(String.valueOf(lives), iconX + iconSize + 10, startY + spacing * 3 + livesOffsetY,
                 livesTextPaint);
 
+        // COINS display (next to lives)
+        float coinIconX = iconX + iconSize + 10 + livesTextPaint.measureText(String.valueOf(lives)) + 20 * density;
+        drawCoinIcon(canvas, coinIconX + iconSize / 2, iconY + iconSize / 2, iconSize / 2);
+        Paint coinPaint = new Paint(livesTextPaint);
+        coinPaint.setColor(Color.rgb(255, 215, 0)); // Gold color
+        canvas.drawText(String.valueOf(coins), coinIconX + iconSize + 10, startY + spacing * 3 + livesOffsetY,
+                coinPaint);
+
         // Technical accents
         bgPaint.setColor(Color.argb(150, 200, 200, 200));
         float sDist = 3 * density;
@@ -253,6 +267,33 @@ public class NeonPowerPanel extends View {
         energyCorePaint.setStrokeWidth(1f);
         energyCorePaint.setColor(Color.argb(180, 0, 255, 255));
         canvas.drawOval(new RectF(cx - radius, cy - radius * 0.3f, cx + radius, cy + radius * 0.3f), energyCorePaint);
+    }
+
+    private void drawCoinIcon(Canvas canvas, float cx, float cy, float radius) {
+        // Outer glow
+        Paint glowP = new Paint(Paint.ANTI_ALIAS_FLAG);
+        glowP.setStyle(Paint.Style.FILL);
+        glowP.setShader(new android.graphics.RadialGradient(cx, cy, radius * 1.4f,
+                new int[] { Color.argb(80, 255, 215, 0), Color.TRANSPARENT }, null,
+                android.graphics.Shader.TileMode.CLAMP));
+        canvas.drawCircle(cx, cy, radius * 1.4f, glowP);
+
+        // Main coin body
+        Paint coinP = new Paint(Paint.ANTI_ALIAS_FLAG);
+        coinP.setStyle(Paint.Style.FILL);
+        coinP.setColor(Color.rgb(255, 215, 0)); // Gold
+        canvas.drawCircle(cx, cy, radius, coinP);
+
+        // Inner ring
+        coinP.setStyle(Paint.Style.STROKE);
+        coinP.setStrokeWidth(1.5f);
+        coinP.setColor(Color.rgb(218, 165, 32)); // Dark gold
+        canvas.drawCircle(cx, cy, radius * 0.8f, coinP);
+
+        // Shine effect
+        coinP.setStyle(Paint.Style.FILL);
+        coinP.setColor(Color.rgb(255, 255, 200)); // Light yellow
+        canvas.drawCircle(cx - radius * 0.3f, cy - radius * 0.3f, radius * 0.3f, coinP);
     }
 
     private void drawHeart(Canvas canvas, float x, float y, float size) {
