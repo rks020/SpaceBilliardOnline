@@ -173,6 +173,12 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         gameView.resume();
+
+        // Refresh coin display when returning from shop
+        if (gameView != null && infoPanel != null) {
+            int currentCoins = gameView.getCoins();
+            infoPanel.setCoins(String.valueOf(currentCoins));
+        }
     }
 
     // Method to update panels from GameView
@@ -186,7 +192,6 @@ public class MainActivity extends Activity {
             powerPanel.setStage(stage);
             powerPanel.setLevelInfo(levelInfo);
             powerPanel.setLives(lives);
-            powerPanel.setCoins(coins); // Coin'i de güncelle
         }
     }
 }

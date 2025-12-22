@@ -27,7 +27,6 @@ public class NeonPowerPanel extends View {
     private String stage = "1/5";
     private String levelInfo = "SPACE 1 - LEVEL 1";
     private int lives = 3;
-    private int coins = 0; // Coin balance
 
     private int themeColor = Color.CYAN;
     private Paint energyCorePaint;
@@ -118,11 +117,6 @@ public class NeonPowerPanel extends View {
         powerBarFillPaint.setShadowLayer(10, 0, 0, color);
         stageTextPaint.setColor(color);
         livesTextPaint.setColor(color);
-        invalidate();
-    }
-
-    public void setCoins(int coins) {
-        this.coins = coins;
         invalidate();
     }
 
@@ -228,14 +222,6 @@ public class NeonPowerPanel extends View {
         drawVectorEnergyCore(canvas, iconX + iconSize / 2, iconY + iconSize / 2, iconSize / 2);
         canvas.drawText(String.valueOf(lives), iconX + iconSize + 10, startY + spacing * 3 + livesOffsetY,
                 livesTextPaint);
-
-        // COINS display (next to lives)
-        float coinIconX = iconX + iconSize + 10 + livesTextPaint.measureText(String.valueOf(lives)) + 20 * density;
-        drawCoinIcon(canvas, coinIconX + iconSize / 2, iconY + iconSize / 2, iconSize / 2);
-        Paint coinPaint = new Paint(livesTextPaint);
-        coinPaint.setColor(Color.rgb(255, 215, 0)); // Gold color
-        canvas.drawText(String.valueOf(coins), coinIconX + iconSize + 10, startY + spacing * 3 + livesOffsetY,
-                coinPaint);
 
         // Technical accents
         bgPaint.setColor(Color.argb(150, 200, 200, 200));
