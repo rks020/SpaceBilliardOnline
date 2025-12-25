@@ -137,6 +137,13 @@ public class GameView extends SurfaceView implements Runnable {
     private float electricFirstTargetX = 0;
     private float electricFirstTargetY = 0;
 
+    private int pendingLightningStrikes = 0;
+    private long lastLightningStrikeTime = 0;
+    private boolean showBossDefeated = false;
+    private long bossDefeatedTime = 0;
+    private boolean showPlayerDefeated = false; // New field
+    private long playerDefeatedTime = 0; // New field
+
     // Level Seçici
     private boolean showLevelSelector = false;
     private int selectorPage = 1;
@@ -163,7 +170,32 @@ public class GameView extends SurfaceView implements Runnable {
     private float currentTouchX, currentTouchY;
     private long lastLaunchTime = 0; // Cooldown for grabbing ball
 
+    // Skill System
+    private String activeSkill = "None";
+    private long lastSkillUseTime = 0;
+    private final long SKILL_COOLDOWN = 10000; // 10 seconds generic cooldown
+    private boolean isSkillActive = false;
+    private float skillBtnX, skillBtnY, skillBtnRadius;
+
+    // Boss System
+    private Boss currentBoss = null;
+
+    // Inventory System
+    private ArrayList<String> inventory = new ArrayList<>();
+    private final int MAX_INVENTORY_SIZE = 3;
+    private float inventorySlotSize;
+    private float inventoryX, inventoryY;
+
+    // New Skills
+    private boolean multiBallActive = false;
+    private boolean magmaTrailActive = false;
+    private long magmaTrailEndTime = 0;
+    private ArrayList<MagmaPatch> magmaPatches = new ArrayList<>();
+    private ArrayList<Ball> bossProjectiles = new ArrayList<>();
+    private float playerHp = 1000, playerMaxHp = 1000;
+
     private int coins = 0;
+    private int pendingColoredBalls = 0; // Toplar yavaş yavaş gelecek
 
     // Level geçiş beklemesi
     private boolean levelCompleted = false;
@@ -431,10 +463,13 @@ public class GameView extends SurfaceView implements Runnable {
         specialBalls.clear();
         cloneBalls.clear();
         particles.clear();
+        magmaPatches.clear();
         missiles.clear();
         missiles.clear();
         electricEffects.clear();
+        electricEffects.clear();
         floatingTexts.clear();
+        inventory.clear(); // Clear inventory on level start/restart
 
         whiteBall.x = centerX;
         whiteBall.y = centerY;
@@ -442,7 +477,7 @@ public class GameView extends SurfaceView implements Runnable {
         whiteBall.vy = 0;
         whiteBall.trail.clear();
         // Ghost modundan çıkarken top boyutunu sıfırla
-        whiteBall.radius = (circleRadius / 0.47f) * 0.02f;
+        whiteBall.radius = (circleRadius / 0.47f) * 0.022f; // Slightly smaller (2.2%)
 
         blackHoleActive = false;
         barrierActive = false;
@@ -451,9 +486,20 @@ public class GameView extends SurfaceView implements Runnable {
         powerBoostActive = false;
         blastWave = null;
 
+        // Initialize Boss (Space 1 Level 10 => Code Level 50)
+        currentBoss = null;
+        if (lv == 10 || lv == 50) {
+            spawnBoss(lv);
+            return; // Skip normal ball layout
+        }
+
         // Her level (5 stage) için top sayısını sıfırla ve yeniden başlat
         int stageInLevel = ((lv - 1) % 5) + 1;
-        int ballCount = stageInLevel + 4; // Her level 5 topla başlar, her stage +1 artar
+        int ballCount = 10 + stageInLevel; // Start higher (11 balls at stage 1)
+
+        // Spawn 4 balls initially
+        int initialSpawn = 4;
+        pendingColoredBalls = ballCount - initialSpawn;
 
         int[] colors = {
                 Color.rgb(255, 0, 85), // Pink-Red
@@ -463,7 +509,7 @@ public class GameView extends SurfaceView implements Runnable {
                 Color.rgb(255, 102, 0) // Orange
         };
 
-        for (int i = 0; i < ballCount; i++) {
+        for (int i = 0; i < initialSpawn; i++) {
             float angle = random.nextFloat() * (float) (2 * Math.PI);
             float radius = circleRadius * 0.7f;
             float x = centerX + (float) Math.cos(angle) * radius;
@@ -476,7 +522,12 @@ public class GameView extends SurfaceView implements Runnable {
         }
 
         // Siyah toplar (Level içindeki stage'e göre artar)
-        int blackCount = (stageInLevel >= 4) ? 2 : 1;
+        int blackCount;
+        if (stageInLevel <= 3)
+            blackCount = 2; // Stages 1, 2, 3 -> 2 balls
+        else
+            blackCount = 3; // Stages 4, 5 -> 3 balls
+
         for (int i = 0; i < blackCount; i++) {
             float angle = random.nextFloat() * (float) (2 * Math.PI);
             float radius = circleRadius * 0.7f;
@@ -484,9 +535,42 @@ public class GameView extends SurfaceView implements Runnable {
             float y = centerY + (float) Math.sin(angle) * radius;
 
             Ball ball = new Ball(x, y, whiteBall.radius * 1.2f, Color.BLACK);
-            ball.vx = (random.nextFloat() - 0.5f) * 12;
-            ball.vy = (random.nextFloat() - 0.5f) * 12;
+            // First ball is static, others are moving
+            if (i == 0) {
+                ball.vx = 0;
+                ball.vy = 0;
+            } else {
+                ball.vx = (random.nextFloat() - 0.5f) * 12;
+                ball.vy = (random.nextFloat() - 0.5f) * 12;
+            }
             blackBalls.add(ball);
+        }
+    }
+
+    private void spawnBoss(int lv) {
+        String name = "Boss";
+        float hp = 500 + (lv * 50);
+        int color = Color.RED;
+
+        if (lv == 50 || lv == 10) {
+            name = "VOID TITAN";
+            hp = 2500; // HP 2500 as requested
+            color = Color.rgb(75, 0, 130); // Indigo
+            timeLeft = 190000; // 190 seconds
+        }
+
+        currentBoss = new Boss(name, hp, color);
+        // Player HP Setup
+        playerMaxHp = 1000;
+        playerHp = playerMaxHp;
+        bossProjectiles.clear();
+
+        // Reposition Player for battle
+        if (whiteBall != null) {
+            whiteBall.x = centerX;
+            whiteBall.y = centerY + circleRadius * 0.6f; // Start below
+            whiteBall.vx = 0;
+            whiteBall.vy = 0;
         }
     }
 
@@ -498,9 +582,22 @@ public class GameView extends SurfaceView implements Runnable {
             update();
             draw();
 
-            // Özel top spawn
-            if (gameStarted && !gameOver && random.nextFloat() < 0.001f && specialBalls.size() < 3) {
+            // Next Level Transition Logic - REMOVED (Handled in update())
+            /*
+             * if (showStageCleared) { ... }
+             */
+
+            // Özel top spawn (Increased Chance)
+            if (gameStarted && !gameOver && random.nextFloat() < 0.002f && specialBalls.size() < 5) {
                 spawnSpecialBall();
+            }
+
+            // Pending Colored Balls Spawn (Random Intervals)
+            // Boss Fight: NO Colored Balls
+            if (gameStarted && !gameOver && pendingColoredBalls > 0 && coloredBalls.size() < 8
+                    && random.nextFloat() < 0.01f && currentBoss == null) {
+                spawnRandomColoredBall();
+                pendingColoredBalls--;
             }
 
             long frameTime = System.currentTimeMillis() - startTime;
@@ -515,9 +612,25 @@ public class GameView extends SurfaceView implements Runnable {
         }
     }
 
+    private void performLightningStrike() {
+        if (currentBoss != null) {
+            electricEffects.add(new ElectricEffect(currentBoss.x, -200, currentBoss.x, currentBoss.y, 1));
+            createImpactBurst(currentBoss.x, currentBoss.y, Color.RED);
+            currentBoss.hp -= 30;
+            floatingTexts.add(new FloatingText("-30", currentBoss.x, currentBoss.y - 50, Color.RED));
+            playSound(soundBlackExplosion);
+        } else if (blackBalls.size() > 0) {
+            Ball b = blackBalls.get(0); // Always target first available
+            electricEffects.add(new ElectricEffect(b.x, -200, b.x, b.y, 1));
+            createImpactBurst(b.x, b.y, Color.BLACK);
+            blackBalls.remove(0);
+            playSound(soundBlackExplosion);
+        }
+    }
+
     private void spawnSpecialBall() {
         String[] types = { "blackhole", "extraTime", "powerBoost", "barrier", "electric",
-                "clone", "freeze", "missile", "teleport", "boom", "ghost" };
+                "clone", "freeze", "missile", "teleport", "boom", "ghost", "multiball", "magma", "lightning" };
         String type = types[random.nextInt(types.length)];
 
         float angle = random.nextFloat() * (float) (2 * Math.PI);
@@ -528,21 +641,65 @@ public class GameView extends SurfaceView implements Runnable {
         specialBalls.add(new SpecialBall(x, y, whiteBall.radius * 1.2f, type));
     }
 
+    private void spawnRandomColoredBall() {
+        int[] colors = {
+                Color.rgb(255, 0, 85),
+                Color.rgb(0, 255, 153),
+                Color.rgb(255, 255, 0),
+                Color.rgb(0, 204, 255),
+                Color.rgb(255, 102, 0)
+        };
+        float angle = random.nextFloat() * (float) (2 * Math.PI);
+        float dist = random.nextFloat() * (circleRadius * 0.8f); // Slightly wider spread
+        float x = centerX + (float) Math.cos(angle) * dist;
+        float y = centerY + (float) Math.sin(angle) * dist;
+
+        Ball b = new Ball(x, y, (circleRadius / 0.47f) * 0.02f, colors[random.nextInt(colors.length)]);
+        // Set Velocity
+        b.vx = (random.nextFloat() - 0.5f) * 12 + ((random.nextFloat() > 0.5) ? 2 : -2);
+        b.vy = (random.nextFloat() - 0.5f) * 12 + ((random.nextFloat() > 0.5) ? 2 : -2);
+        coloredBalls.add(b);
+
+        // Visual Spawn Effect - REMOVED as requested
+        // createImpactBurst(x, y, Color.WHITE);
+    }
+
     private void update() {
         if (isOnlineMode) {
-            // Online mode only updates animations/particles here if needed,
-            // but main physics is server-side.
-            // Avoid local game logic (level completion, whiteBall access)
-
-            // Only update particles/effects if you want locally
+            // Online mode: update particles only
             for (int i = particles.size() - 1; i >= 0; i--) {
                 Particle p = particles.get(i);
                 p.update();
                 if (p.isDead())
                     particles.remove(i);
             }
-            // Maybe other effects too?
             return;
+        }
+
+        // Offline Logic: Lightning Sequencer
+        if (pendingLightningStrikes > 0) {
+            long now = System.currentTimeMillis();
+            if (now - lastLightningStrikeTime >= 1000) {
+                lastLightningStrikeTime = now;
+                pendingLightningStrikes--;
+                performLightningStrike();
+            }
+        }
+
+        // Boss Defeated Sequence Transition
+        if (showBossDefeated && System.currentTimeMillis() - bossDefeatedTime > 3000) {
+            showBossDefeated = false;
+            if (coloredBalls.isEmpty() && pendingColoredBalls == 0) {
+                levelCompleted = true;
+                showStageCleared = true;
+                stageClearedTime = System.currentTimeMillis();
+
+                // Stage Cleared: Explode all Black Balls (ensure cleanup)
+                for (Ball b : blackBalls) {
+                    createImpactBurst(b.x, b.y, Color.BLACK);
+                }
+                blackBalls.clear();
+            }
         }
 
         if (!gameStarted || gameOver)
@@ -554,7 +711,41 @@ public class GameView extends SurfaceView implements Runnable {
 
         // Zaman
         timeLeft -= deltaTime;
-        if (timeLeft <= 0 && coloredBalls.size() > 0) {
+
+        // Boss Projectiles Update
+        for (int i = bossProjectiles.size() - 1; i >= 0; i--) {
+            Ball p = bossProjectiles.get(i);
+            p.x += p.vx;
+            p.y += p.vy;
+            if (p.x < -100 || p.x > screenWidth + 100 || p.y < -100 || p.y > screenHeight + 100) {
+                bossProjectiles.remove(i);
+            }
+        }
+
+        // Game Over Check for HP
+        if (currentBoss != null && playerHp <= 0) {
+            gameOver = true;
+            playSound(soundGameOver);
+            updateMenuButtonsVisibility();
+            return;
+        }
+
+        // Magma Update
+        if (magmaTrailActive) {
+            if (System.currentTimeMillis() > magmaTrailEndTime) {
+                magmaTrailActive = false;
+            } else if (whiteBall != null && (Math.abs(whiteBall.vx) > 1 || Math.abs(whiteBall.vy) > 1)) {
+                if (random.nextFloat() < 0.2f) {
+                    magmaPatches.add(new MagmaPatch(whiteBall.x, whiteBall.y, whiteBall.radius * 0.8f));
+                }
+            }
+        }
+        for (int i = magmaPatches.size() - 1; i >= 0; i--) {
+            magmaPatches.get(i).update();
+            if (magmaPatches.get(i).isDead())
+                magmaPatches.remove(i);
+        }
+        if (timeLeft <= 0 && (coloredBalls.size() > 0 || currentBoss != null)) {
             gameOver = true;
             saveProgress();
             playSound(soundGameOver);
@@ -562,8 +753,10 @@ public class GameView extends SurfaceView implements Runnable {
             return;
         }
 
-        // Tüm toplar toplandı mı?
-        if (coloredBalls.size() == 0 && !levelCompleted) {
+        // Tüm toplar toplandı mı? (Ve Boss yoksa)
+        // Tüm toplar toplandı mı? (Ve Boss yoksa)
+        if (coloredBalls.size() == 0 && pendingColoredBalls == 0 && currentBoss == null && !levelCompleted
+                && !showBossDefeated) {
             levelCompleted = true;
             showStageCleared = true;
             stageClearedTime = System.currentTimeMillis();
@@ -622,10 +815,18 @@ public class GameView extends SurfaceView implements Runnable {
         // Elektrik topu ikinci sıçrama kontrolü
         if (electricSecondBounce && System.currentTimeMillis() >= electricSecondBounceTime) {
             electricSecondBounce = false;
-            if (coloredBalls.size() > 0) {
+            if (currentBoss != null) {
+                // Boss varsa ona sek
+                electricEffects.add(
+                        new ElectricEffect(electricFirstTargetX, electricFirstTargetY, currentBoss.x, currentBoss.y,
+                                0));
+                createImpactBurst(currentBoss.x, currentBoss.y, currentBoss.color);
+                currentBoss.hp -= 150; // Electric damage
+                playSound(soundElectric);
+            } else if (coloredBalls.size() > 0) {
                 Ball target2 = coloredBalls.get(random.nextInt(coloredBalls.size()));
                 electricEffects
-                        .add(new ElectricEffect(electricFirstTargetX, electricFirstTargetY, target2.x, target2.y));
+                        .add(new ElectricEffect(electricFirstTargetX, electricFirstTargetY, target2.x, target2.y, 0));
                 createImpactBurst(target2.x, target2.y, target2.color);
                 score++;
                 comboCounter++;
@@ -684,6 +885,11 @@ public class GameView extends SurfaceView implements Runnable {
             }
         }
 
+        // Boss Update
+        if (currentBoss != null) {
+            currentBoss.update();
+        }
+
         // Renkli toplar (freeze kontrolü)
         if (!freezeActive) {
             for (Ball ball : coloredBalls) {
@@ -717,7 +923,9 @@ public class GameView extends SurfaceView implements Runnable {
         updateMissiles();
 
         // Blast wave
-        if (blastWave != null) {
+        if (blastWave != null)
+
+        {
             blastWave.update();
             if (blastWave.isDead())
                 blastWave = null;
@@ -778,6 +986,20 @@ public class GameView extends SurfaceView implements Runnable {
         if (comboCounter > 0 && System.currentTimeMillis() - lastHitTime > COMBO_TIMEOUT) {
             comboCounter = 0;
         }
+
+        // Player Boss Death Check (removed currentBoss null check)
+        if (playerHp <= 0 && !gameOver && !showPlayerDefeated) {
+            playerHp = 0; // Clamp to prevent retrigger from additional damage
+            showPlayerDefeated = true;
+            playerDefeatedTime = System.currentTimeMillis();
+            playSound(soundGameOver);
+        }
+
+        if (showPlayerDefeated && System.currentTimeMillis() - playerDefeatedTime > 3000) {
+            gameOver = true;
+            showPlayerDefeated = false;
+            updateMenuButtonsVisibility();
+        }
     }
 
     private void updateBallTrail(Ball ball) {
@@ -817,6 +1039,52 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     private void checkCollisions() {
+        // Boss Projectiles vs Player
+        for (int i = bossProjectiles.size() - 1; i >= 0; i--) {
+            Ball p = bossProjectiles.get(i);
+            if (whiteBall != null) {
+                float dx = p.x - whiteBall.x;
+                float dy = p.y - whiteBall.y;
+                if (Math.sqrt(dx * dx + dy * dy) < p.radius + whiteBall.radius) {
+                    if (barrierActive) {
+                        createImpactBurst(p.x, p.y, Color.CYAN); // Block effect
+                        bossProjectiles.remove(i);
+                        playSound(soundShield);
+                        continue;
+                    }
+                    playerHp -= 150; // Damage
+                    createImpactBurst(whiteBall.x, whiteBall.y, Color.RED);
+                    bossProjectiles.remove(i);
+                    // Shake
+                    cameraShakeX = 20;
+                    shakeEndTime = System.currentTimeMillis() + 300;
+                    playSound(soundCollision);
+                }
+            }
+        }
+
+        // Magma Collisions
+        for (int m = magmaPatches.size() - 1; m >= 0; m--) {
+            MagmaPatch p = magmaPatches.get(m);
+            if (currentBoss != null) {
+                float dx = p.x - currentBoss.x;
+                float dy = p.y - currentBoss.y;
+                if (Math.sqrt(dx * dx + dy * dy) < p.radius + currentBoss.radius) {
+                    currentBoss.hp -= 5;
+                }
+            }
+            // Vs Colored Balls
+            for (int i = coloredBalls.size() - 1; i >= 0; i--) {
+                Ball b = coloredBalls.get(i);
+                float dx = p.x - b.x;
+                float dy = p.y - b.y;
+                if (Math.sqrt(dx * dx + dy * dy) < p.radius * 2.0 + b.radius) { // Radius increased for easier hit
+                    createImpactBurst(b.x, b.y, b.color);
+                    coloredBalls.remove(i);
+                    playSound(soundCollision);
+                }
+            }
+        }
         // Drag sırasında çarpışma yok
         if (isDragging) {
             return;
@@ -831,6 +1099,78 @@ public class GameView extends SurfaceView implements Runnable {
         }
 
         for (Ball wBall : allWhiteBalls) {
+            // Boss Collision Check
+            if (currentBoss != null) {
+                float dx = wBall.x - currentBoss.x;
+                float dy = wBall.y - currentBoss.y;
+                float dist = (float) Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < wBall.radius + currentBoss.radius) {
+                    boolean bossShielded = (currentBoss.state == 1 || currentBoss.dashing);
+
+                    if (bossShielded) {
+                        // BOSS SHIELDED (Dashing)
+                        playSound(soundShield);
+                        createImpactBurst(wBall.x, wBall.y, Color.CYAN); // Shield Effect
+                        floatingTexts.add(new FloatingText("BLOCKED", wBall.x, wBall.y - 50, Color.CYAN));
+
+                        // Check if player is protected or takes damage from dash
+                        if (currentBoss.dashing && !currentBoss.charging && wBall == whiteBall) {
+                            if (barrierActive || ghostModeActive) {
+                                // Protected - consume barrier but NO damage
+                                if (barrierActive) {
+                                    barrierActive = false;
+                                    floatingTexts.add(
+                                            new FloatingText("BARRIER BROKEN!", whiteBall.x, whiteBall.y + 50,
+                                                    Color.YELLOW));
+                                    playSound(soundCollision);
+                                }
+                                // Ghost mode just blocks, no consumption
+                            } else {
+                                // Not protected - take damage
+                                playerHp -= 40; // Reduced Dash Impact Damage
+                                floatingTexts.add(new FloatingText("-40", whiteBall.x, whiteBall.y - 50, Color.RED));
+                                createImpactBurst(whiteBall.x, whiteBall.y, Color.RED);
+                                cameraShakeX = 30;
+                                shakeEndTime = System.currentTimeMillis() + 400;
+                                playSound(soundCollision);
+                            }
+                        }
+                    } else {
+                        // Damage Boss
+                        currentBoss.hp -= 25;
+
+                        // Valid Hit Effects
+                        createParticles(wBall.x, wBall.y, currentBoss.color);
+                        playSound(soundCollision);
+                        floatingTexts.add(new FloatingText("-25", wBall.x, wBall.y - 50, Color.WHITE));
+                    }
+
+                    // Reflect Ball
+                    float angle = (float) Math.atan2(dy, dx);
+                    float speed = (float) Math.sqrt(wBall.vx * wBall.vx + wBall.vy * wBall.vy);
+                    speed = Math.min(speed * 1.1f, 60f); // Limit Max Speed
+                    wBall.vx = (float) Math.cos(angle) * speed;
+                    wBall.vy = (float) Math.sin(angle) * speed;
+
+                    // Push out to prevent sticking (Glitch Fix)
+                    float overlap = (wBall.radius + currentBoss.radius) - dist + 2;
+                    wBall.x += Math.cos(angle) * overlap;
+                    wBall.y += Math.sin(angle) * overlap;
+
+                    // Check Death
+                    if (currentBoss.hp <= 0) {
+                        currentBoss = null;
+                        showBossDefeated = true;
+                        bossDefeatedTime = System.currentTimeMillis();
+                        for (int k = 0; k < 5; k++)
+                            createImpactBurst(centerX + (random.nextFloat() - 0.5f) * 300,
+                                    centerY + (random.nextFloat() - 0.5f) * 300, Color.RED);
+                        playSound(soundBlackExplosion);
+                        // Level completion deferred until Boss Defeated text finishes
+                    }
+                }
+            }
             // Renkli toplar
             for (int i = coloredBalls.size() - 1; i >= 0; i--) {
                 Ball ball = coloredBalls.get(i);
@@ -859,6 +1199,20 @@ public class GameView extends SurfaceView implements Runnable {
                     coloredBalls.remove(i);
                     playSound(soundCollision);
 
+                    // Check Level Completion here
+                    if (coloredBalls.isEmpty() && pendingColoredBalls == 0 && currentBoss == null
+                            && !showBossDefeated) {
+                        levelCompleted = true; // Will trigger next level in main loop
+                        showStageCleared = true;
+                        stageClearedTime = System.currentTimeMillis();
+
+                        // Stage Cleared: Explode all Black Balls
+                        for (Ball b : blackBalls) {
+                            createImpactBurst(b.x, b.y, Color.BLACK);
+                        }
+                        blackBalls.clear();
+                    }
+
                     // Hız artır
                     float dx = wBall.x - ball.x;
                     float dy = wBall.y - ball.y;
@@ -880,6 +1234,10 @@ public class GameView extends SurfaceView implements Runnable {
                     continue;
 
                 if (checkBallCollision(wBall, ball)) {
+                    // Clone/Multi-balls are IMMUNE to Black Balls
+                    if (wBall != whiteBall)
+                        continue;
+
                     if (barrierActive || ghostModeActive) {
                         // Korundu
                         long currentTime = System.currentTimeMillis();
@@ -940,6 +1298,22 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     private void activateSpecialPower(String type, Ball targetBall) {
+        // Inventory Collection Logic
+        // ONLY Multi-Ball (M), Magma (F), Lighting (L) go to inventory.
+        if (type.equals("multiball") || type.equals("magma") || type.equals("lightning")) {
+
+            if (inventory.size() < MAX_INVENTORY_SIZE) {
+                inventory.add(type);
+                playSound(soundCoin);
+                floatingTexts.add(new FloatingText("COLLECTED!", targetBall.x, targetBall.y, Color.GREEN));
+                return; // Do not activate immediately
+            }
+        }
+
+        activateSkillEffect(type, targetBall);
+    }
+
+    private void activateSkillEffect(String type, Ball targetBall) {
         switch (type) {
             case "blackhole":
                 blackHoleActive = true;
@@ -957,6 +1331,15 @@ public class GameView extends SurfaceView implements Runnable {
                 barrierEndTime = System.currentTimeMillis() + 5000;
                 playSound(soundShield);
                 break;
+            case "multiball":
+                multiBallActive = true;
+                playSound(soundPower);
+                break;
+            case "magma":
+                magmaTrailActive = true;
+                magmaTrailEndTime = System.currentTimeMillis() + 10000;
+                playSound(soundPower); // Using power sound
+                break;
             case "electric":
                 triggerElectric();
                 playSound(soundElectric);
@@ -973,10 +1356,10 @@ public class GameView extends SurfaceView implements Runnable {
                 playSound(soundFreeze);
                 break;
             case "missile":
-                if (blackBalls.size() > 0) {
-                    missiles.add(new GuidedMissile(whiteBall.x, whiteBall.y, blackBalls.get(0)));
-                    playSound(soundMissile);
-                }
+                // Fire missile (Target Boss if balls are empty)
+                Ball target = (blackBalls.size() > 0) ? blackBalls.get(0) : null;
+                missiles.add(new GuidedMissile(whiteBall.x, whiteBall.y, target));
+                playSound(soundMissile);
                 break;
             case "teleport":
                 float angle = random.nextFloat() * (float) (2 * Math.PI);
@@ -984,6 +1367,13 @@ public class GameView extends SurfaceView implements Runnable {
                 targetBall.x = centerX + (float) Math.cos(angle) * radius;
                 targetBall.y = centerY + (float) Math.sin(angle) * radius;
                 createParticles(targetBall.x, targetBall.y, Color.GREEN);
+                break;
+            case "lightning":
+                // Trigger sequenced lightning (3 strikes, 1s interval)
+                pendingLightningStrikes = 3;
+                lastLightningStrikeTime = System.currentTimeMillis() - 1000; // Force first strike immediately
+                playSound(soundElectric);
+                createImpactBurst(centerX, centerY, Color.YELLOW);
                 break;
             case "boom":
                 blastWave = new BlastWave(targetBall.x, targetBall.y);
@@ -1012,7 +1402,8 @@ public class GameView extends SurfaceView implements Runnable {
 
         // İlk hedef
         Ball target1 = coloredBalls.get(random.nextInt(coloredBalls.size()));
-        electricEffects.add(new ElectricEffect(whiteBall.x, whiteBall.y, target1.x, target1.y));
+        // Standard Electric (Type 0)
+        electricEffects.add(new ElectricEffect(whiteBall.x, whiteBall.y, target1.x, target1.y, 0));
         createImpactBurst(target1.x, target1.y, target1.color);
         score++;
         comboCounter++;
@@ -1020,7 +1411,7 @@ public class GameView extends SurfaceView implements Runnable {
         coloredBalls.remove(target1);
 
         // İkinci hedef için gecikme ayarla (0.4 saniye)
-        if (coloredBalls.size() > 0) {
+        if (currentBoss != null || coloredBalls.size() > 0) {
             electricFirstTargetX = target1.x;
             electricFirstTargetY = target1.y;
             electricSecondBounce = true;
@@ -1046,6 +1437,29 @@ public class GameView extends SurfaceView implements Runnable {
                     missiles.remove(i);
                     playSound(soundBlackExplosion);
                     break;
+                }
+            }
+
+            // Boss Collision
+            if (currentBoss != null) {
+                float dx = missile.x - currentBoss.x;
+                float dy = missile.y - currentBoss.y;
+                if (Math.sqrt(dx * dx + dy * dy) < missile.radius + currentBoss.radius) {
+                    currentBoss.hp -= 100;
+                    createParticles(missile.x, missile.y, Color.MAGENTA);
+                    playSound(soundBlackExplosion);
+                    missiles.remove(i);
+
+                    if (currentBoss.hp <= 0 && !showBossDefeated) {
+                        currentBoss = null;
+                        showBossDefeated = true;
+                        bossDefeatedTime = System.currentTimeMillis();
+                        for (int k = 0; k < 5; k++)
+                            createImpactBurst(centerX + (random.nextFloat() - 0.5f) * 300,
+                                    centerY + (random.nextFloat() - 0.5f) * 300, Color.RED);
+                        playSound(soundBlackExplosion);
+                    }
+                    continue;
                 }
             }
 
@@ -1235,6 +1649,51 @@ public class GameView extends SurfaceView implements Runnable {
                     break;
             }
 
+            // Draw Magma
+            for (MagmaPatch p : magmaPatches)
+                p.draw(canvas);
+
+            // Draw Boss Projectiles
+            paint.setStyle(Paint.Style.FILL);
+            for (Ball p : bossProjectiles) {
+                paint.setColor(p.color);
+                paint.setShadowLayer(10, 0, 0, p.color);
+                canvas.drawCircle(p.x, p.y, p.radius, paint);
+            }
+            paint.clearShadowLayer();
+
+            // Draw Player HP Bar (if Boss active)
+            if (currentBoss != null) {
+                float barW = screenWidth * 0.5f;
+                float barH = 20;
+                float barX = (screenWidth - barW) / 2;
+                float barY = screenHeight - 250; // Slightly above bottom
+
+                // Background
+                paint.setStyle(Paint.Style.FILL);
+                paint.setColor(Color.DKGRAY);
+                canvas.drawRect(barX, barY, barX + barW, barY + barH, paint);
+
+                // HP
+                paint.setColor(Color.GREEN);
+                float ratio = Math.max(0, playerHp / playerMaxHp);
+                if (ratio < 0.3f)
+                    paint.setColor(Color.RED);
+                canvas.drawRect(barX, barY, barX + barW * ratio, barY + barH, paint);
+
+                // Border
+                paint.setStyle(Paint.Style.STROKE);
+                paint.setColor(Color.WHITE);
+                paint.setStrokeWidth(2);
+                canvas.drawRect(barX, barY, barX + barW, barY + barH, paint);
+
+                paint.setStyle(Paint.Style.FILL);
+                paint.setColor(Color.WHITE);
+                paint.setTextSize(30);
+                paint.setTextAlign(Paint.Align.CENTER);
+                canvas.drawText("PLAYER HP", centerX, barY - 10, paint);
+            }
+
             // Çember
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeWidth(6);
@@ -1249,12 +1708,14 @@ public class GameView extends SurfaceView implements Runnable {
             }
 
             // Electric effects
-            for (ElectricEffect effect : electricEffects) {
+            for (int i = 0; i < electricEffects.size(); i++) {
+                ElectricEffect effect = electricEffects.get(i);
                 effect.draw(canvas, paint);
             }
 
             // Parçacıklar
-            for (Particle p : particles) {
+            for (int i = 0; i < particles.size(); i++) {
+                Particle p = particles.get(i);
                 p.draw(canvas, paint);
             }
 
@@ -1292,20 +1753,29 @@ public class GameView extends SurfaceView implements Runnable {
                     e.printStackTrace();
                 }
             } else {
+                // Draw Boss
+                if (currentBoss != null) {
+                    currentBoss.draw(canvas);
+                }
+
                 // Toplar
-                for (Ball ball : coloredBalls) {
+                for (int i = 0; i < coloredBalls.size(); i++) {
+                    Ball ball = coloredBalls.get(i);
                     drawBall(canvas, ball);
                 }
 
-                for (Ball ball : blackBalls) {
+                for (int i = 0; i < blackBalls.size(); i++) {
+                    Ball ball = blackBalls.get(i);
                     drawBall(canvas, ball);
                 }
 
-                for (SpecialBall ball : specialBalls) {
+                for (int i = 0; i < specialBalls.size(); i++) {
+                    SpecialBall ball = specialBalls.get(i);
                     drawSpecialBall(canvas, ball);
                 }
 
-                for (Ball ball : cloneBalls) {
+                for (int i = 0; i < cloneBalls.size(); i++) {
+                    Ball ball = cloneBalls.get(i);
                     drawBall(canvas, ball);
 
                     // Clone topu için geri sayım göster
@@ -1329,7 +1799,8 @@ public class GameView extends SurfaceView implements Runnable {
             }
 
             // Missiles
-            for (GuidedMissile missile : missiles) {
+            for (int i = 0; i < missiles.size(); i++) {
+                GuidedMissile missile = missiles.get(i);
                 missile.draw(canvas, paint);
             }
 
@@ -1366,32 +1837,6 @@ public class GameView extends SurfaceView implements Runnable {
                     dy = dragStartY - currentTouchY;
                 } else {
                     // Classic Drag: Vector is Center - DraggedPos (Spring back)
-                    dx = currentDraggedBall.x - dragStartX;
-                    // Note: Here dragStartX was set to ball center in classic mode!
-                    // Wait, in classic mode dragStartX is original ball center.
-                    // draggedBall.x is current finger pos.
-                    // Force vector is Center(Start) - Current(Ball).
-                    // So dx = dragStartX - currentDraggedBall.x; ??
-
-                    // Old code was: dx = currentDraggedBall.x - dragStartX; (Finger - Center)
-                    // Angle was atan2(-dy, -dx) -> (Center - Finger). Correct.
-                    // So old code was technically vector FROM CENTER TO FINGER.
-                    // Then angle inverted.
-
-                    // Let's stick to consistency: We want vector of RESULTING VELOCITY.
-                    // Resulting velocity is Center - Finger.
-
-                    dx = dragStartX - currentDraggedBall.x;
-                    dy = dragStartY - currentDraggedBall.y;
-
-                    // BUT wait, old code calculated 'distance' then angle from (Ball - Center).
-                    // Old code: dx = Ball.x - StartX. (Finger - Center)
-                    // Angle = atan2(-dy, -dx). = atan2(CenterY - FingerY, CenterX - FingerX).
-                    // = Angle from Finger TO Center. (Correct launch direction).
-
-                    // So let's calculate 'Launch Vector' directly for both.
-                    // Launch Vector = Center - Finger.
-
                     dx = dragStartX - currentDraggedBall.x;
                     dy = dragStartY - currentDraggedBall.y;
                 }
@@ -1400,223 +1845,16 @@ public class GameView extends SurfaceView implements Runnable {
                 float ratio = distance / MAX_DRAG_DISTANCE;
 
                 // Launch Angle (Direction of shoot)
-                // Since our dx, dy is already "Launch Vector" (Center - Finger), just atan2(dy,
-                // dx)
                 float launchAngle = (float) Math.atan2(dy, dx);
-
-                // Note: The original code used atan2(-dy, -dx) because dx was (Finger -
-                // Center).
-                // I inverted calculation to (Center - Finger) so now I use atan2(dy, dx).
-                // For Bottom Drag: Start - Current. (Pull - Finger). Same logic.
-                // Start is static anchor, Current is pulled back.
-                // Vector Start - Current is the direction of shoot. Correct.
 
                 // Eski çizgi (drag line) yerine nişan çizgisi (trajectory)
                 if (distance > 10) {
-                    // launchAngle is already set correctly above
-
-                    // Çizgi ve Ok parametreleri
-                    float startDist = currentDraggedBall.radius * 1.5f;
-                    float lineLen = 400 * ratio; // Güç arttıkça uzayan çizgi
-
-                    float startX = currentDraggedBall.x + (float) Math.cos(launchAngle) * startDist;
-                    float startY = currentDraggedBall.y + (float) Math.sin(launchAngle) * startDist;
-                    float endX = currentDraggedBall.x + (float) Math.cos(launchAngle) * (startDist + lineLen);
-                    float endY = currentDraggedBall.y + (float) Math.sin(launchAngle) * (startDist + lineLen);
-
-                    // Visual end point (slightly before the arrow tip to avoid clipping)
-                    float vOffset = 15;
-                    float vEndX = currentDraggedBall.x
-                            + (float) Math.cos(launchAngle) * (startDist + Math.max(0, lineLen - vOffset));
-                    float vEndY = currentDraggedBall.y
-                            + (float) Math.sin(launchAngle) * (startDist + Math.max(0, lineLen - vOffset));
-
-                    // Kesikli çizgi (Trajectory)
-                    paint.setStyle(Paint.Style.STROKE);
-                    paint.setStrokeWidth(5);
-                    paint.setColor(Color.WHITE);
-                    paint.setAlpha(180);
-
-                    if (selectedTrajectory.equals("laser")) {
-                        // Visionary Laser Style
-                        paint.setAlpha(255);
-                        paint.setShadowLayer(15, 0, 0, Color.RED);
-                        paint.setStrokeWidth(8);
-                        paint.setColor(Color.RED);
-                        canvas.drawLine(startX, startY, vEndX, vEndY, paint);
-
-                        paint.setColor(Color.WHITE);
-                        paint.setStrokeWidth(3);
-                        canvas.drawLine(startX, startY, vEndX, vEndY, paint);
-                        paint.clearShadowLayer();
-                    } else if (selectedTrajectory.equals("electric")) {
-                        // Electric Zig-Zag
-                        paint.setAlpha(255);
-                        paint.setStrokeWidth(5);
-                        paint.setColor(Color.CYAN);
-                        paint.setShadowLayer(20, 0, 0, Color.CYAN);
-                        paint.setStyle(Paint.Style.STROKE);
-
-                        android.graphics.Path path = new android.graphics.Path();
-                        path.moveTo(startX, startY);
-                        int segs = 12;
-                        for (int i = 1; i <= segs; i++) {
-                            float px = startX + (vEndX - startX) * i / segs;
-                            float py = startY + (vEndY - startY) * i / segs;
-                            float offset = (float) (Math.sin(System.currentTimeMillis() * 0.05 + i) * 15);
-                            float perpX = -(endY - startY) / lineLen;
-                            float perpY = (endX - startX) / lineLen;
-                            path.lineTo(px + perpX * offset, py + perpY * offset);
-                        }
-                        canvas.drawPath(path, paint);
-                        paint.clearShadowLayer();
-                    } else if (selectedTrajectory.equals("dots")) {
-                        // Golden Pearls
-                        paint.setStyle(Paint.Style.FILL);
-                        paint.setColor(Color.rgb(255, 215, 0));
-                        paint.setShadowLayer(15, 0, 0, Color.YELLOW);
-                        int dots = 10;
-                        for (int i = 0; i <= dots; i++) {
-                            float px = startX + (vEndX - startX) * i / dots;
-                            float py = startY + (vEndY - startY) * i / dots;
-                            canvas.drawCircle(px, py, 6, paint);
-                        }
-                        paint.clearShadowLayer();
-                    } else if (selectedTrajectory.equals("plasma")) {
-                        // Fading Plasma
-                        paint.setStyle(Paint.Style.FILL);
-                        int dots = 15;
-                        for (int i = 0; i <= dots; i++) {
-                            float t = (float) i / dots;
-                            float px = startX + (vEndX - startX) * t;
-                            float py = startY + (vEndY - startY) * t;
-                            paint.setColor(Color.MAGENTA);
-                            paint.setAlpha((int) (255 * t));
-                            paint.setShadowLayer(10 * t, 0, 0, Color.MAGENTA);
-                            canvas.drawCircle(px, py, 8 * t, paint);
-                        }
-                        paint.setAlpha(255);
-                        paint.clearShadowLayer();
-                    } else if (selectedTrajectory.equals("arrow")) {
-                        // Green Arrow
-                        paint.setAlpha(255);
-                        paint.setShadowLayer(15, 0, 0, Color.GREEN);
-                        paint.setStrokeWidth(6);
-                        paint.setColor(Color.GREEN);
-                        canvas.drawLine(startX, startY, vEndX, vEndY, paint);
-
-                        // Small arrowheads along the line
-                        paint.setStyle(Paint.Style.FILL);
-                        int arrows = 3;
-                        for (int i = 1; i <= arrows; i++) {
-                            float t = (float) i / arrows;
-                            float ax = startX + (vEndX - startX) * t;
-                            float ay = startY + (vEndY - startY) * t;
-                            // Simple arrowhead
-                            // ... (We draw the main head at the end anyway, maybe just dots or small
-                            // chevrons here?)
-                            // Let's just keep the main line green and rely on the big arrow at the end.
-                        }
-                        paint.clearShadowLayer();
-                    } else if (selectedTrajectory.equals("wave")) {
-                        // Cyan Wave
-                        paint.setAlpha(255);
-                        paint.setStrokeWidth(4);
-                        paint.setColor(Color.CYAN);
-                        paint.setStyle(Paint.Style.STROKE);
-
-                        android.graphics.Path path = new android.graphics.Path();
-                        path.moveTo(startX, startY);
-                        int segs = 20;
-                        for (int i = 1; i <= segs; i++) {
-                            float t = (float) i / segs;
-                            float px = startX + (vEndX - startX) * t;
-                            float py = startY + (vEndY - startY) * t;
-
-                            // Sine wave
-                            float offset = (float) Math.sin(t * Math.PI * 4 - System.currentTimeMillis() * 0.01) * 20;
-                            float perpX = -(endY - startY) / lineLen;
-                            float perpY = (endX - startX) / lineLen;
-
-                            path.lineTo(px + perpX * offset, py + perpY * offset);
-                        }
-                        canvas.drawPath(path, paint);
-                    } else if (selectedTrajectory.equals("grid")) {
-                        // Projected Grid Guide
-                        paint.setAlpha(150);
-                        paint.setStrokeWidth(2);
-                        paint.setColor(Color.WHITE);
-                        paint.setStyle(Paint.Style.STROKE);
-
-                        // Draw a "ladder" or grid projection
-                        int steps = 15;
-                        for (int i = 0; i <= steps; i++) {
-                            float t = (float) i / steps;
-                            float px = startX + (vEndX - startX) * t;
-                            float py = startY + (vEndY - startY) * t;
-
-                            // Cross lines
-                            float perpX = -(endY - startY) / lineLen * 10 * (1 + t); // Widens at end
-                            float perpY = (endX - startX) / lineLen * 10 * (1 + t);
-
-                            canvas.drawLine(px - perpX, py - perpY, px + perpX, py + perpY, paint);
-                        }
-                        // Side lines
-                        canvas.drawLine(startX, startY, vEndX, vEndY, paint);
-
-                    } else if (selectedTrajectory.equals("pulse")) {
-                        // Pulsating Line
-                        float pulse = (float) (Math.sin(System.currentTimeMillis() * 0.02) * 0.5 + 0.5);
-                        paint.setAlpha(255);
-                        paint.setStrokeWidth(4 + 4 * pulse);
-                        paint.setColor(Color.rgb(255, 50, 50));
-                        paint.setShadowLayer(15 * pulse, 0, 0, Color.RED);
-                        canvas.drawLine(startX, startY, vEndX, vEndY, paint);
-                        paint.clearShadowLayer();
-
-                    } else {
-                        // Default dashed
-                        paint.setPathEffect(new android.graphics.DashPathEffect(new float[] { 20, 20 }, 0));
-                        canvas.drawLine(startX, startY, vEndX, vEndY, paint);
-                        paint.setPathEffect(null);
+                    // Multi-Ball Sight: 3 Lines if active
+                    drawTrajectory(canvas, launchAngle, ratio, currentDraggedBall);
+                    if (multiBallActive) {
+                        drawTrajectory(canvas, launchAngle + 0.3f, ratio, currentDraggedBall);
+                        drawTrajectory(canvas, launchAngle - 0.3f, ratio, currentDraggedBall);
                     }
-                    paint.setAlpha(255);
-
-                    // Ok başı (V şeklinde) - Çizginin SONUNDA
-                    int arrowColor = Color.WHITE;
-                    int shadowColor = Color.CYAN;
-                    if (selectedTrajectory.equals("laser")) {
-                        arrowColor = Color.RED;
-                        shadowColor = Color.RED;
-                    } else if (selectedTrajectory.equals("electric")) {
-                        arrowColor = Color.CYAN;
-                        shadowColor = Color.CYAN;
-                    } else if (selectedTrajectory.equals("dots")) {
-                        arrowColor = Color.rgb(255, 215, 0);
-                        shadowColor = Color.YELLOW;
-                    } else if (selectedTrajectory.equals("plasma")) {
-                        arrowColor = Color.MAGENTA;
-                        shadowColor = Color.MAGENTA;
-                    }
-
-                    paint.setStrokeWidth(8);
-                    paint.setStrokeCap(Paint.Cap.ROUND);
-                    paint.setColor(arrowColor);
-                    paint.setShadowLayer(10, 0, 0, shadowColor);
-
-                    float arrowSize = (selectedTrajectory.equals("dashed")) ? 40 : 50;
-                    float wingAngle = (float) Math.toRadians(150); // 150 derece kanat açısı
-
-                    // startX/Y yerine endX/Y kullanıyoruz (Gerçek uç)
-                    float wing1X = endX + (float) Math.cos(launchAngle + wingAngle) * arrowSize;
-                    float wing1Y = endY + (float) Math.sin(launchAngle + wingAngle) * arrowSize;
-
-                    float wing2X = endX + (float) Math.cos(launchAngle - wingAngle) * arrowSize;
-                    float wing2Y = endY + (float) Math.sin(launchAngle - wingAngle) * arrowSize;
-
-                    canvas.drawLine(endX, endY, wing1X, wing1Y, paint);
-                    canvas.drawLine(endX, endY, wing2X, wing2Y, paint);
-                    paint.clearShadowLayer();
                 }
 
                 paint.setStyle(Paint.Style.STROKE);
@@ -2568,6 +2806,29 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     private void drawUI(Canvas canvas) {
+        if (showBossDefeated) {
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(Color.RED);
+            paint.setTextSize(screenWidth * 0.15f);
+            paint.setTextAlign(Paint.Align.CENTER);
+            paint.setShadowLayer(50, 0, 0, Color.BLACK);
+            canvas.drawText("BOSS DEFEATED", centerX, centerY, paint);
+            paint.clearShadowLayer();
+            return;
+        }
+
+        if (showPlayerDefeated && !gameOver) {
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(Color.RED);
+            paint.setTextSize(screenWidth * 0.12f);
+            paint.setTextAlign(Paint.Align.CENTER);
+            paint.setShadowLayer(50, 0, 0, Color.BLACK);
+            canvas.drawText("DEFEATED", centerX, centerY - screenHeight * 0.05f, paint);
+            paint.setTextSize(screenWidth * 0.08f);
+            canvas.drawText("BY BOSS", centerX, centerY + screenHeight * 0.05f, paint);
+            paint.clearShadowLayer();
+            return;
+        }
         // UI artık MainActivity'deki custom panellerde gösteriliyor
         // Eski text-based UI kaldırıldı
 
@@ -2741,7 +3002,8 @@ public class GameView extends SurfaceView implements Runnable {
 
         // Draw In-Game Menu Icon logic
         if (gameStarted && !gameOver) {
-            drawInGameMenuIcon(canvas);
+            drawSkillButton(canvas);
+            drawInventory(canvas);
         }
         // Başlık... (Mevcut kod aşağıda kalacak, sadece if bloğunu değiştiriyorum)
 
@@ -2822,12 +3084,14 @@ public class GameView extends SurfaceView implements Runnable {
         // Liste verileri
         int[] colors = {
                 Color.rgb(255, 165, 0), Color.rgb(255, 215, 0), Color.BLUE, Color.CYAN,
-                Color.rgb(255, 192, 203), Color.rgb(173, 216, 230), Color.RED, Color.GREEN, Color.rgb(139, 0, 0)
+                Color.rgb(255, 192, 203), Color.rgb(173, 216, 230), Color.RED, Color.GREEN, Color.rgb(139, 0, 0),
+                Color.YELLOW
         };
         String[] descs = {
                 "Extra Time: +5 Seconds", "Power Boost: Strong shot", "Barrier: Shield protection",
                 "Electric: Chain reaction", "Clone: Duplicate ball", "Freeze: Stop movement",
-                "Missile: Homing attack", "Teleport: Instant jump", "Boom: Area explosion"
+                "Missile: Homing attack", "Teleport: Instant jump", "Boom: Area explosion",
+                "Lightning: Strike black balls"
         };
 
         for (int i = 0; i < colors.length; i++) {
@@ -3219,6 +3483,41 @@ public class GameView extends SurfaceView implements Runnable {
                         return true;
                     }
 
+                    // Skill Button Check
+                    float dSkill = (float) Math.sqrt(Math.pow(touchX - skillBtnX, 2) + Math.pow(touchY - skillBtnY, 2));
+                    long currentTime = System.currentTimeMillis();
+                    boolean isOnCooldown = (currentTime - lastSkillUseTime < SKILL_COOLDOWN);
+
+                    if (dSkill < skillBtnRadius) {
+                        if (!activeSkill.equals("None") && !isOnCooldown) {
+                            lastSkillUseTime = currentTime;
+                            isSkillActive = true;
+                            if (activeSkill.equals("Ghost Ball")) {
+                                ghostModeActive = true;
+                                ghostModeEndTime = currentTime + 5000;
+                                floatingTexts
+                                        .add(new FloatingText("GHOST MODE!", whiteBall.x, whiteBall.y, Color.CYAN));
+                                playSound(soundPower);
+                            }
+                        }
+                        return true;
+                    }
+
+                    // Inventory Check
+                    for (int i = 0; i < inventory.size(); i++) {
+                        float slotX = inventoryX + i * (inventorySlotSize * 1.2f);
+                        float dInv = (float) Math.sqrt(Math.pow(touchX - slotX, 2) + Math.pow(touchY - inventoryY, 2));
+                        if (dInv < inventorySlotSize * 0.45f) {
+                            if (whiteBall != null) {
+                                activateSkillEffect(inventory.get(i), whiteBall);
+                                inventory.remove(i);
+                            }
+                            return true;
+                        }
+                    }
+                }
+
+                if (gameStarted && !gameOver) {
                     // Hangi topa dokunuldu?
                     Ball touchedBall = null;
                     float minDist = Float.MAX_VALUE;
@@ -3228,8 +3527,8 @@ public class GameView extends SurfaceView implements Runnable {
                     float bottomZoneStart = screenHeight * 0.6f;
 
                     // Cooldown Check: Prevent spamming click to stop ball
-                    if (System.currentTimeMillis() - lastLaunchTime < 1000) {
-                        return true; // Ignore touch if within 1 second of last shot
+                    if (System.currentTimeMillis() - lastLaunchTime < 750) {
+                        return true; // Ignore touch if within 0.75 second of last shot
                     }
 
                     if (touchY >= bottomZoneStart && whiteBall != null) {
@@ -3356,6 +3655,11 @@ public class GameView extends SurfaceView implements Runnable {
                         playSound(soundLaunch);
 
                         lastLaunchTime = System.currentTimeMillis();
+
+                        if (multiBallActive) {
+                            spawnClones(draggedBall);
+                            multiBallActive = false;
+                        }
                     }
 
                     isDragging = false;
@@ -3425,6 +3729,207 @@ public class GameView extends SurfaceView implements Runnable {
         canvas.drawPath(homePath, paint);
     }
 
+    private void drawTrajectory(Canvas canvas, float launchAngle, float ratio, Ball currentDraggedBall) {
+        // Çizgi ve Ok parametreleri
+        float startDist = currentDraggedBall.radius * 1.5f;
+        float lineLen = 250 * ratio; // Shortened from 400
+
+        float startX = currentDraggedBall.x + (float) Math.cos(launchAngle) * startDist;
+        float startY = currentDraggedBall.y + (float) Math.sin(launchAngle) * startDist;
+        float endX = currentDraggedBall.x + (float) Math.cos(launchAngle) * (startDist + lineLen);
+        float endY = currentDraggedBall.y + (float) Math.sin(launchAngle) * (startDist + lineLen);
+
+        // Visual end point (slightly before the arrow tip to avoid clipping)
+        float vOffset = 15;
+        float vEndX = currentDraggedBall.x
+                + (float) Math.cos(launchAngle) * (startDist + Math.max(0, lineLen - vOffset));
+        float vEndY = currentDraggedBall.y
+                + (float) Math.sin(launchAngle) * (startDist + Math.max(0, lineLen - vOffset));
+
+        // Kesikli çizgi (Trajectory)
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(5);
+        paint.setColor(Color.WHITE);
+        paint.setAlpha(180);
+
+        if (selectedTrajectory.equals("laser")) {
+            // Visionary Laser Style
+            paint.setAlpha(255);
+            paint.setShadowLayer(15, 0, 0, Color.RED);
+            paint.setStrokeWidth(8);
+            paint.setColor(Color.RED);
+            canvas.drawLine(startX, startY, vEndX, vEndY, paint);
+
+            paint.setColor(Color.WHITE);
+            paint.setStrokeWidth(3);
+            canvas.drawLine(startX, startY, vEndX, vEndY, paint);
+            paint.clearShadowLayer();
+        } else if (selectedTrajectory.equals("electric")) {
+            // Electric Zig-Zag
+            paint.setAlpha(255);
+            paint.setStrokeWidth(5);
+            paint.setColor(Color.CYAN);
+            paint.setShadowLayer(20, 0, 0, Color.CYAN);
+            paint.setStyle(Paint.Style.STROKE);
+
+            android.graphics.Path path = new android.graphics.Path();
+            path.moveTo(startX, startY);
+            int segs = 12;
+            for (int i = 1; i <= segs; i++) {
+                float px = startX + (vEndX - startX) * i / segs;
+                float py = startY + (vEndY - startY) * i / segs;
+                float offset = (float) (Math.sin(System.currentTimeMillis() * 0.05 + i) * 15);
+                float perpX = -(endY - startY) / lineLen;
+                float perpY = (endX - startX) / lineLen;
+                path.lineTo(px + perpX * offset, py + perpY * offset);
+            }
+            canvas.drawPath(path, paint);
+            paint.clearShadowLayer();
+        } else if (selectedTrajectory.equals("dots")) {
+            // Golden Pearls
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(Color.rgb(255, 215, 0));
+            paint.setShadowLayer(15, 0, 0, Color.YELLOW);
+            int dots = 10;
+            for (int i = 0; i <= dots; i++) {
+                float px = startX + (vEndX - startX) * i / dots;
+                float py = startY + (vEndY - startY) * i / dots;
+                canvas.drawCircle(px, py, 6, paint);
+            }
+            paint.clearShadowLayer();
+        } else if (selectedTrajectory.equals("plasma")) {
+            // Fading Plasma
+            paint.setStyle(Paint.Style.FILL);
+            int dots = 15;
+            for (int i = 0; i <= dots; i++) {
+                float t = (float) i / dots;
+                float px = startX + (vEndX - startX) * t;
+                float py = startY + (vEndY - startY) * t;
+                paint.setColor(Color.MAGENTA);
+                paint.setAlpha((int) (255 * t));
+                paint.setShadowLayer(10 * t, 0, 0, Color.MAGENTA);
+                canvas.drawCircle(px, py, 8 * t, paint);
+            }
+            paint.setAlpha(255);
+            paint.clearShadowLayer();
+        } else if (selectedTrajectory.equals("arrow")) {
+            // Green Arrow
+            paint.setAlpha(255);
+            paint.setShadowLayer(15, 0, 0, Color.GREEN);
+            paint.setStrokeWidth(6);
+            paint.setColor(Color.GREEN);
+            canvas.drawLine(startX, startY, vEndX, vEndY, paint);
+
+            // Small arrowheads along the line
+            paint.setStyle(Paint.Style.FILL);
+            int arrows = 3;
+            for (int i = 1; i <= arrows; i++) {
+                float t = (float) i / arrows;
+                float ax = startX + (vEndX - startX) * t;
+                float ay = startY + (vEndY - startY) * t;
+            }
+            paint.clearShadowLayer();
+        } else if (selectedTrajectory.equals("wave")) {
+            // Cyan Wave
+            paint.setAlpha(255);
+            paint.setStrokeWidth(4);
+            paint.setColor(Color.CYAN);
+            paint.setStyle(Paint.Style.STROKE);
+
+            android.graphics.Path path = new android.graphics.Path();
+            path.moveTo(startX, startY);
+            int segs = 20;
+            for (int i = 1; i <= segs; i++) {
+                float t = (float) i / segs;
+                float px = startX + (vEndX - startX) * t;
+                float py = startY + (vEndY - startY) * t;
+
+                // Sine wave
+                float offset = (float) Math.sin(t * Math.PI * 4 - System.currentTimeMillis() * 0.01) * 20;
+                float perpX = -(endY - startY) / lineLen;
+                float perpY = (endX - startX) / lineLen;
+
+                path.lineTo(px + perpX * offset, py + perpY * offset);
+            }
+            canvas.drawPath(path, paint);
+        } else if (selectedTrajectory.equals("grid")) {
+            // Projected Grid Guide
+            paint.setAlpha(150);
+            paint.setStrokeWidth(2);
+            paint.setColor(Color.WHITE);
+            paint.setStyle(Paint.Style.STROKE);
+
+            // Draw a "ladder" or grid projection
+            int steps = 15;
+            for (int i = 0; i <= steps; i++) {
+                float t = (float) i / steps;
+                float px = startX + (vEndX - startX) * t;
+                float py = startY + (vEndY - startY) * t;
+
+                // Cross lines
+                float perpX = -(endY - startY) / lineLen * 10 * (1 + t); // Widens at end
+                float perpY = (endX - startX) / lineLen * 10 * (1 + t);
+
+                canvas.drawLine(px - perpX, py - perpY, px + perpX, py + perpY, paint);
+            }
+            // Side lines
+            canvas.drawLine(startX, startY, vEndX, vEndY, paint);
+
+        } else if (selectedTrajectory.equals("pulse")) {
+            // Pulsating Line
+            float pulse = (float) (Math.sin(System.currentTimeMillis() * 0.02) * 0.5 + 0.5);
+            paint.setAlpha(255);
+            paint.setStrokeWidth(4 + 4 * pulse);
+            paint.setColor(Color.rgb(255, 50, 50));
+            paint.setShadowLayer(15 * pulse, 0, 0, Color.RED);
+            canvas.drawLine(startX, startY, vEndX, vEndY, paint);
+            paint.clearShadowLayer();
+
+        } else {
+            // Default dashed
+            paint.setPathEffect(new android.graphics.DashPathEffect(new float[] { 20, 20 }, 0));
+            canvas.drawLine(startX, startY, vEndX, vEndY, paint);
+            paint.setPathEffect(null);
+        }
+        paint.setAlpha(255);
+
+        // Ok başı (V şeklinde) - Çizginin SONUNDA
+        int arrowColor = Color.WHITE;
+        int shadowColor = Color.CYAN;
+        if (selectedTrajectory.equals("laser")) {
+            arrowColor = Color.RED;
+            shadowColor = Color.RED;
+        } else if (selectedTrajectory.equals("electric")) {
+            arrowColor = Color.CYAN;
+            shadowColor = Color.CYAN;
+        } else if (selectedTrajectory.equals("dots")) {
+            arrowColor = Color.rgb(255, 215, 0);
+            shadowColor = Color.YELLOW;
+        } else if (selectedTrajectory.equals("plasma")) {
+            arrowColor = Color.MAGENTA;
+            shadowColor = Color.MAGENTA;
+        }
+
+        paint.setStrokeWidth(8);
+        paint.setStrokeCap(Paint.Cap.ROUND);
+        paint.setColor(arrowColor);
+        paint.setShadowLayer(10, 0, 0, shadowColor);
+
+        float arrowSize = (selectedTrajectory.equals("dashed")) ? 40 : 50;
+        float wingAngle = (float) Math.toRadians(150); // 150 derece kanat açısı
+
+        // startX/Y yerine endX/Y kullanıyoruz (Gerçek uç)
+        float wing1X = endX + (float) Math.cos(launchAngle + wingAngle) * arrowSize;
+        float wing1Y = endY + (float) Math.sin(launchAngle + wingAngle) * arrowSize;
+
+        float wing2X = endX + (float) Math.cos(launchAngle - wingAngle) * arrowSize;
+        float wing2Y = endY + (float) Math.sin(launchAngle - wingAngle) * arrowSize;
+
+        canvas.drawLine(endX, endY, wing1X, wing1Y, paint);
+        canvas.drawLine(endX, endY, wing2X, wing2Y, paint);
+        paint.clearShadowLayer();
+    }
+
     // İç sınıflar
     class Ball {
         float x, y, vx, vy, radius;
@@ -3490,6 +3995,8 @@ public class GameView extends SurfaceView implements Runnable {
                     return Color.rgb(139, 0, 0);
                 case "ghost":
                     return Color.rgb(211, 211, 211);
+                case "lightning":
+                    return Color.MAGENTA;
                 default:
                     return Color.MAGENTA;
             }
@@ -3519,6 +4026,8 @@ public class GameView extends SurfaceView implements Runnable {
                     return "X";
                 case "ghost":
                     return "G";
+                case "lightning":
+                    return "?";
                 default:
                     return "?";
             }
@@ -4100,6 +4609,7 @@ public class GameView extends SurfaceView implements Runnable {
     class GuidedMissile {
         float x, y, vx, vy, radius = 8, speed = 4;
         Ball target;
+        boolean dead = false;
 
         GuidedMissile(float x, float y, Ball target) {
             this.x = x;
@@ -4108,21 +4618,53 @@ public class GameView extends SurfaceView implements Runnable {
         }
 
         void update() {
-            float dx = target.x - x;
-            float dy = target.y - y;
-            float distance = (float) Math.sqrt(dx * dx + dy * dy);
+            if (dead)
+                return;
 
-            if (distance > speed) {
-                vx = (dx / distance) * speed;
-                vy = (dy / distance) * speed;
-                x += vx;
-                y += vy;
-            } else {
-                x = target.x;
-                y = target.y;
+            float tx = 0, ty = 0;
+            boolean hasTarget = false;
+
+            // Priority: Assigned Target -> Boss -> Random Black/Color
+            if (target != null && (coloredBalls.contains(target) || blackBalls.contains(target))) {
+                tx = target.x;
+                ty = target.y;
+                hasTarget = true;
+            } else if (currentBoss != null) {
+                tx = currentBoss.x;
+                ty = currentBoss.y;
+                hasTarget = true;
             }
 
-            speed = Math.min(speed + 0.5f, 10);
+            if (hasTarget) {
+                float dx = tx - x;
+                float dy = ty - y;
+                float distance = (float) Math.sqrt(dx * dx + dy * dy);
+
+                // Hit Check Boss
+                if (currentBoss != null && Math.abs(tx - currentBoss.x) < 1 && distance < currentBoss.radius) {
+                    currentBoss.hp -= 30; // Missile Damage
+                    floatingTexts.add(new FloatingText("-30", x, y, Color.RED));
+                    createImpactBurst(x, y, Color.RED);
+                    playSound(soundBlackExplosion); // Assuming sound exists
+                    dead = true;
+                    return;
+                }
+
+                if (distance > speed) {
+                    vx = (dx / distance) * speed;
+                    vy = (dy / distance) * speed;
+                    x += vx;
+                    y += vy;
+                } else {
+                    x = tx;
+                    y = ty;
+                    // Hit logic for ball handled elsewhere or assume hit
+                    dead = true;
+                }
+                speed = Math.min(speed + 0.5f, 15);
+            } else {
+                dead = true;
+            }
         }
 
         void draw(Canvas canvas, Paint paint) {
@@ -4136,13 +4678,43 @@ public class GameView extends SurfaceView implements Runnable {
 
     class ElectricEffect {
         float x1, y1, x2, y2;
-        int life = 30;
+        int life, type; // 0=Standard, 1=Heavy
+        java.util.ArrayList<PointF> pathPoints = new java.util.ArrayList<>();
 
-        ElectricEffect(float x1, float y1, float x2, float y2) {
+        ElectricEffect(float x1, float y1, float x2, float y2, int type) {
             this.x1 = x1;
             this.y1 = y1;
             this.x2 = x2;
             this.y2 = y2;
+            this.type = type;
+            this.life = (type == 1) ? 30 : 15; // Heavy lasts longer
+            generateLightning();
+        }
+
+        void generateLightning() {
+            pathPoints.clear();
+            if (type == 0) {
+                // Simple ZigZag (Old Style)
+                pathPoints.add(new PointF(x1, y1));
+                float midX = (x1 + x2) / 2 + (random.nextFloat() - 0.5f) * 20;
+                float midY = (y1 + y2) / 2 + (random.nextFloat() - 0.5f) * 20;
+                pathPoints.add(new PointF(midX, midY));
+                pathPoints.add(new PointF(x2, y2));
+            } else {
+                // Heavy Lightning (Zeus Style)
+                pathPoints.add(new PointF(x1, y1));
+                float dist = (float) Math.hypot(x2 - x1, y2 - y1);
+                int segments = 10;
+                float dx = (x2 - x1) / segments;
+                float dy = (y2 - y1) / segments;
+                for (int i = 1; i < segments; i++) {
+                    float px = x1 + dx * i;
+                    float py = y1 + dy * i;
+                    float jitter = (random.nextFloat() - 0.5f) * 30;
+                    pathPoints.add(new PointF(px + jitter, py + jitter));
+                }
+                pathPoints.add(new PointF(x2, y2));
+            }
         }
 
         void update() {
@@ -4155,24 +4727,42 @@ public class GameView extends SurfaceView implements Runnable {
 
         void draw(Canvas canvas, Paint paint) {
             paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(3);
-            paint.setColor(Color.CYAN);
-            paint.setAlpha((int) (255 * (life / 30f)));
+            paint.setStrokeCap(Paint.Cap.ROUND);
+            paint.setStrokeJoin(Paint.Join.ROUND);
 
-            // Zigzag çizgi
-            float midX = (x1 + x2) / 2 + (random.nextFloat() - 0.5f) * 20;
-            float midY = (y1 + y2) / 2 + (random.nextFloat() - 0.5f) * 20;
-
-            canvas.drawLine(x1, y1, midX, midY, paint);
-            canvas.drawLine(midX, midY, x2, y2, paint);
-
+            if (type == 1) {
+                // Heavy Glow
+                paint.setColor(Color.WHITE);
+                paint.setStrokeWidth(8);
+                paint.setShadowLayer(25, 0, 0, Color.CYAN);
+                drawPath(canvas, paint);
+                paint.clearShadowLayer();
+            } else {
+                // Standard
+                paint.setColor(Color.CYAN);
+                paint.setStrokeWidth(3);
+                paint.setAlpha((int) (255 * (life / 15f)));
+                drawPath(canvas, paint);
+            }
             paint.setAlpha(255);
+        }
+
+        private void drawPath(Canvas canvas, Paint paint) {
+            if (pathPoints.size() < 2)
+                return;
+            Path p = new Path();
+            p.moveTo(pathPoints.get(0).x, pathPoints.get(0).y);
+            for (int i = 1; i < pathPoints.size(); i++) {
+                p.lineTo(pathPoints.get(i).x, pathPoints.get(i).y);
+            }
+            canvas.drawPath(p, paint);
         }
     }
 
     class BlastWave {
         float x, y, radius = 0, maxRadius;
         int life = 60;
+        boolean bossHit = false;
 
         BlastWave(float x, float y) {
             this.x = x;
@@ -4183,6 +4773,16 @@ public class GameView extends SurfaceView implements Runnable {
         void update() {
             radius = maxRadius * (1 - life / 60f);
             life--;
+
+            // Boss Check
+            if (!bossHit && currentBoss != null) {
+                float dist = (float) Math.hypot(currentBoss.x - x, currentBoss.y - y);
+                if (dist < radius + currentBoss.radius) {
+                    currentBoss.hp -= 30;
+                    floatingTexts.add(new FloatingText("-30", currentBoss.x, currentBoss.y, Color.rgb(255, 165, 0)));
+                    bossHit = true;
+                }
+            }
 
             // Çevredeki topları dalga yayıldıkça yok et
             for (int i = coloredBalls.size() - 1; i >= 0; i--) {
@@ -4491,7 +5091,8 @@ public class GameView extends SurfaceView implements Runnable {
             int currentSpace = ((level - 1) / 50) + 1;
             int currentLevelInSpace = ((level - 1) / 5) + 1;
 
-            String levelText = "SPACE " + currentSpace + " - LEVEL " + currentLevelInSpace;
+            int remaining = coloredBalls.size() + pendingColoredBalls;
+            String levelText = "Level " + currentLevelInSpace + " - Ball: " + remaining;
             int power = (int) (lastLaunchPower * (powerBoostActive ? 200 : 100));
 
             mainActivity.runOnUiThread(new Runnable() {
@@ -4851,6 +5452,432 @@ public class GameView extends SurfaceView implements Runnable {
                     draggedBall = null;
                 }
                 break;
+        }
+    }
+
+    private void drawSkillButton(Canvas canvas) {
+        // Position at bottom right (Safe area)
+        skillBtnRadius = screenWidth * 0.08f;
+        skillBtnX = screenWidth - skillBtnRadius * 1.5f;
+        skillBtnY = screenHeight - skillBtnRadius * 1.5f;
+
+        // Inventory Layout
+        inventorySlotSize = screenWidth * 0.12f;
+        inventoryX = screenWidth * 0.05f + inventorySlotSize / 2;
+        inventoryY = screenHeight - inventorySlotSize * 0.8f;
+
+        // Background
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.argb(190, 30, 30, 50));
+        canvas.drawCircle(skillBtnX, skillBtnY, skillBtnRadius, paint);
+
+        long currentTime = System.currentTimeMillis();
+        boolean isOnCooldown = (currentTime - lastSkillUseTime < SKILL_COOLDOWN);
+
+        // Border
+        paint.setStyle(Paint.Style.STROKE);
+        if (isOnCooldown) {
+            paint.setStrokeWidth(5);
+            paint.setColor(Color.GRAY);
+            paint.setShadowLayer(0, 0, 0, 0);
+        } else if (activeSkill.equals("None")) {
+            paint.setStrokeWidth(5);
+            paint.setColor(Color.DKGRAY);
+            paint.setShadowLayer(0, 0, 0, 0);
+        } else {
+            // Ready to use
+            paint.setStrokeWidth(8);
+            paint.setColor(Color.CYAN);
+            paint.setShadowLayer(20, 0, 0, Color.CYAN);
+        }
+        canvas.drawCircle(skillBtnX, skillBtnY, skillBtnRadius, paint);
+        paint.clearShadowLayer();
+
+        // Icon / Text
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.WHITE);
+        paint.setTextAlign(Paint.Align.CENTER);
+
+        float textY = skillBtnY - (paint.descent() + paint.ascent()) / 2;
+
+        if (isOnCooldown) {
+            float remaining = (SKILL_COOLDOWN - (currentTime - lastSkillUseTime)) / 1000f;
+            paint.setTextSize(skillBtnRadius * 0.5f);
+            canvas.drawText(String.format("%.1f", remaining), skillBtnX, textY, paint);
+        } else {
+            paint.setTextSize(skillBtnRadius * 0.35f);
+            String label = activeSkill.equals("None") ? "EMPTY" : activeSkill;
+            if (activeSkill.equals("Ghost Ball"))
+                label = "GHOST";
+
+            // Draw label
+            canvas.drawText(label, skillBtnX, textY, paint);
+        }
+    }
+
+    private void drawInventory(Canvas canvas) {
+        for (int i = 0; i < MAX_INVENTORY_SIZE; i++) {
+            float slotX = inventoryX + i * (inventorySlotSize * 1.2f);
+
+            // Draw Slot Background
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(Color.argb(100, 50, 50, 50));
+            canvas.drawCircle(slotX, inventoryY, inventorySlotSize * 0.5f, paint);
+
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(3);
+            paint.setColor(Color.GRAY);
+            canvas.drawCircle(slotX, inventoryY, inventorySlotSize * 0.5f, paint);
+
+            // Draw Item if exists
+            if (i < inventory.size()) {
+                String skill = inventory.get(i);
+
+                // Determine Color/Letter based on skill
+                int color = Color.WHITE;
+                String letter = "?";
+
+                switch (skill) {
+                    case "ghost":
+                        color = Color.CYAN;
+                        letter = "G";
+                        break;
+                    case "missile":
+                        color = Color.RED;
+                        letter = "M";
+                        break;
+                    case "barrier":
+                        color = Color.BLUE;
+                        letter = "B";
+                        break;
+                    case "freeze":
+                        color = Color.rgb(0, 200, 255);
+                        letter = "F";
+                        break;
+                    case "clone":
+                        color = Color.GREEN;
+                        letter = "C";
+                        break;
+                    case "blackhole":
+                        color = Color.DKGRAY;
+                        letter = "H";
+                        break;
+                    case "multiball":
+                        color = Color.rgb(255, 165, 0); // Orange
+                        letter = "M";
+                        break;
+                    case "magma":
+                        color = Color.rgb(255, 69, 0); // Red-Orange
+                        letter = "F";
+                        break;
+                    case "lightning":
+                        color = Color.rgb(255, 255, 0); // Yellow
+                        letter = "L";
+                        break;
+                }
+
+                // Draw Icon (Mini Special Ball)
+                paint.setStyle(Paint.Style.FILL);
+                RadialGradient gradient = new RadialGradient(
+                        slotX - inventorySlotSize * 0.15f, inventoryY - inventorySlotSize * 0.15f,
+                        inventorySlotSize * 0.4f,
+                        Color.WHITE, color, Shader.TileMode.CLAMP);
+                paint.setShader(gradient);
+                canvas.drawCircle(slotX, inventoryY, inventorySlotSize * 0.4f, paint);
+                paint.setShader(null);
+
+                // Letter
+                paint.setColor(Color.WHITE);
+                paint.setTextSize(inventorySlotSize * 0.5f);
+                paint.setTextAlign(Paint.Align.CENTER);
+                canvas.drawText(letter, slotX, inventoryY + inventorySlotSize * 0.15f, paint);
+            }
+        }
+    }
+
+    private void spawnClones(Ball parent) {
+        for (int i = 0; i < 2; i++) {
+            Ball clone = new Ball(parent.x, parent.y, parent.radius, Color.rgb(255, 100, 0));
+            float angleOffset = (i == 0) ? 0.3f : -0.3f; // ~17 degrees
+            float vx = parent.vx;
+            float vy = parent.vy;
+            float newVx = (float) (vx * Math.cos(angleOffset) - vy * Math.sin(angleOffset));
+            float newVy = (float) (vx * Math.sin(angleOffset) + vy * Math.cos(angleOffset));
+            clone.vx = newVx;
+            clone.vy = newVy;
+            // Clone color set in properties
+            cloneBalls.add(clone);
+        }
+    }
+
+    class MagmaPatch {
+        float x, y, radius;
+        long createTime;
+        long duration = 3000;
+
+        MagmaPatch(float x, float y, float r) {
+            this.x = x;
+            this.y = y;
+            this.radius = r;
+            this.createTime = System.currentTimeMillis();
+        }
+
+        void update() {
+            // Generate Flame Particles (Combo-like effect)
+            if (random.nextFloat() < 0.2f) {
+                createFlame(x + (random.nextFloat() - 0.5f) * radius, y + (random.nextFloat() - 0.5f) * radius);
+            }
+        }
+
+        boolean isDead() {
+            return System.currentTimeMillis() - createTime > duration;
+        }
+
+        void draw(Canvas canvas) {
+            // Drawn via particles mostly, but keep a faint glow base
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(Color.rgb(255, 50, 0));
+            paint.setAlpha(30);
+            canvas.drawCircle(x, y, radius, paint);
+            paint.setAlpha(255);
+        }
+    }
+
+    class Boss {
+        String name;
+        float x, y, radius;
+        float hp, maxHp;
+        int color;
+        long lastStateChangeTime;
+        int state = 0; // 0: Idle/Shoot, 1: Dash, 2: Burst
+        long lastAttackTime;
+        float dashTargetX, dashTargetY;
+        boolean dashing = false;
+        boolean charging = false;
+        long chargeStartTime;
+        float hoverCenterX, hoverCenterY;
+
+        Boss(String name, float maxHp, int color) {
+            this.name = name;
+            this.maxHp = maxHp;
+            this.hp = maxHp;
+            this.color = color;
+            this.x = centerX;
+            this.y = centerY - circleRadius * 0.65f;
+            this.hoverCenterX = x;
+            this.hoverCenterY = y;
+            this.radius = circleRadius * 0.25f;
+            this.lastStateChangeTime = System.currentTimeMillis();
+        }
+
+        void update() {
+            long now = System.currentTimeMillis();
+
+            // State Machine Checks (Only if in Idle State 0)
+            if (state == 0) {
+                if (now - lastStateChangeTime > 3000) { // 3 seconds idle wait
+                    // Select next state based on HP
+                    if (hp <= maxHp / 2) {
+                        // HP <= 50%: Randomly choose Dash (1) or Burst (2)
+                        state = random.nextBoolean() ? 1 : 2;
+                    } else {
+                        // HP > 50%: Always Dash (1)
+                        state = 1;
+                    }
+
+                    lastStateChangeTime = now;
+                    dashing = false;
+
+                    if (state == 1) {
+                        // Prepare Dash
+                        charging = true;
+                        chargeStartTime = now;
+                        playSound(soundLaunch);
+                    } else if (state == 2) {
+                        // Prepare Burst - Charging Phase
+                        charging = true;
+                        chargeStartTime = now;
+                        playSound(soundLaunch); // Warning sound
+                    }
+                }
+            }
+
+            if (state == 0) { // Hover Locally
+                y = hoverCenterY + (float) Math.sin(now * 0.002) * 30;
+                x = hoverCenterX + (float) Math.cos(now * 0.0013) * 20;
+
+                if (now - lastAttackTime > 1500) {
+                    shootVoidBall();
+                    lastAttackTime = now;
+                }
+            } else if (state == 1) { // Charge & Dash
+                if (!dashing) {
+                    // Start Charge Phase
+                    dashing = true;
+                    charging = true;
+                    chargeStartTime = now;
+                    playSound(soundLaunch); // Warning
+                }
+
+                if (charging) {
+                    // Wait 2 seconds (Red Eyes)
+                    if (now - chargeStartTime > 2000) {
+                        charging = false;
+                        // Lock Target logic
+                        if (whiteBall != null) {
+                            dashTargetX = whiteBall.x;
+                            dashTargetY = whiteBall.y;
+                        } else {
+                            dashTargetX = centerX;
+                            dashTargetY = centerY;
+                        }
+                    }
+                } else {
+                    // Moving Phase
+                    float dx = dashTargetX - x;
+                    float dy = dashTargetY - y;
+                    float dist = (float) Math.sqrt(dx * dx + dy * dy);
+
+                    // Boundary Check
+                    float distFromCenter = (float) Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+                    if (distFromCenter + radius > circleRadius * 0.95f) {
+                        // Hit wall, stop here but PUSH INWARDS to prevent getting stuck
+                        state = 0;
+                        dashing = false;
+                        charging = false;
+                        lastStateChangeTime = now;
+
+                        // Push inwards (Stronger push to 0.6f)
+                        float angle = (float) Math.atan2(y - centerY, x - centerX);
+                        hoverCenterX = centerX + (float) Math.cos(angle) * (circleRadius * 0.6f);
+                        hoverCenterY = centerY + (float) Math.sin(angle) * (circleRadius * 0.6f);
+                        x = hoverCenterX;
+                        y = hoverCenterY;
+                        return;
+                    }
+
+                    float speed = 35f;
+                    if (dist > speed) {
+                        x += (dx / dist) * speed; // Very Fast
+                        y += (dy / dist) * speed;
+                    } else {
+                        // Reached Target
+                        x = dashTargetX;
+                        y = dashTargetY;
+                        state = 0;
+                        dashing = false;
+                        charging = false;
+                        lastStateChangeTime = now;
+                        hoverCenterX = x;
+                        hoverCenterY = y;
+                    }
+                }
+            } else if (state == 2) {
+                if (charging) {
+                    // 2 Seconds Warning before Burst
+                    if (now - chargeStartTime > 2000) {
+                        doBurstAttack();
+                        charging = false;
+                        state = 0;
+                        lastStateChangeTime = now;
+                    }
+                }
+            }
+        }
+
+        void shootVoidBall() {
+            if (whiteBall != null) {
+                float angle = (float) Math.atan2(whiteBall.y - y, whiteBall.x - x);
+                float speed = 12;
+                Ball proj = new Ball(x, y, 25, Color.rgb(75, 0, 130));
+                proj.vx = (float) Math.cos(angle) * speed;
+                proj.vy = (float) Math.sin(angle) * speed;
+                bossProjectiles.add(proj);
+                playSound(soundLaunch);
+            }
+        }
+
+        void doBurstAttack() {
+            playSound(soundBlackExplosion); // Big sound
+            for (int i = 0; i < 20; i++) {
+                float angle = (float) (i * (2 * Math.PI / 20));
+                float speed = 10;
+                Ball proj = new Ball(x, y, 20, Color.rgb(100, 0, 150));
+                proj.vx = (float) Math.cos(angle) * speed;
+                proj.vy = (float) Math.sin(angle) * speed;
+                bossProjectiles.add(proj);
+            }
+        }
+
+        void draw(Canvas canvas) {
+            // Aura
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setColor(color);
+            if (state == 1)
+                paint.setColor(Color.CYAN); // Blue Shield for Dash
+            paint.setStrokeWidth(10);
+            paint.setShadowLayer(40, 0, 0, (state == 1) ? Color.CYAN : color);
+            float pulse = (float) (1.0 + Math.sin(System.currentTimeMillis() * 0.005) * 0.1);
+            if (state == 1)
+                pulse = 1.5f; // Dasher larger aura
+            if (state == 2)
+                pulse = 2.0f; // Burst Huge Aura Warning
+
+            canvas.drawCircle(x, y, radius * pulse, paint);
+            paint.clearShadowLayer();
+
+            // Body
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(color);
+            paint.setShadowLayer(50, 0, 0, color);
+            canvas.drawCircle(x, y, radius, paint);
+            paint.clearShadowLayer();
+
+            // Core (Void Eye)
+            paint.setColor(Color.BLACK);
+            canvas.drawCircle(x, y, radius * 0.6f, paint);
+
+            // Inner Pupil - Color changes by state
+            int pupilColor = Color.rgb(100, 0, 100);
+            if (state == 1) {
+                if (charging)
+                    pupilColor = Color.RED; // Warning Red
+                else
+                    pupilColor = Color.BLACK; // Moving
+            }
+            if (state == 2)
+                pupilColor = Color.CYAN; // Burst eyes warning
+            paint.setColor(pupilColor);
+            canvas.drawCircle(x, y, radius * 0.3f, paint);
+
+            // HP Bar (Above Boss)
+            float barW = radius * 2.5f;
+            float barH = 25;
+            float barX = x - barW / 2;
+            float barY = y - radius - 80;
+
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(Color.DKGRAY);
+            canvas.drawRect(barX, barY, barX + barW, barY + barH, paint);
+
+            paint.setColor(Color.RED);
+            float hpRatio = Math.max(0, hp / maxHp);
+            canvas.drawRect(barX, barY, barX + barW * hpRatio, barY + barH, paint);
+
+            // Border
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setColor(Color.WHITE);
+            paint.setStrokeWidth(2);
+            canvas.drawRect(barX, barY, barX + barW, barY + barH, paint);
+
+            // Name
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(Color.WHITE);
+            paint.setTextSize(50);
+            paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+            paint.setTextAlign(Paint.Align.CENTER);
+            canvas.drawText(name, x, barY - 20, paint);
+            paint.setTypeface(Typeface.DEFAULT);
         }
     }
 }
