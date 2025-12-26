@@ -167,7 +167,9 @@ raw electric_ball
 raw freeze
 raw game_over
 raw guided_missile
+raw laser_gun
 raw power_boost
+raw retro_laser
 raw shield_block
 string app_name
 string call_notification_answer_action

@@ -166,8 +166,10 @@ int raw electric_ball 0x7f090004
 int raw freeze 0x7f090005
 int raw game_over 0x7f090006
 int raw guided_missile 0x7f090007
-int raw power_boost 0x7f090008
-int raw shield_block 0x7f090009
+int raw laser_gun 0x7f090008
+int raw power_boost 0x7f090009
+int raw retro_laser 0x7f09000a
+int raw shield_block 0x7f09000b
 int string app_name 0x7f0a0000
 int string call_notification_answer_action 0x7f0a0001
 int string call_notification_answer_video_action 0x7f0a0002

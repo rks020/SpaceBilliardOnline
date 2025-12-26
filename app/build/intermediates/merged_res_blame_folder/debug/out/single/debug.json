@@ -48,6 +48,10 @@
         "source": "com.spacebilliard.app-main-10:/raw/collision_sound.mp3"
     },
     {
+        "merged": "com.spacebilliard.app-merged_res-8:/raw_retro_laser.mp3.flat",
+        "source": "com.spacebilliard.app-main-10:/raw/retro_laser.mp3"
+    },
+    {
         "merged": "com.spacebilliard.app-merged_res-8:/raw_game_over.mp3.flat",
         "source": "com.spacebilliard.app-main-10:/raw/game_over.mp3"
     },
@@ -66,6 +70,10 @@
     {
         "merged": "com.spacebilliard.app-merged_res-8:/mipmap-xxxhdpi_ic_launcher.png.flat",
         "source": "com.spacebilliard.app-main-10:/mipmap-xxxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.spacebilliard.app-merged_res-8:/raw_laser_gun.mp3.flat",
+        "source": "com.spacebilliard.app-main-10:/raw/laser_gun.mp3"
     },
     {
         "merged": "com.spacebilliard.app-merged_res-8:/mipmap-xhdpi_ic_launcher_round.webp.flat",

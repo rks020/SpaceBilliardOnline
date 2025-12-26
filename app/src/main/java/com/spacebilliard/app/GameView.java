@@ -110,9 +110,13 @@ public class GameView extends SurfaceView implements Runnable {
     private long freezeEndTime = 0;
     private boolean ghostModeActive = false;
     private long ghostModeEndTime = 0;
+    private long electricModeEndTime = 0; // Electric Power-up for Boss
     private float originalWhiteBallRadius = 0;
     private boolean powerBoostActive = false;
     private BlastWave blastWave = null;
+
+    // New sounds
+    private int soundRetroLaser, soundLaserGun;
 
     // UI durumu
     private boolean showInstructions = false;
@@ -334,6 +338,8 @@ public class GameView extends SurfaceView implements Runnable {
             soundMissile = soundPool.load(context, R.raw.guided_missile, 1);
             soundPower = soundPool.load(context, R.raw.power_boost, 1);
             soundShield = soundPool.load(context, R.raw.shield_block, 1);
+            soundRetroLaser = soundPool.load(context, R.raw.retro_laser, 1);
+            soundLaserGun = soundPool.load(context, R.raw.laser_gun, 1);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -478,6 +484,7 @@ public class GameView extends SurfaceView implements Runnable {
         whiteBall.trail.clear();
         // Ghost modundan çıkarken top boyutunu sıfırla
         whiteBall.radius = (circleRadius / 0.47f) * 0.022f; // Slightly smaller (2.2%)
+        originalWhiteBallRadius = whiteBall.radius; // Initialize default radius
 
         blackHoleActive = false;
         barrierActive = false;
@@ -488,7 +495,7 @@ public class GameView extends SurfaceView implements Runnable {
 
         // Initialize Boss (Space 1 Level 10 => Code Level 50)
         currentBoss = null;
-        if (lv == 10 || lv == 50) {
+        if (lv == 10 || lv == 50 || lv == 100 || lv == 1) { // Added lv=1 for testing
             spawnBoss(lv);
             return; // Skip normal ball layout
         }
@@ -552,11 +559,16 @@ public class GameView extends SurfaceView implements Runnable {
         float hp = 500 + (lv * 50);
         int color = Color.RED;
 
-        if (lv == 50 || lv == 10) {
+        if (lv == 10 || lv == 50) {
             name = "VOID TITAN";
-            hp = 2500; // HP 2500 as requested
-            color = Color.rgb(75, 0, 130); // Indigo
-            timeLeft = 190000; // 190 seconds
+            hp = 2000;
+            color = Color.rgb(75, 0, 130);
+            timeLeft = 190000;
+        } else if (lv == 100 || lv == 1) {
+            name = "LUNAR CONSTRUCT";
+            hp = 2000;
+            color = Color.rgb(100, 100, 100); // Darker Gray
+            timeLeft = 240000;
         }
 
         currentBoss = new Boss(name, hp, color);
@@ -587,8 +599,9 @@ public class GameView extends SurfaceView implements Runnable {
              * if (showStageCleared) { ... }
              */
 
-            // Özel top spawn (Increased Chance)
-            if (gameStarted && !gameOver && random.nextFloat() < 0.002f && specialBalls.size() < 5) {
+            // Special Ball Spawn logic (Higher chance in Boss Fight)
+            float spawnChance = (currentBoss != null) ? 0.006f : 0.002f; // 3x chance in Boss Mode
+            if (gameStarted && !gameOver && random.nextFloat() < spawnChance && specialBalls.size() < 5) {
                 spawnSpecialBall();
             }
 
@@ -616,14 +629,21 @@ public class GameView extends SurfaceView implements Runnable {
         if (currentBoss != null) {
             electricEffects.add(new ElectricEffect(currentBoss.x, -200, currentBoss.x, currentBoss.y, 1));
             createImpactBurst(currentBoss.x, currentBoss.y, Color.RED);
-            currentBoss.hp -= 30;
-            floatingTexts.add(new FloatingText("-30", currentBoss.x, currentBoss.y - 50, Color.RED));
+            currentBoss.hp -= 50;
+            floatingTexts.add(new FloatingText("-50", currentBoss.x, currentBoss.y - 50, Color.RED));
             playSound(soundBlackExplosion);
         } else if (blackBalls.size() > 0) {
             Ball b = blackBalls.get(0); // Always target first available
             electricEffects.add(new ElectricEffect(b.x, -200, b.x, b.y, 1));
             createImpactBurst(b.x, b.y, Color.BLACK);
             blackBalls.remove(0);
+            playSound(soundBlackExplosion);
+        } else if (coloredBalls.size() > 0) {
+            Ball b = coloredBalls.get(random.nextInt(coloredBalls.size()));
+            electricEffects.add(new ElectricEffect(b.x, -200, b.x, b.y, 1));
+            createImpactBurst(b.x, b.y, b.color);
+            score += 5;
+            coloredBalls.remove(b);
             playSound(soundBlackExplosion);
         }
     }
@@ -638,7 +658,7 @@ public class GameView extends SurfaceView implements Runnable {
         float x = centerX + (float) Math.cos(angle) * radius;
         float y = centerY + (float) Math.sin(angle) * radius;
 
-        specialBalls.add(new SpecialBall(x, y, whiteBall.radius * 1.2f, type));
+        specialBalls.add(new SpecialBall(x, y, originalWhiteBallRadius * 1.4f, type));
     }
 
     private void spawnRandomColoredBall() {
@@ -712,23 +732,47 @@ public class GameView extends SurfaceView implements Runnable {
         // Zaman
         timeLeft -= deltaTime;
 
-        // Boss Projectiles Update
+        // Boss Projectiles Update & Collision with Player Balls
         for (int i = bossProjectiles.size() - 1; i >= 0; i--) {
             Ball p = bossProjectiles.get(i);
             p.x += p.vx;
             p.y += p.vy;
+
+            // Check collision with player's white ball (not clones/multi balls)
+            if (whiteBall != null) {
+                float dx = whiteBall.x - p.x;
+                float dy = whiteBall.y - p.y;
+                float dist = (float) Math.sqrt(dx * dx + dy * dy);
+                if (dist < whiteBall.radius + p.radius) {
+                    // Hit player
+                    if (!barrierActive && !ghostModeActive) {
+                        playerHp -= 40;
+                        floatingTexts.add(new FloatingText("-40", whiteBall.x, whiteBall.y - 50, Color.RED));
+                        createImpactBurst(p.x, p.y, Color.RED);
+                        playSound(soundCollision);
+                    }
+                    bossProjectiles.remove(i);
+                    continue;
+                }
+            }
+
+            // Remove if out of bounds
             if (p.x < -100 || p.x > screenWidth + 100 || p.y < -100 || p.y > screenHeight + 100) {
                 bossProjectiles.remove(i);
             }
         }
 
         // Game Over Check for HP
-        if (currentBoss != null && playerHp <= 0) {
-            gameOver = true;
-            playSound(soundGameOver);
-            updateMenuButtonsVisibility();
-            return;
-        }
+        /*
+         * REMOVED to prevent immediate Game Over.
+         * Now handled by 'showPlayerDefeated' sequence at lines 1004+.
+         * if (currentBoss != null && playerHp <= 0) {
+         * gameOver = true;
+         * playSound(soundGameOver);
+         * updateMenuButtonsVisibility();
+         * return;
+         * }
+         */
 
         // Magma Update
         if (magmaTrailActive) {
@@ -744,6 +788,28 @@ public class GameView extends SurfaceView implements Runnable {
             magmaPatches.get(i).update();
             if (magmaPatches.get(i).isDead())
                 magmaPatches.remove(i);
+        }
+
+        // Feature: Magma Patches destroy Boss Projectiles (except Meteors)
+        if (!magmaPatches.isEmpty() && !bossProjectiles.isEmpty()) {
+            for (int i = bossProjectiles.size() - 1; i >= 0; i--) {
+                Ball proj = bossProjectiles.get(i);
+                // Meteors are immune (Ghost-like)
+                if (proj instanceof MeteorProjectile)
+                    continue;
+
+                for (MagmaPatch mp : magmaPatches) {
+                    float dx = proj.x - mp.x;
+                    float dy = proj.y - mp.y;
+                    float dist = (float) Math.sqrt(dx * dx + dy * dy);
+                    if (dist < proj.radius + mp.radius) {
+                        bossProjectiles.remove(i);
+                        createImpactBurst(proj.x, proj.y, Color.rgb(255, 100, 0)); // Magma color
+                        playSound(soundBlackExplosion);
+                        break; // Stop checking this projectile
+                    }
+                }
+            }
         }
         if (timeLeft <= 0 && (coloredBalls.size() > 0 || currentBoss != null)) {
             gameOver = true;
@@ -993,6 +1059,13 @@ public class GameView extends SurfaceView implements Runnable {
             showPlayerDefeated = true;
             playerDefeatedTime = System.currentTimeMillis();
             playSound(soundGameOver);
+
+            // Player ball explosion visual
+            for (int k = 0; k < 8; k++) {
+                createImpactBurst(whiteBall.x + (random.nextFloat() - 0.5f) * 100,
+                        whiteBall.y + (random.nextFloat() - 0.5f) * 100, Color.WHITE);
+            }
+            playSound(soundBlackExplosion);
         }
 
         if (showPlayerDefeated && System.currentTimeMillis() - playerDefeatedTime > 3000) {
@@ -1137,13 +1210,25 @@ public class GameView extends SurfaceView implements Runnable {
                             }
                         }
                     } else {
-                        // Damage Boss
-                        currentBoss.hp -= 25;
+                        // Boss Interaction
+                        long now = System.currentTimeMillis();
+                        if (now < electricModeEndTime) {
+                            // Electric Mode: 40 Damage + Bounce Effect
+                            currentBoss.hp -= 40;
+                            floatingTexts.add(new FloatingText("-40", wBall.x, wBall.y - 50, Color.CYAN));
 
-                        // Valid Hit Effects
-                        createParticles(wBall.x, wBall.y, currentBoss.color);
-                        playSound(soundCollision);
-                        floatingTexts.add(new FloatingText("-25", wBall.x, wBall.y - 50, Color.WHITE));
+                            // Visuals: Electric Arc Connecting Ball & Boss
+                            electricEffects.add(new ElectricEffect(wBall.x, wBall.y, currentBoss.x, currentBoss.y, 0));
+                            createImpactBurst(wBall.x, wBall.y, Color.CYAN);
+                            createParticles(wBall.x, wBall.y, Color.CYAN);
+                            playSound(soundBlackExplosion); // Powerful hit
+                        } else {
+                            // Normal Hit: 25 Damage
+                            currentBoss.hp -= 25;
+                            createParticles(wBall.x, wBall.y, currentBoss.color);
+                            playSound(soundCollision);
+                            floatingTexts.add(new FloatingText("-25", wBall.x, wBall.y - 50, Color.WHITE));
+                        }
                     }
 
                     // Reflect Ball
@@ -1207,6 +1292,9 @@ public class GameView extends SurfaceView implements Runnable {
                         stageClearedTime = System.currentTimeMillis();
 
                         // Stage Cleared: Explode all Black Balls
+                        if (!blackBalls.isEmpty()) {
+                            // soundLaserGun removed from here, moved to Boss
+                        }
                         for (Ball b : blackBalls) {
                             createImpactBurst(b.x, b.y, Color.BLACK);
                         }
@@ -1281,6 +1369,54 @@ public class GameView extends SurfaceView implements Runnable {
                 }
             }
         }
+
+        // Special Ball vs Boss Collisions
+        if (currentBoss != null)
+
+        {
+            for (int i = specialBalls.size() - 1; i >= 0; i--) {
+                SpecialBall sp = specialBalls.get(i);
+                // Hitbox check
+                float dx = sp.x - currentBoss.x;
+                float dy = sp.y - currentBoss.y;
+                float dist = (float) Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < sp.radius + currentBoss.radius) {
+                    // Check type
+                    if (sp.type.equals("lightning") || sp.type.equals("electric")) {
+                        long now = System.currentTimeMillis();
+                        if (now - sp.lastBossHitTime > 200) { // 200ms debounce
+                            sp.lastBossHitTime = now;
+                            sp.bossHits++;
+
+                            // Damage
+                            currentBoss.hp -= 40;
+                            floatingTexts.add(new FloatingText("-40", sp.x, sp.y - 40, Color.CYAN));
+                            createImpactBurst(sp.x, sp.y, Color.CYAN);
+                            playSound(soundBlackExplosion); // Powerful hit sound
+
+                            // Bounce Logic (Reverse velocity based on normal)
+                            float nx = dx / dist;
+                            float ny = dy / dist;
+
+                            // v' = v - 2(v.n)n
+                            float dot = sp.vx * nx + sp.vy * ny;
+                            sp.vx = sp.vx - 2 * dot * nx;
+                            sp.vy = sp.vy - 2 * dot * ny;
+
+                            // Push out slightly to prevent sticking
+                            sp.x += nx * 10;
+                            sp.y += ny * 10;
+
+                            if (sp.bossHits >= 2) {
+                                specialBalls.remove(i); // Destroy after 2nd hit
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
     }
 
     private boolean checkBallCollision(Ball b1, Ball b2) {
@@ -1305,7 +1441,7 @@ public class GameView extends SurfaceView implements Runnable {
             if (inventory.size() < MAX_INVENTORY_SIZE) {
                 inventory.add(type);
                 playSound(soundCoin);
-                floatingTexts.add(new FloatingText("COLLECTED!", targetBall.x, targetBall.y, Color.GREEN));
+                floatingTexts.add(new FloatingText("COLLECTED!", targetBall.x, targetBall.y, Color.GREEN, 0.5f));
                 return; // Do not activate immediately
             }
         }
@@ -1343,6 +1479,7 @@ public class GameView extends SurfaceView implements Runnable {
             case "electric":
                 triggerElectric();
                 playSound(soundElectric);
+                electricModeEndTime = System.currentTimeMillis() + 10000; // 10 Seconds Electric Mode
                 break;
             case "clone":
                 // Ghost mode aktifse orijinal boyutu kullan
@@ -1379,11 +1516,12 @@ public class GameView extends SurfaceView implements Runnable {
                 blastWave = new BlastWave(targetBall.x, targetBall.y);
                 break;
             case "ghost":
-                if (!ghostModeActive) {
+                // G topu sadece oyuncu topuna etki etmeli (özellikli topları büyütmemeli)
+                if (!ghostModeActive && targetBall == whiteBall) {
                     originalWhiteBallRadius = whiteBall.radius;
                     ghostModeActive = true;
                     ghostModeEndTime = System.currentTimeMillis() + 3000;
-                    // Sadece beyaz topu büyüt, diğerleri etkilenmez
+                    // Sadece beyaz topu büyüt
                     whiteBall.radius = originalWhiteBallRadius * 1.75f;
                 }
                 break;
@@ -1654,13 +1792,9 @@ public class GameView extends SurfaceView implements Runnable {
                 p.draw(canvas);
 
             // Draw Boss Projectiles
-            paint.setStyle(Paint.Style.FILL);
             for (Ball p : bossProjectiles) {
-                paint.setColor(p.color);
-                paint.setShadowLayer(10, 0, 0, p.color);
-                canvas.drawCircle(p.x, p.y, p.radius, paint);
+                drawBall(canvas, p);
             }
-            paint.clearShadowLayer();
 
             // Draw Player HP Bar (if Boss active)
             if (currentBoss != null) {
@@ -1805,13 +1939,13 @@ public class GameView extends SurfaceView implements Runnable {
             }
 
             // Trail (Only for player ball)
-            if (!selectedTrail.equals("none") && whiteBall.trail.size() > 0) {
+            if (!selectedTrail.equals("none") && whiteBall.trail.size() > 0 && !showPlayerDefeated) {
                 drawCometTrail(canvas, whiteBall);
             }
 
             // Beyaz top (Sadece offline modda çiziyoruz, online modda hostBall/guestBall
             // kullanılıyor)
-            if (!isOnlineMode) {
+            if (!isOnlineMode && !showPlayerDefeated) {
                 drawBall(canvas, whiteBall);
             }
 
@@ -1889,6 +2023,11 @@ public class GameView extends SurfaceView implements Runnable {
                 paint.clearShadowLayer();
             }
 
+            // Electric Effects (NOW VISIBLE)
+            for (ElectricEffect effect : electricEffects) {
+                effect.draw(canvas, paint);
+            }
+
             // Combo text göster (Floating texts)
             for (FloatingText ft : floatingTexts) {
                 ft.draw(canvas, paint);
@@ -1958,6 +2097,16 @@ public class GameView extends SurfaceView implements Runnable {
         // Eğer top yoksa veya yarıçapı 0 ise (veya çok küçükse) çizimi iptal et.
         // Bu satır çökme (Crash) sorununu %100 çözecektir.
         if (ball == null || ball.radius <= 0.1f || Float.isNaN(ball.radius)) {
+            return;
+        }
+
+        if (ball instanceof MoonRock) {
+            drawMoonRock(canvas, (MoonRock) ball);
+            return;
+        }
+
+        if (ball instanceof MeteorProjectile) {
+            drawMeteor(canvas, (MeteorProjectile) ball);
             return;
         }
 
@@ -2180,6 +2329,55 @@ public class GameView extends SurfaceView implements Runnable {
         }
         path.close();
         canvas.drawPath(path, paint);
+    }
+
+    private void drawMoonRock(Canvas canvas, MoonRock rock) {
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.rgb(100, 100, 100)); // Fixed Dark Gray Base
+        paint.setShadowLayer(10, 0, 0, Color.BLACK);
+        canvas.drawCircle(rock.x, rock.y, rock.radius, paint);
+        paint.clearShadowLayer();
+
+        // Craters (High Contrast Black)
+        paint.setColor(Color.BLACK);
+        paint.setAlpha(180);
+        float r = rock.radius;
+        // Crater 1
+        canvas.drawCircle(rock.x - r * 0.3f, rock.y - r * 0.3f, r * 0.3f, paint);
+        // Crater 2
+        canvas.drawCircle(rock.x + r * 0.4f, rock.y + r * 0.2f, r * 0.2f, paint);
+        // Crater 3
+        canvas.drawCircle(rock.x, rock.y + r * 0.5f, r * 0.15f, paint);
+        paint.setAlpha(255);
+
+        // Highlight
+        paint.setColor(Color.WHITE);
+        paint.setAlpha(50);
+        canvas.drawCircle(rock.x - r * 0.3f, rock.y - r * 0.3f, r * 0.2f, paint);
+        paint.setAlpha(255);
+    }
+
+    private void drawMeteor(Canvas canvas, MeteorProjectile m) {
+        // Trail
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(m.radius); // Trail width = ball size
+        paint.setStrokeCap(Paint.Cap.ROUND);
+        paint.setColor(m.color);
+        paint.setAlpha(100); // Semi-transparent tail
+        // Draw line opposite to velocity
+        canvas.drawLine(m.x, m.y, m.x - m.vx * m.trailLengthFactor, m.y - m.vy * m.trailLengthFactor, paint);
+
+        // Head
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(m.color);
+        paint.setAlpha(255);
+        canvas.drawCircle(m.x, m.y, m.radius, paint);
+
+        // Core (Hot white center)
+        paint.setColor(Color.WHITE);
+        paint.setAlpha(200);
+        canvas.drawCircle(m.x, m.y, m.radius * 0.4f, paint);
+        paint.setAlpha(255);
     }
 
     private void drawAuraEffect(Canvas canvas, Ball ball) {
@@ -2809,7 +3007,7 @@ public class GameView extends SurfaceView implements Runnable {
         if (showBossDefeated) {
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(Color.RED);
-            paint.setTextSize(screenWidth * 0.15f);
+            paint.setTextSize(screenWidth * 0.10f); // Reduced from 0.15f to prevent overflow
             paint.setTextAlign(Paint.Align.CENTER);
             paint.setShadowLayer(50, 0, 0, Color.BLACK);
             canvas.drawText("BOSS DEFEATED", centerX, centerY, paint);
@@ -3004,6 +3202,7 @@ public class GameView extends SurfaceView implements Runnable {
         if (gameStarted && !gameOver) {
             drawSkillButton(canvas);
             drawInventory(canvas);
+            drawInGameMenuIcon(canvas); // Added Home Button
         }
         // Başlık... (Mevcut kod aşağıda kalacak, sadece if bloğunu değiştiriyorum)
 
@@ -3958,9 +4157,26 @@ public class GameView extends SurfaceView implements Runnable {
         }
     }
 
+    class MoonRock extends Ball {
+        MoonRock(float x, float y, float radius, int color) {
+            super(x, y, radius, color);
+        }
+    }
+
+    class MeteorProjectile extends Ball {
+        float trailLengthFactor;
+
+        MeteorProjectile(float x, float y, float radius) {
+            super(x, y, radius, Color.rgb(255, 100 + new Random().nextInt(155), 50));
+            this.trailLengthFactor = 5f; // Adjust based on speed
+        }
+    }
+
     class SpecialBall {
         float x, y, vx, vy, radius;
         String type;
+        int bossHits = 0; // Track hits on boss
+        long lastBossHitTime = 0; // Debounce
 
         SpecialBall(float x, float y, float radius, String type) {
             this.x = x;
@@ -4677,85 +4893,99 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     class ElectricEffect {
-        float x1, y1, x2, y2;
-        int life, type; // 0=Standard, 1=Heavy
-        java.util.ArrayList<PointF> pathPoints = new java.util.ArrayList<>();
+        float startX, startY, endX, endY;
+        java.util.List<float[]> segments = new java.util.ArrayList<>();
+        float opacity = 1.0f;
+        float maxDisplacement = 60f; // Adjusted for game scale (User example used 30 for shorter segments)
+        int frameCounter = 0;
 
         ElectricEffect(float x1, float y1, float x2, float y2, int type) {
-            this.x1 = x1;
-            this.y1 = y1;
-            this.x2 = x2;
-            this.y2 = y2;
-            this.type = type;
-            this.life = (type == 1) ? 30 : 15; // Heavy lasts longer
-            generateLightning();
+            this.startX = x1;
+            this.startY = y1;
+            this.endX = x2;
+            this.endY = y2;
+
+            // Adjust displacement based on distance or type if needed
+            float dist = (float) Math.hypot(x2 - x1, y2 - y1);
+            this.maxDisplacement = Math.max(30f, dist / 8f); // Dynamic displacement
+
+            generateSegments();
         }
 
-        void generateLightning() {
-            pathPoints.clear();
-            if (type == 0) {
-                // Simple ZigZag (Old Style)
-                pathPoints.add(new PointF(x1, y1));
-                float midX = (x1 + x2) / 2 + (random.nextFloat() - 0.5f) * 20;
-                float midY = (y1 + y2) / 2 + (random.nextFloat() - 0.5f) * 20;
-                pathPoints.add(new PointF(midX, midY));
-                pathPoints.add(new PointF(x2, y2));
+        private void generateSegments() {
+            segments.clear();
+            createElectricLine(startX, startY, endX, endY, maxDisplacement);
+        }
+
+        // Recursive Generation (From User's Code)
+        private void createElectricLine(float x1, float y1, float x2, float y2, float disp) {
+            if (disp < 4) {
+                segments.add(new float[] { x1, y1, x2, y2 });
             } else {
-                // Heavy Lightning (Zeus Style)
-                pathPoints.add(new PointF(x1, y1));
-                float dist = (float) Math.hypot(x2 - x1, y2 - y1);
-                int segments = 10;
-                float dx = (x2 - x1) / segments;
-                float dy = (y2 - y1) / segments;
-                for (int i = 1; i < segments; i++) {
-                    float px = x1 + dx * i;
-                    float py = y1 + dy * i;
-                    float jitter = (random.nextFloat() - 0.5f) * 30;
-                    pathPoints.add(new PointF(px + jitter, py + jitter));
-                }
-                pathPoints.add(new PointF(x2, y2));
+                float midX = (x1 + x2) / 2 + (random.nextFloat() - 0.5f) * disp;
+                float midY = (y1 + y2) / 2 + (random.nextFloat() - 0.5f) * disp;
+                createElectricLine(x1, y1, midX, midY, disp / 2);
+                createElectricLine(midX, midY, x2, y2, disp / 2);
             }
         }
 
         void update() {
-            life--;
+            // Emulate Timer(50) jitter effect
+            // Assuming ~60 FPS, 50ms is roughly every 3 frames.
+            frameCounter++;
+            if (frameCounter % 3 == 0) {
+                generateSegments();
+            }
+
+            // Fade Logic (From User's Code: opacity -= 0.03f)
+            opacity -= 0.03f;
         }
 
         boolean isDead() {
-            return life <= 0;
+            return opacity <= 0;
         }
 
         void draw(Canvas canvas, Paint paint) {
+            if (segments.isEmpty() || opacity <= 0)
+                return;
+
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeCap(Paint.Cap.ROUND);
             paint.setStrokeJoin(Paint.Join.ROUND);
 
-            if (type == 1) {
-                // Heavy Glow
-                paint.setColor(Color.WHITE);
-                paint.setStrokeWidth(8);
-                paint.setShadowLayer(25, 0, 0, Color.CYAN);
-                drawPath(canvas, paint);
-                paint.clearShadowLayer();
-            } else {
-                // Standard
-                paint.setColor(Color.CYAN);
-                paint.setStrokeWidth(3);
-                paint.setAlpha((int) (255 * (life / 15f)));
-                drawPath(canvas, paint);
-            }
-            paint.setAlpha(255);
-        }
+            // 1. Outer Glow (Blue/Cyan: 0, 150, 255)
+            // Stroke: 5.0f
+            // Opacity: opacity * 150 (out of 255)
+            paint.setStrokeWidth(5.0f);
+            int glowAlpha = (int) (opacity * 150);
+            if (glowAlpha > 255)
+                glowAlpha = 255;
+            if (glowAlpha < 0)
+                glowAlpha = 0;
 
-        private void drawPath(Canvas canvas, Paint paint) {
-            if (pathPoints.size() < 2)
-                return;
-            Path p = new Path();
-            p.moveTo(pathPoints.get(0).x, pathPoints.get(0).y);
-            for (int i = 1; i < pathPoints.size(); i++) {
-                p.lineTo(pathPoints.get(i).x, pathPoints.get(i).y);
+            paint.setColor(Color.argb(glowAlpha, 0, 150, 255));
+            paint.setShadowLayer(15, 0, 0, Color.argb(glowAlpha, 0, 150, 255)); // Add bloom
+
+            for (float[] seg : segments) {
+                canvas.drawLine(seg[0], seg[1], seg[2], seg[3], paint);
             }
-            canvas.drawPath(p, paint);
+            paint.clearShadowLayer();
+
+            // 2. Inner Core (White: 255, 255, 255)
+            // Stroke: 1.5f
+            // Opacity: opacity * 255
+            paint.setStrokeWidth(1.5f);
+            int coreAlpha = (int) (opacity * 255);
+            if (coreAlpha > 255)
+                coreAlpha = 255;
+            if (coreAlpha < 0)
+                coreAlpha = 0;
+
+            paint.setColor(Color.argb(coreAlpha, 255, 255, 255));
+
+            for (float[] seg : segments) {
+                canvas.drawLine(seg[0], seg[1], seg[2], seg[3], paint);
+            }
         }
     }
 
@@ -4774,10 +5004,13 @@ public class GameView extends SurfaceView implements Runnable {
             radius = maxRadius * (1 - life / 60f);
             life--;
 
-            // Boss Check
+            // Boss Check (Squared Distance Optimization)
             if (!bossHit && currentBoss != null) {
-                float dist = (float) Math.hypot(currentBoss.x - x, currentBoss.y - y);
-                if (dist < radius + currentBoss.radius) {
+                float dx = currentBoss.x - x;
+                float dy = currentBoss.y - y;
+                float distSq = dx * dx + dy * dy;
+                float hitDist = radius + currentBoss.radius;
+                if (distSq < hitDist * hitDist) {
                     currentBoss.hp -= 30;
                     floatingTexts.add(new FloatingText("-30", currentBoss.x, currentBoss.y, Color.rgb(255, 165, 0)));
                     bossHit = true;
@@ -4810,6 +5043,23 @@ public class GameView extends SurfaceView implements Runnable {
                     playSound(soundCollision); // Siyah top patlasa da standart çarpışma sesi (kullanıcı isteği)
                 }
             }
+
+            // Feature: Blast Wave Destroys Boss Projectiles
+            if (!bossProjectiles.isEmpty()) {
+                for (int i = bossProjectiles.size() - 1; i >= 0; i--) {
+                    Ball proj = bossProjectiles.get(i);
+                    float dx = x - proj.x;
+                    float dy = y - proj.y;
+                    float distance = (float) Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < radius) {
+                        bossProjectiles.remove(i);
+                        // Visual feedback
+                        createImpactBurst(proj.x, proj.y, Color.rgb(255, 69, 0));
+                        playSound(soundBlackExplosion); // Explosion sound
+                    }
+                }
+            }
         }
 
         boolean isDead() {
@@ -4821,9 +5071,10 @@ public class GameView extends SurfaceView implements Runnable {
             paint.setStrokeWidth(8 * (life / 60f));
             paint.setColor(Color.rgb(255, 69, 0));
             paint.setAlpha((int) (255 * (life / 60f)));
-            paint.setShadowLayer(20, 0, 0, Color.RED);
+            // paint.setShadowLayer(20, 0, 0, Color.RED); // Removed for performance (Lag
+            // fix)
             canvas.drawCircle(x, y, radius, paint);
-            paint.clearShadowLayer();
+            // paint.clearShadowLayer();
             paint.setAlpha(255);
         }
     }
@@ -4908,6 +5159,7 @@ public class GameView extends SurfaceView implements Runnable {
             canvas.drawCircle(x - size, y - size, size * 0.8f, paint);
             paint.setAlpha(255);
         }
+
     }
 
     private void drawMoon(Canvas canvas) {
@@ -5186,12 +5438,18 @@ public class GameView extends SurfaceView implements Runnable {
         int life = 60; // Frames
         int maxLife = 60;
         float floatSpeed = 3f;
+        float sizeScale = 1.0f;
 
         FloatingText(String text, float x, float y, int color) {
+            this(text, x, y, color, 1.0f);
+        }
+
+        FloatingText(String text, float x, float y, int color, float sizeScale) {
             this.text = text;
             this.x = x;
             this.y = y;
             this.color = color;
+            this.sizeScale = sizeScale;
         }
 
         void update() {
@@ -5210,8 +5468,9 @@ public class GameView extends SurfaceView implements Runnable {
 
             // Calculate sizes and alpha
             float ratio = (float) life / maxLife;
-            paint.setTextSize(screenWidth * 0.12f * (0.8f + 0.2f * ratio)); // Shrink slightly as it fades? Or grow?
-                                                                            // Let's stay mostly constant or subtle pop
+            paint.setTextSize(screenWidth * 0.12f * sizeScale * (0.8f + 0.2f * ratio)); // Shrink slightly as it fades?
+                                                                                        // Or grow?
+            // Let's stay mostly constant or subtle pop
             paint.setAlpha((int) (255 * ratio)); // Fade out
 
             // Text Color
@@ -5469,10 +5728,19 @@ public class GameView extends SurfaceView implements Runnable {
         // Background
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(Color.argb(190, 30, 30, 50));
-        canvas.drawCircle(skillBtnX, skillBtnY, skillBtnRadius, paint);
 
         long currentTime = System.currentTimeMillis();
         boolean isOnCooldown = (currentTime - lastSkillUseTime < SKILL_COOLDOWN);
+
+        // Hide if None and not on Cooldown
+        if (activeSkill.equals("None") && !isOnCooldown)
+            return;
+
+        canvas.drawCircle(skillBtnX, skillBtnY, skillBtnRadius, paint);
+
+        // Remove redundant declaration below (moved up)
+        // long currentTime = System.currentTimeMillis();
+        // boolean isOnCooldown = (currentTime - lastSkillUseTime < SKILL_COOLDOWN);
 
         // Border
         paint.setStyle(Paint.Style.STROKE);
@@ -5668,11 +5936,23 @@ public class GameView extends SurfaceView implements Runnable {
             this.hoverCenterY = y;
             this.radius = circleRadius * 0.25f;
             this.lastStateChangeTime = System.currentTimeMillis();
+            this.lastAttackTime = System.currentTimeMillis(); // CRITICAL: Initialize attack timer
+            android.util.Log.d("BOSS_DEBUG", "Boss created: " + name + " HP: " + maxHp + " State: " + state);
         }
 
         void update() {
             long now = System.currentTimeMillis();
+            // State Machine based on Boss Type
+            if (name.equals("VOID TITAN") || name.equals("Boss")) {
+                updateVoidTitan(now);
+            } else if (name.equals("LUNAR CONSTRUCT")) {
+                updateLunarConstruct(now);
+            } else {
+                // Unknown boss
+            }
+        }
 
+        private void updateVoidTitan(long now) {
             // State Machine Checks (Only if in Idle State 0)
             if (state == 0) {
                 if (now - lastStateChangeTime > 3000) { // 3 seconds idle wait
@@ -5692,12 +5972,12 @@ public class GameView extends SurfaceView implements Runnable {
                         // Prepare Dash
                         charging = true;
                         chargeStartTime = now;
-                        playSound(soundLaunch);
+                        playSound(soundPower); // Replaced soundLaunch
                     } else if (state == 2) {
                         // Prepare Burst - Charging Phase
                         charging = true;
                         chargeStartTime = now;
-                        playSound(soundLaunch); // Warning sound
+                        playSound(soundPower); // Warning sound
                     }
                 }
             }
@@ -5716,7 +5996,7 @@ public class GameView extends SurfaceView implements Runnable {
                     dashing = true;
                     charging = true;
                     chargeStartTime = now;
-                    playSound(soundLaunch); // Warning
+                    playSound(soundPower); // Warning
                 }
 
                 if (charging) {
@@ -5785,6 +6065,89 @@ public class GameView extends SurfaceView implements Runnable {
             }
         }
 
+        private void updateLunarConstruct(long now) {
+            // Hover logic (Slower, heavier)
+            y = hoverCenterY + (float) Math.sin(now * 0.001) * 20;
+
+            // State Machine
+            if (state == 0) { // Idle (Moon Rock)
+                if (now - lastAttackTime > 2500) { // Every 2.5s
+                    shootMoonRock();
+                    lastAttackTime = now;
+                }
+
+                // Dynamic cooldown: Faster transitions when HP is low (enrage)
+                long stateChangeCooldown = (hp > maxHp / 2) ? 5000 : 3000; // 5s normal, 3s enraged
+                if (now - lastStateChangeTime > stateChangeCooldown) {
+                    android.util.Log.d("BOSS_DEBUG", "STATE CHANGE TRIGGERED! HP: " + hp + "/" + maxHp);
+                    if (hp > maxHp / 2) {
+                        state = 1; // Scatter Shot (Phase 1)
+                    } else {
+                        state = 2; // Meteor Shower (Phase 2 - Enrage)
+                    }
+                    charging = true;
+                    chargeStartTime = now;
+                    playSound(soundPower); // Charging Up
+                    lastStateChangeTime = now;
+                    android.util.Log.d("BOSS_DEBUG", "New state: " + state + " charging: " + charging);
+                }
+            } else if (state == 1) { // Scatter Shot
+                if (charging && now - chargeStartTime > 1500) {
+                    doScatterShot();
+                    charging = false;
+                    state = 0; // Return to idle
+                    lastStateChangeTime = now;
+                }
+            } else if (state == 2) { // Meteor Shower
+                if (charging && now - chargeStartTime > 1500) {
+                    doMeteorShower();
+                    charging = false;
+                    state = 0;
+                    lastStateChangeTime = now;
+                }
+            }
+        }
+
+        void shootMoonRock() {
+            if (whiteBall != null) {
+                android.util.Log.d("BOSS_DEBUG", "shootMoonRock called");
+                float angle = (float) Math.atan2(whiteBall.y - y, whiteBall.x - x);
+                float speed = 8; // Slow
+                Ball proj = new MoonRock(x, y, 40, Color.LTGRAY); // Big Rock
+                android.util.Log.d("BOSS_DEBUG", "Created MoonRock: " + proj.getClass().getName());
+                proj.vx = (float) Math.cos(angle) * speed;
+                proj.vy = (float) Math.sin(angle) * speed;
+                bossProjectiles.add(proj);
+                playSound(soundRetroLaser); // Reuse sound for now
+            }
+        }
+
+        void doMeteorShower() {
+            android.util.Log.d("BOSS_DEBUG", "doMeteorShower called");
+            for (int i = 0; i < 20; i++) {
+                float startX = (random.nextFloat() * screenWidth);
+                float startY = -50 - random.nextFloat() * 200; // Spawn closer to top (visible sooner)
+                Ball proj = new MeteorProjectile(startX, startY, 25); // Slightly larger
+
+                // Target player position
+                if (whiteBall != null) {
+                    float targetDx = whiteBall.x - startX;
+                    float targetDy = whiteBall.y - startY;
+                    float targetDist = (float) Math.sqrt(targetDx * targetDx + targetDy * targetDy);
+                    float speed = 10 + random.nextFloat() * 8; // Random speed 10-18
+
+                    proj.vx = (targetDx / targetDist) * speed;
+                    proj.vy = (targetDy / targetDist) * speed;
+                } else {
+                    proj.vx = (random.nextFloat() - 0.5f) * 6;
+                    proj.vy = 12 + random.nextFloat() * 8;
+                }
+                bossProjectiles.add(proj);
+            }
+            android.util.Log.d("BOSS_DEBUG", "Meteor shower spawned 20 Meteors");
+            playSound(soundBlackExplosion); // Rumble sound
+        }
+
         void shootVoidBall() {
             if (whiteBall != null) {
                 float angle = (float) Math.atan2(whiteBall.y - y, whiteBall.x - x);
@@ -5793,16 +6156,33 @@ public class GameView extends SurfaceView implements Runnable {
                 proj.vx = (float) Math.cos(angle) * speed;
                 proj.vy = (float) Math.sin(angle) * speed;
                 bossProjectiles.add(proj);
-                playSound(soundLaunch);
+                playSound(soundRetroLaser); // Retro laser sound
             }
         }
 
         void doBurstAttack() {
-            playSound(soundBlackExplosion); // Big sound
+            playSound(soundLaserGun); // Laser Gun sound for 20-ball attack
             for (int i = 0; i < 20; i++) {
                 float angle = (float) (i * (2 * Math.PI / 20));
                 float speed = 10;
                 Ball proj = new Ball(x, y, 20, Color.rgb(100, 0, 150));
+                proj.vx = (float) Math.cos(angle) * speed;
+                proj.vy = (float) Math.sin(angle) * speed;
+                bossProjectiles.add(proj);
+            }
+        }
+
+        void doScatterShot() {
+            playSound(soundRetroLaser);
+            // Triple Scatter Shot (Standard Phase)
+            android.util.Log.d("BOSS_DEBUG", "doScatterShot called");
+            for (int i = -1; i <= 1; i++) {
+                if (whiteBall == null)
+                    break;
+                float angle = (float) Math.atan2(whiteBall.y - y, whiteBall.x - x);
+                angle += i * 0.2f; // Spread by ~11 degrees
+                float speed = 10;
+                Ball proj = new MoonRock(x, y, 30, Color.LTGRAY);
                 proj.vx = (float) Math.cos(angle) * speed;
                 proj.vy = (float) Math.sin(angle) * speed;
                 bossProjectiles.add(proj);
@@ -5815,6 +6195,22 @@ public class GameView extends SurfaceView implements Runnable {
             paint.setColor(color);
             if (state == 1)
                 paint.setColor(Color.CYAN); // Blue Shield for Dash
+
+            // Glow Effect during Charge (State 2)
+            if (state == 2 && charging) {
+                paint.setStyle(Paint.Style.FILL);
+                paint.setColor(Color.YELLOW);
+                paint.setAlpha(100);
+                paint.setShadowLayer(50, 0, 0, Color.YELLOW);
+                canvas.drawCircle(x, y, radius * 1.5f, paint);
+                paint.clearShadowLayer();
+                paint.setAlpha(255);
+
+                // Restore Stroke for main body
+                paint.setStyle(Paint.Style.STROKE);
+                paint.setColor(color);
+            }
+
             paint.setStrokeWidth(10);
             paint.setShadowLayer(40, 0, 0, (state == 1) ? Color.CYAN : color);
             float pulse = (float) (1.0 + Math.sin(System.currentTimeMillis() * 0.005) * 0.1);
@@ -5858,6 +6254,15 @@ public class GameView extends SurfaceView implements Runnable {
 
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(Color.DKGRAY);
+
+            // Draw Craters for Lunar Construct
+            if (name.equals("LUNAR CONSTRUCT")) {
+                paint.setColor(Color.rgb(150, 150, 150));
+                canvas.drawCircle(x - radius * 0.4f, y - radius * 0.3f, radius * 0.2f, paint);
+                canvas.drawCircle(x + radius * 0.5f, y + radius * 0.2f, radius * 0.25f, paint);
+                canvas.drawCircle(x - radius * 0.2f, y + radius * 0.5f, radius * 0.15f, paint);
+            }
+
             canvas.drawRect(barX, barY, barX + barW, barY + barH, paint);
 
             paint.setColor(Color.RED);
