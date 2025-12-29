@@ -103,10 +103,10 @@ public class OnlineGameView extends SurfaceView implements Runnable {
                 if (hostBall == null)
                     hostBall = new Ball(x, y, ballRadius, color);
 
-                // Direct position update (no interpolation)
+                // INTERPOLATION: Set target instead of direct update
                 if (!(isDragging && isHost)) {
-                    hostBall.x = x;
-                    hostBall.y = y;
+                    hostBall.targetX = x;
+                    hostBall.targetY = y;
                 }
                 hostBall.color = color;
                 hostBall.radius = ballRadius;
@@ -120,10 +120,10 @@ public class OnlineGameView extends SurfaceView implements Runnable {
                 if (guestBall == null)
                     guestBall = new Ball(x, y, ballRadius, color);
 
-                // Direct position update (no interpolation)
+                // INTERPOLATION: Set target instead of direct update
                 if (!(isDragging && !isHost)) {
-                    guestBall.x = x;
-                    guestBall.y = y;
+                    guestBall.targetX = x;
+                    guestBall.targetY = y;
                 }
                 guestBall.color = color;
                 guestBall.radius = ballRadius;
@@ -149,7 +149,7 @@ public class OnlineGameView extends SurfaceView implements Runnable {
                         ballPool.add(removed);
                     }
 
-                    // 3. Update properties of active balls (direct updates, no interpolation)
+                    // 3. Update properties of active balls (with interpolation)
                     for (int i = 0; i < newCount; i++) {
                         JSONObject b = arr.getJSONObject(i);
                         float x = (float) b.optDouble("x", 0.5) * screenWidth;
@@ -157,8 +157,8 @@ public class OnlineGameView extends SurfaceView implements Runnable {
                         int color = Color.parseColor(b.optString("color", "#FF0055"));
 
                         Ball ball = coloredBalls.get(i);
-                        ball.x = x;
-                        ball.y = y;
+                        ball.targetX = x;
+                        ball.targetY = y;
                         ball.color = color;
                         ball.radius = circleRadius * 0.055f;
                     }
@@ -289,6 +289,15 @@ public class OnlineGameView extends SurfaceView implements Runnable {
                     if (power > 10 && gameManager != null) {
                         float normX = myBall.x / screenWidth;
                         float normY = myBall.y / screenHeight;
+
+                        // CLIENT-SIDE PREDICTION: Apply shot locally for instant feedback
+                        // Server will correct if needed
+                        float vx = (float) Math.cos(angle) * power * 0.05f;
+                        float vy = (float) Math.sin(angle) * power * 0.05f;
+                        myBall.targetX += vx * 3; // Predict ~3 frames ahead
+                        myBall.targetY += vy * 3;
+
+                        // Send to server (server is authoritative)
                         gameManager.sendShot(angle, power, normX, normY);
 
                         // Set cooldown
@@ -304,6 +313,12 @@ public class OnlineGameView extends SurfaceView implements Runnable {
                         }
                     }
                     isDragging = false;
+
+                    // FIX: Reset target to current position to prevent server snap
+                    if (myBall != null) {
+                        myBall.targetX = myBall.x;
+                        myBall.targetY = myBall.y;
+                    }
                 }
                 break;
         }
@@ -329,6 +344,26 @@ public class OnlineGameView extends SurfaceView implements Runnable {
     }
 
     private void update() {
+        // INTERPOLATION: Smooth ball movement
+        final float LERP_FACTOR = 0.15f; // 0.1-0.2 is ideal for online games
+
+        if (hostBall != null) {
+            hostBall.x += (hostBall.targetX - hostBall.x) * LERP_FACTOR;
+            hostBall.y += (hostBall.targetY - hostBall.y) * LERP_FACTOR;
+        }
+
+        if (guestBall != null) {
+            guestBall.x += (guestBall.targetX - guestBall.x) * LERP_FACTOR;
+            guestBall.y += (guestBall.targetY - guestBall.y) * LERP_FACTOR;
+        }
+
+        synchronized (coloredBalls) {
+            for (Ball ball : coloredBalls) {
+                ball.x += (ball.targetX - ball.x) * LERP_FACTOR;
+                ball.y += (ball.targetY - ball.y) * LERP_FACTOR;
+            }
+        }
+
         // Update particles (synchronized)
         synchronized (particles) {
             for (int i = particles.size() - 1; i >= 0; i--) {
