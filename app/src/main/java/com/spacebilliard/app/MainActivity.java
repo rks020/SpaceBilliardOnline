@@ -15,12 +15,33 @@ import android.widget.LinearLayout;
 import com.spacebilliard.app.ui.NeonButton;
 import com.spacebilliard.app.ui.NeonInfoPanel;
 import com.spacebilliard.app.ui.NeonPowerPanel;
+import com.spacebilliard.app.ui.NeonMainMenuPanel;
+import com.spacebilliard.app.ui.NeonGameOverPanel;
+
+// AdMob imports
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.google.android.gms.ads.rewarded.RewardedAd;
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
+import com.google.android.gms.ads.LoadAdError;
 
 public class MainActivity extends Activity {
 
     private GameView gameView;
     private NeonInfoPanel infoPanel;
     private NeonPowerPanel powerPanel;
+
+    // New UI Panels
+    private NeonMainMenuPanel mainMenuPanel;
+    private NeonGameOverPanel gameOverPanel;
+
+    // AdMob fields
+    private AdView bannerAd;
+    private RewardedAd rewardedAd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,12 +53,24 @@ public class MainActivity extends Activity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+        // Initialize AdMob SDK
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+                // SDK initialized
+                loadRewardedAd();
+            }
+        });
+
         // Oyun görünümünü oluştur
         gameView = new GameView(this);
 
         // Root Layout
         FrameLayout root = new FrameLayout(this);
         root.addView(gameView);
+
+        // Calculate density for layout positioning
+        int density = (int) getResources().getDisplayMetrics().density;
 
         // Top Panel Container (Horizontal layout for two panels)
         LinearLayout topPanelContainer = new LinearLayout(this);
@@ -48,7 +81,8 @@ public class MainActivity extends Activity {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
         topContainerParams.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
-        topContainerParams.setMargins(20, 30, 20, 0);
+        // Pushing panel down by 60dp (50dp banner + 10dp padding)
+        topContainerParams.setMargins(20 * density, 60 * density, 20 * density, 0);
         topPanelContainer.setLayoutParams(topContainerParams);
 
         // Left Panel (TIME/SCORE/COIN)
@@ -59,7 +93,7 @@ public class MainActivity extends Activity {
 
         LinearLayout.LayoutParams infoPanelParams = new LinearLayout.LayoutParams(
                 0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
-        infoPanelParams.setMargins(0, 0, 10, 0);
+        infoPanelParams.setMargins(0, 0, 10 * density, 0);
         infoPanel.setLayoutParams(infoPanelParams);
 
         // Right Panel (POWER/STAGE/LIVES with Heart)
@@ -78,109 +112,115 @@ public class MainActivity extends Activity {
 
         root.addView(topPanelContainer);
 
-        // Calculate center for button positioning
-        int density = (int) getResources().getDisplayMetrics().density;
+        // Banner Ad at top
+        bannerAd = new AdView(this);
+        bannerAd.setAdUnitId("ca-app-pub-3940256099942544/6300978111"); // Test banner ID
+        bannerAd.setAdSize(AdSize.BANNER);
 
-        // Shop Button (Bottom most)
-        final NeonButton shopBtn = new NeonButton(this, "SHOP", Color.rgb(255, 60, 120));
-        FrameLayout.LayoutParams shopParams = new FrameLayout.LayoutParams(
-                (int) (getResources().getDisplayMetrics().density * 180),
-                (int) (getResources().getDisplayMetrics().density * 45));
-        shopParams.gravity = Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM;
-        shopParams.bottomMargin = (int) (getResources().getDisplayMetrics().density * 220); // Adjusted
-        shopBtn.setLayoutParams(shopParams);
+        FrameLayout.LayoutParams bannerParams = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        bannerParams.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
+        bannerAd.setLayoutParams(bannerParams);
 
-        // Hall of Fame Button
-        final NeonButton hallOfFameBtn = new NeonButton(this, "HALL OF FAME", Color.rgb(255, 215, 0));
-        FrameLayout.LayoutParams hallParams = new FrameLayout.LayoutParams(
-                (int) (getResources().getDisplayMetrics().density * 180),
-                (int) (getResources().getDisplayMetrics().density * 45));
-        hallParams.gravity = Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM;
-        hallParams.bottomMargin = (int) (getResources().getDisplayMetrics().density * 280); // +60dp
-        hallOfFameBtn.setLayoutParams(hallParams);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        bannerAd.loadAd(adRequest);
 
-        // How to Play Button
-        final NeonButton howToBtn = new NeonButton(this, "HOW TO PLAY", Color.MAGENTA);
-        FrameLayout.LayoutParams howToParams = new FrameLayout.LayoutParams(
-                (int) (getResources().getDisplayMetrics().density * 180),
-                (int) (getResources().getDisplayMetrics().density * 45));
-        howToParams.gravity = Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM;
-        howToParams.bottomMargin = (int) (getResources().getDisplayMetrics().density * 280); // Adjusted
-        howToBtn.setLayoutParams(howToParams);
+        root.addView(bannerAd);
 
-        // Play Online Button (NEW!)
-        final NeonButton playOnlineBtn = new NeonButton(this, "PLAY ONLINE", Color.GREEN);
-        FrameLayout.LayoutParams onlineParams = new FrameLayout.LayoutParams(
-                (int) (getResources().getDisplayMetrics().density * 180),
-                (int) (getResources().getDisplayMetrics().density * 45));
-        onlineParams.gravity = Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM;
-        onlineParams.bottomMargin = (int) (getResources().getDisplayMetrics().density * 340); // Between START and HOW
-                                                                                              // TO
-        playOnlineBtn.setLayoutParams(onlineParams);
+        // --- Initialize New Panels ---
 
-        // Start Button (Top most)
-        final NeonButton startBtn = new NeonButton(this, "START GAME", Color.CYAN);
-        FrameLayout.LayoutParams startParams = new FrameLayout.LayoutParams(
-                (int) (getResources().getDisplayMetrics().density * 180),
-                (int) (getResources().getDisplayMetrics().density * 45));
-        startParams.gravity = Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM;
-        startParams.bottomMargin = (int) (getResources().getDisplayMetrics().density * 400); // +60dp
-        startBtn.setLayoutParams(startParams);
+        // Main Menu Panel
+        mainMenuPanel = new NeonMainMenuPanel(this);
+        FrameLayout.LayoutParams menuParams = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT);
+        mainMenuPanel.setLayoutParams(menuParams);
+        root.addView(mainMenuPanel);
 
-        // Initially visible
-        shopBtn.setVisibility(View.VISIBLE);
-        startBtn.setVisibility(View.VISIBLE);
-        playOnlineBtn.setVisibility(View.VISIBLE);
-        howToBtn.setVisibility(View.VISIBLE);
-        hallOfFameBtn.setVisibility(View.VISIBLE);
+        // Game Over Panel
+        gameOverPanel = new NeonGameOverPanel(this);
+        gameOverPanel.setLayoutParams(menuParams);
+        gameOverPanel.setVisibility(View.GONE); // Initially hidden
+        root.addView(gameOverPanel);
 
-        shopBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, ShopActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        startBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                gameView.startGame();
-            }
-        });
-
-        playOnlineBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, OnlineActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        howToBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                gameView.showInstructions();
-            }
-        });
-
-        hallOfFameBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                gameView.showHighScore();
-            }
-        });
-
-        root.addView(shopBtn);
-        root.addView(startBtn);
-        root.addView(playOnlineBtn);
-        root.addView(howToBtn);
-        root.addView(hallOfFameBtn);
-
-        // Give GameView references to buttons so it can manage visibility
-        gameView.setMenuButtons(startBtn, howToBtn, shopBtn, hallOfFameBtn, playOnlineBtn);
+        // --- Setup Listeners ---
+        setupMainMenuListeners();
+        setupGameOverListeners();
 
         setContentView(root);
+    }
+
+    private void setupMainMenuListeners() {
+        mainMenuPanel.btnStart.setOnClickListener(v -> {
+            gameView.startGame();
+            hideAllPanels();
+        });
+
+        mainMenuPanel.btnShop.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, ShopActivity.class);
+            startActivity(intent);
+        });
+
+        mainMenuPanel.btnPlayOnline.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, OnlineActivity.class);
+            startActivity(intent);
+        });
+
+        mainMenuPanel.btnHowTo.setOnClickListener(v -> {
+            gameView.showInstructions();
+            // main menu stays visible? No, instructions overlay handles it
+            mainMenuPanel.setVisibility(View.GONE);
+        });
+
+        mainMenuPanel.btnHallOfFame.setOnClickListener(v -> {
+            gameView.showHighScore();
+            mainMenuPanel.setVisibility(View.GONE);
+        });
+    }
+
+    private void setupGameOverListeners() {
+        gameOverPanel.btnRevive.setOnClickListener(v -> {
+            showRewardedAdForContinue();
+        });
+
+        gameOverPanel.btnReboot.setOnClickListener(v -> {
+            gameView.rebootLevel();
+            hideAllPanels();
+        });
+
+        gameOverPanel.btnHallOfFame.setOnClickListener(v -> {
+            gameView.showHighScore();
+            gameOverPanel.setVisibility(View.GONE);
+        });
+
+        gameOverPanel.btnMainMenu.setOnClickListener(v -> {
+            gameView.resetToMainMenu();
+            showMainMenu();
+        });
+    }
+
+    // UI Helpers
+
+    public void showMainMenu() {
+        runOnUiThread(() -> {
+            mainMenuPanel.setVisibility(View.VISIBLE);
+            gameOverPanel.setVisibility(View.GONE);
+        });
+    }
+
+    public void showGameOverScreen() {
+        runOnUiThread(() -> {
+            gameOverPanel.setVisibility(View.VISIBLE);
+            mainMenuPanel.setVisibility(View.GONE);
+        });
+    }
+
+    public void hideAllPanels() {
+        runOnUiThread(() -> {
+            mainMenuPanel.setVisibility(View.GONE);
+            gameOverPanel.setVisibility(View.GONE);
+        });
     }
 
     @Override
@@ -218,6 +258,45 @@ public class MainActivity extends Activity {
             powerPanel.setStage(stage);
             powerPanel.setLevelInfo(levelInfo);
             powerPanel.setLives(lives);
+        }
+    }
+
+    // Load rewarded ad
+    private void loadRewardedAd() {
+        AdRequest adRequest = new AdRequest.Builder().build();
+        RewardedAd.load(this, "ca-app-pub-3940256099942544/5224354917", // Test rewarded ID
+                adRequest, new RewardedAdLoadCallback() {
+                    @Override
+                    public void onAdLoaded(RewardedAd ad) {
+                        rewardedAd = ad;
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(LoadAdError loadAdError) {
+                        rewardedAd = null;
+                    }
+                });
+    }
+
+    // Show rewarded ad and give the reward (continuing the game)
+    public void showRewardedAdForContinue() {
+        if (rewardedAd != null) {
+            rewardedAd.show(this, rewardItem -> {
+                // User watched ad, grant continue
+                if (gameView != null) {
+                    gameView.continueAfterAd();
+                    hideAllPanels(); // Success
+                }
+                // Load next ad
+                loadRewardedAd();
+            });
+        } else {
+            // Ad not ready, just continue anyway (fallback)
+            if (gameView != null) {
+                gameView.continueAfterAd();
+                hideAllPanels(); // Success
+            }
+            loadRewardedAd();
         }
     }
 }

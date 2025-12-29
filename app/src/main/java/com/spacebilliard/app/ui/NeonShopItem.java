@@ -201,6 +201,85 @@ public class NeonShopItem extends View {
                     canvas.drawRect(cx - size * 0.6f, cy - size * 0.6f, cx - size * 0.2f, cy - size * 0.2f, p);
                     canvas.drawRect(cx + size * 0.1f, cy, cx + size * 0.5f, cy + size * 0.4f, p);
                     canvas.drawRect(cx - size * 0.3f, cy + size * 0.3f, cx, cy + size * 0.6f, p);
+                } else if (skinId.contains("matrix")) {
+                    // Matrix Trail
+                    p.setColor(Color.GREEN);
+                    p.setTextSize(size);
+                    p.setTextAlign(Paint.Align.CENTER);
+                    p.setStyle(Paint.Style.FILL);
+                    canvas.drawText("1", cx - size * 0.5f, cy, p);
+                    canvas.drawText("0", cx, cy + size * 0.5f, p);
+                    canvas.drawText("1", cx + size * 0.5f, cy - size * 0.5f, p);
+                } else if (skinId.contains("dna")) {
+                    // DNA Trail
+                    p.setStyle(Paint.Style.STROKE);
+                    p.setStrokeWidth(4);
+                    p.setColor(Color.MAGENTA);
+                    android.graphics.Path dna = new android.graphics.Path();
+                    dna.moveTo(cx - size, cy);
+                    dna.quadTo(cx - size * 0.5f, cy - size, cx, cy);
+                    dna.quadTo(cx + size * 0.5f, cy + size, cx + size, cy);
+                    canvas.drawPath(dna, p);
+                    p.setColor(Color.CYAN);
+                    android.graphics.Path dna2 = new android.graphics.Path();
+                    dna2.moveTo(cx - size, cy);
+                    dna2.quadTo(cx - size * 0.5f, cy + size, cx, cy);
+                    dna2.quadTo(cx + size * 0.5f, cy - size, cx + size, cy);
+                    canvas.drawPath(dna2, p);
+                } else if (skinId.contains("sakura")) {
+                    // Sakura Trail
+                    p.setStyle(Paint.Style.FILL);
+                    p.setColor(Color.rgb(255, 183, 197));
+                    canvas.drawOval(cx - size * 0.5f, cy - size * 0.2f, cx, cy + size * 0.2f, p);
+                    canvas.drawOval(cx, cy, cx + size * 0.5f, cy + size * 0.4f, p);
+                    canvas.drawOval(cx + size * 0.2f, cy - size * 0.5f, cx + size * 0.6f, cy - size * 0.1f, p);
+                } else if (skinId.contains("void")) {
+                    // Void Trail
+                    p.setStyle(Paint.Style.FILL);
+                    p.setColor(Color.WHITE);
+                    canvas.drawCircle(cx, cy, size, p);
+                    p.setColor(Color.BLACK);
+                    canvas.drawCircle(cx, cy, size * 0.8f, p);
+                } else if (skinId.contains("crystal")) {
+                    // Crystal Trail
+                    p.setStyle(Paint.Style.FILL);
+                    p.setColor(Color.CYAN);
+                    android.graphics.Path d = new android.graphics.Path();
+                    d.moveTo(cx, cy - size);
+                    d.lineTo(cx + size * 0.6f, cy);
+                    d.lineTo(cx, cy + size);
+                    d.lineTo(cx - size * 0.6f, cy);
+                    d.close();
+                    canvas.drawPath(d, p);
+                } else if (skinId.contains("music")) {
+                    // Music Trail
+                    p.setColor(Color.WHITE);
+                    p.setStyle(Paint.Style.FILL);
+                    canvas.drawCircle(cx - size * 0.3f, cy + size * 0.5f, size * 0.25f, p);
+                    canvas.drawRect(cx - size * 0.2f, cy - size * 0.5f, cx - size * 0.1f, cy + size * 0.5f, p);
+                    canvas.drawRect(cx - size * 0.2f, cy - size * 0.5f, cx + size * 0.3f, cy - size * 0.3f, p);
+                } else if (skinId.contains("heartbeat")) {
+                    // Heartbeat Trail
+                    p.setColor(Color.RED);
+                    p.setStyle(Paint.Style.STROKE);
+                    p.setStrokeWidth(5);
+                    android.graphics.Path pulse = new android.graphics.Path();
+                    pulse.moveTo(cx - size, cy);
+                    pulse.lineTo(cx - size * 0.3f, cy);
+                    pulse.lineTo(cx, cy - size * 0.8f);
+                    pulse.lineTo(cx + size * 0.3f, cy + size * 0.8f);
+                    pulse.lineTo(cx + size * 0.6f, cy);
+                    pulse.lineTo(cx + size, cy);
+                    canvas.drawPath(pulse, p);
+                } else if (skinId.contains("comet")) {
+                    // Comet Trail
+                    p.setStyle(Paint.Style.FILL);
+                    p.setColor(Color.rgb(255, 140, 0));
+                    canvas.drawCircle(cx, cy, size * 0.6f, p);
+                    p.setStyle(Paint.Style.STROKE);
+                    p.setStrokeWidth(4);
+                    canvas.drawLine(cx, cy, cx - size, cy + size * 0.5f, p);
+                    canvas.drawLine(cx, cy, cx - size, cy - size * 0.5f, p);
                 } else {
                     // Default/Color Trail
                     for (int i = 0; i < 5; i++) {
@@ -268,6 +347,83 @@ public class NeonShopItem extends View {
                     path.quadTo(cx - size * 0.5f, cy - size * 0.8f, cx, cy);
                     path.quadTo(cx + size * 0.5f, cy + size * 0.8f, cx + size, cy);
                     canvas.drawPath(path, p);
+                } else if (skinId.contains("sniper")) {
+                    // Sniper Crosshairs
+                    canvas.drawLine(cx - size, cy + size, cx + size, cy - size, p);
+                    // Crosshair 1
+                    canvas.drawLine(cx - size * 0.4f, cy + size * 0.6f, cx - size * 0.4f + 10, cy + size * 0.6f + 10,
+                            p);
+                    canvas.drawLine(cx - size * 0.4f, cy + size * 0.6f, cx - size * 0.4f - 10, cy + size * 0.6f - 10,
+                            p);
+                    // Crosshair 2
+                    canvas.drawLine(cx + size * 0.4f, cy - size * 0.6f, cx + size * 0.4f + 10, cy - size * 0.6f + 10,
+                            p);
+                    canvas.drawLine(cx + size * 0.4f, cy - size * 0.6f, cx + size * 0.4f - 10, cy - size * 0.6f - 10,
+                            p);
+                } else if (skinId.contains("double")) {
+                    // Double Parallel Lines
+                    canvas.drawLine(cx - size - 10, cy + size - 10, cx + size - 10, cy - size - 10, p);
+                    canvas.drawLine(cx - size + 10, cy + size + 10, cx + size + 10, cy - size + 10, p);
+                } else if (skinId.contains("rainbow")) {
+                    // Rainbow Gradient Line
+                    Paint rainbowP = new Paint(p);
+                    rainbowP.setStrokeWidth(8);
+                    rainbowP.setColor(Color.RED);
+                    canvas.drawLine(cx - size, cy + size, cx - size * 0.3f, cy + size * 0.3f, rainbowP);
+                    rainbowP.setColor(Color.GREEN);
+                    canvas.drawLine(cx - size * 0.3f, cy + size * 0.3f, cx + size * 0.3f, cy - size * 0.3f, rainbowP);
+                    rainbowP.setColor(Color.BLUE);
+                    canvas.drawLine(cx + size * 0.3f, cy - size * 0.3f, cx + size, cy - size, rainbowP);
+                } else if (skinId.contains("dashdot")) {
+                    // Dash-Dot Morse
+                    p.setPathEffect(new android.graphics.DashPathEffect(new float[] { 30, 20, 5, 20 }, 0));
+                    canvas.drawLine(cx - size, cy + size, cx + size, cy - size, p);
+                    p.setPathEffect(null);
+                } else if (skinId.contains("stars")) {
+                    // Stars on line
+                    p.setColor(Color.YELLOW);
+                    p.setStyle(Paint.Style.FILL);
+                    drawStarIcon(canvas, cx, cy, size * 0.3f, p);
+                    drawStarIcon(canvas, cx - size * 0.6f, cy + size * 0.6f, size * 0.2f, p);
+                    drawStarIcon(canvas, cx + size * 0.6f, cy - size * 0.6f, size * 0.2f, p);
+                } else if (skinId.contains("hearts")) {
+                    // Hearts on line
+                    p.setColor(Color.rgb(255, 105, 180));
+                    p.setStyle(Paint.Style.FILL);
+                    canvas.drawCircle(cx - size * 0.5f, cy + size * 0.5f, 8, p); // Simplified heart (circle)
+                    canvas.drawCircle(cx + size * 0.5f, cy - size * 0.5f, 8, p);
+                } else if (skinId.contains("tech")) {
+                    // Tech Circuit
+                    p.setColor(Color.GREEN);
+                    canvas.drawLine(cx - size, cy + size, cx - size * 0.3f, cy + size * 0.3f, p);
+                    canvas.drawCircle(cx - size * 0.3f, cy + size * 0.3f, 8, p);
+                    canvas.drawLine(cx - size * 0.3f, cy + size * 0.3f, cx, cy - size * 0.5f, p);
+                } else if (skinId.contains("snake")) {
+                    // Snake S-Curve
+                    android.graphics.Path snake = new android.graphics.Path();
+                    snake.moveTo(cx - size, cy + size);
+                    snake.cubicTo(cx - size * 0.5f, cy + size * 0.5f, cx - size * 0.8f, cy, cx, cy);
+                    snake.cubicTo(cx + size * 0.8f, cy, cx + size * 0.5f, cy - size * 0.5f, cx + size, cy - size);
+                    p.setStyle(Paint.Style.STROKE);
+                    canvas.drawPath(snake, p);
+                } else if (skinId.contains("chevron")) {
+                    // Chevron >>
+                    p.setStrokeWidth(4);
+                    for (int i = -1; i <= 1; i++) {
+                        float off = i * size * 0.5f;
+                        canvas.drawLine(cx + off - 10, cy - off + 10, cx + off, cy - off, p);
+                        canvas.drawLine(cx + off - 10, cy - off - 10, cx + off, cy - off, p);
+                    }
+                } else if (skinId.contains("fire")) {
+                    // Fire Jagged
+                    p.setColor(Color.rgb(255, 69, 0));
+                    android.graphics.Path fire = new android.graphics.Path();
+                    fire.moveTo(cx - size, cy + size);
+                    fire.lineTo(cx - size * 0.5f, cy + size * 0.2f);
+                    fire.lineTo(cx, cy + size * 0.5f);
+                    fire.lineTo(cx + size * 0.5f, cy - size * 0.2f);
+                    fire.lineTo(cx + size, cy - size);
+                    canvas.drawPath(fire, p);
                 } else {
                     // Laser (Solid Line)
                     canvas.drawLine(cx - size, cy + size, cx + size, cy - size, p);
@@ -280,7 +436,7 @@ public class NeonShopItem extends View {
                 iconPaint.clearShadowLayer();
                 return;
 
-            } else if (skinId.startsWith("impact_")) {
+            } else if (skinId.startsWith("impact_") || skinId.equals("classic")) { // Fix for classic/shockwave icon
                 // Effects
                 Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
                 p.setStyle(Paint.Style.STROKE);
@@ -288,47 +444,93 @@ public class NeonShopItem extends View {
                 p.setColor(themeColor);
                 p.setShadowLayer(15, 0, 0, themeColor);
 
-                if (skinId.contains("stars")) {
+                if (skinId.contains("pixel")) {
+                    // Pixel
                     p.setStyle(Paint.Style.FILL);
-                    drawStarIcon(canvas, cx, cy, size * 0.6f, p);
-                    drawStarIcon(canvas, cx - size * 0.5f, cy - size * 0.5f, size * 0.3f, p);
-                    drawStarIcon(canvas, cx + size * 0.5f, cy + size * 0.5f, size * 0.3f, p);
-                } else if (skinId.contains("electric")) {
-                    // Electric Boom
-                    for (int i = 0; i < 4; i++) {
-                        float angle = (float) (i * Math.PI / 2);
-                        float x1 = cx + (float) Math.cos(angle) * (size * 0.3f);
-                        float y1 = cy + (float) Math.sin(angle) * (size * 0.3f);
-                        float x2 = cx + (float) Math.cos(angle) * size;
-                        float y2 = cy + (float) Math.sin(angle) * size;
-
-                        // Zig zag ray
-                        android.graphics.Path path = new android.graphics.Path();
-                        path.moveTo(x1, y1);
-                        path.lineTo((x1 + x2) / 2 + 10, (y1 + y2) / 2 - 10);
-                        path.lineTo(x2, y2);
-                        canvas.drawPath(path, p);
+                    p.setColor(Color.GREEN);
+                    float s = size * 0.2f;
+                    canvas.drawRect(cx - s, cy - s, cx + s, cy + s, p);
+                    canvas.drawRect(cx - s * 3, cy - s * 3, cx - s, cy - s, p);
+                    canvas.drawRect(cx + s, cy + s, cx + s * 3, cy + s * 3, p);
+                    canvas.drawRect(cx + s, cy - s * 3, cx + s * 3, cy - s, p);
+                    canvas.drawRect(cx - s * 3, cy + s, cx - s, cy + s * 3, p);
+                } else if (skinId.contains("vortex")) {
+                    // Vortex
+                    p.setStyle(Paint.Style.STROKE);
+                    p.setStrokeWidth(3);
+                    for (int i = 0; i < 3; i++) {
+                        float r = size * (0.3f + i * 0.3f);
+                        RectF oval = new RectF(cx - r, cy - r, cx + r, cy + r);
+                        canvas.drawArc(oval, i * 45, 270, false, p);
                     }
-                } else if (skinId.contains("ripple")) {
-                    // Ripple Impact
-                    for (int i = 1; i <= 3; i++) {
-                        p.setAlpha(255 - i * 60);
-                        canvas.drawCircle(cx, cy, size * 0.3f * i, p);
-                    }
-                } else if (skinId.contains("confetti")) {
-                    // Confetti Impact
+                } else if (skinId.contains("sparks")) {
+                    // Sparks
                     p.setStyle(Paint.Style.FILL);
-                    int[] colors = { Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW };
+                    p.setColor(Color.YELLOW);
                     for (int i = 0; i < 8; i++) {
-                        p.setColor(colors[i % 4]);
                         float angle = (float) (i * Math.PI / 4);
-                        float dist = size * 0.7f;
-                        float px = cx + (float) Math.cos(angle) * dist;
-                        float py = cy + (float) Math.sin(angle) * dist;
-                        canvas.drawRect(px - 4, py - 4, px + 4, py + 4, p);
+                        float dist = size * 0.6f;
+                        canvas.drawLine(cx, cy, cx + (float) Math.cos(angle) * dist,
+                                cy + (float) Math.sin(angle) * dist, p);
                     }
+                } else if (skinId.contains("hearts")) {
+                    // Hearts
+                    p.setStyle(Paint.Style.FILL);
+                    p.setColor(Color.RED);
+                    canvas.drawCircle(cx - size * 0.3f, cy, size * 0.3f, p);
+                    canvas.drawCircle(cx + size * 0.3f, cy, size * 0.3f, p);
+                    android.graphics.Path path = new android.graphics.Path();
+                    path.moveTo(cx - size * 0.6f, cy + size * 0.1f);
+                    path.lineTo(cx, cy + size * 0.8f);
+                    path.lineTo(cx + size * 0.6f, cy + size * 0.1f);
+                    canvas.drawPath(path, p);
+                } else if (skinId.contains("skull")) {
+                    // Skull
+                    p.setStyle(Paint.Style.FILL);
+                    p.setColor(Color.LTGRAY);
+                    canvas.drawCircle(cx, cy - size * 0.2f, size * 0.5f, p);
+                    canvas.drawRect(cx - size * 0.3f, cy, cx + size * 0.3f, cy + size * 0.5f, p);
+                    p.setColor(Color.BLACK);
+                    canvas.drawCircle(cx - size * 0.2f, cy - size * 0.1f, size * 0.15f, p);
+                    canvas.drawCircle(cx + size * 0.2f, cy - size * 0.1f, size * 0.15f, p);
+                } else if (skinId.contains("music")) {
+                    // Music
+                    p.setColor(Color.CYAN);
+                    p.setStyle(Paint.Style.FILL);
+                    canvas.drawCircle(cx - size * 0.3f, cy + size * 0.3f, size * 0.2f, p);
+                    p.setStrokeWidth(4);
+                    canvas.drawLine(cx - size * 0.1f, cy + size * 0.3f, cx - size * 0.1f, cy - size * 0.5f, p);
+                    canvas.drawLine(cx - size * 0.1f, cy - size * 0.5f, cx + size * 0.3f, cy - size * 0.3f, p);
+                } else if (skinId.contains("lightning") || skinId.contains("electric")) {
+                    // Lightning/Electric
+                    p.setColor(Color.CYAN);
+                    p.setStyle(Paint.Style.STROKE);
+                    android.graphics.Path path = new android.graphics.Path();
+                    path.moveTo(cx, cy - size * 0.8f);
+                    path.lineTo(cx + size * 0.4f, cy - size * 0.1f);
+                    path.lineTo(cx - size * 0.2f, cy + size * 0.1f);
+                    path.lineTo(cx + size * 0.2f, cy + size * 0.8f);
+                    canvas.drawPath(path, p);
+                } else if (skinId.contains("confetti")) {
+                    // Confetti
+                    p.setStyle(Paint.Style.FILL);
+                    int[] colors = { Color.RED, Color.GREEN, Color.BLUE, Color.MAGENTA };
+                    for (int i = 0; i < 6; i++) {
+                        p.setColor(colors[i % 4]);
+                        canvas.drawRect(cx + (i - 3) * size * 0.3f, cy + (i % 2 == 0 ? size * 0.3f : -size * 0.3f),
+                                cx + (i - 3) * size * 0.3f + 8, cy + (i % 2 == 0 ? size * 0.3f : -size * 0.3f) + 8, p);
+                    }
+                } else if (skinId.contains("ghost")) {
+                    // Ghost
+                    p.setStyle(Paint.Style.FILL);
+                    p.setColor(Color.WHITE);
+                    canvas.drawCircle(cx, cy - size * 0.1f, size * 0.5f, p);
+                    canvas.drawRect(cx - size * 0.5f, cy - size * 0.1f, cx + size * 0.5f, cy + size * 0.5f, p);
+                    p.setColor(Color.BLACK);
+                    canvas.drawCircle(cx - size * 0.2f, cy - size * 0.1f, size * 0.1f, p);
+                    canvas.drawCircle(cx + size * 0.2f, cy - size * 0.1f, size * 0.1f, p);
                 } else {
-                    // Standard Boom
+                    // Standard Boom (Shockwave)
                     canvas.drawCircle(cx, cy, size * 0.5f, p);
                     canvas.drawCircle(cx, cy, size, p);
                 }
@@ -797,6 +999,167 @@ public class NeonShopItem extends View {
                 canvas.drawRect(cx - r, cy, cx + r, cy + r, p);
                 break;
 
+            // --- TURKEY (Super Lig) ---
+            case "team_galatasaray":
+                drawBadgeIcon(canvas, cx, cy, r, Color.rgb(169, 4, 50), Color.rgb(253, 185, 19), Color.WHITE, "GS");
+                break;
+            case "team_fenerbahce":
+                drawBadgeIcon(canvas, cx, cy, r, Color.rgb(0, 32, 91), Color.YELLOW, Color.rgb(0, 32, 91), "FB");
+                break;
+            case "team_besiktas":
+                drawBadgeIcon(canvas, cx, cy, r, Color.BLACK, Color.WHITE, Color.BLACK, "BJK");
+                break;
+            case "team_trabzon":
+                drawBadgeIcon(canvas, cx, cy, r, Color.rgb(125, 0, 48), Color.rgb(105, 190, 221), Color.WHITE, "TS");
+                break;
+            case "team_basaksehir":
+                drawBadgeIcon(canvas, cx, cy, r, Color.rgb(22, 57, 100), Color.rgb(235, 96, 11), Color.WHITE, "IBFK");
+                break;
+            case "team_adana":
+                drawBadgeIcon(canvas, cx, cy, r, Color.rgb(40, 93, 161), Color.rgb(40, 93, 161), Color.WHITE, "ADS");
+                break; // Blue/Blue
+            case "team_samsun":
+                drawBadgeIcon(canvas, cx, cy, r, Color.RED, Color.WHITE, Color.RED, "SAM");
+                break;
+            case "team_goztepe":
+                drawBadgeIcon(canvas, cx, cy, r, Color.RED, Color.YELLOW, Color.RED, "GOZ");
+                break;
+            case "team_sivas":
+                drawBadgeIcon(canvas, cx, cy, r, Color.RED, Color.WHITE, Color.RED, "YGS");
+                break;
+            case "team_konya":
+                drawBadgeIcon(canvas, cx, cy, r, Color.rgb(0, 98, 65), Color.WHITE, Color.BLACK, "KON");
+                break;
+
+            // --- ENGLAND (Premier League) ---
+            case "team_man_city":
+                drawBadgeIcon(canvas, cx, cy, r, Color.rgb(108, 171, 221), Color.WHITE, Color.rgb(108, 171, 221),
+                        "MCI");
+                break;
+            case "team_arsenal":
+                drawBadgeIcon(canvas, cx, cy, r, Color.rgb(239, 1, 7), Color.WHITE, Color.rgb(239, 1, 7), "ARS");
+                break;
+            case "team_liverpool":
+                drawBadgeIcon(canvas, cx, cy, r, Color.rgb(200, 16, 46), Color.WHITE, Color.rgb(200, 16, 46), "LIV");
+                break;
+            case "team_aston_villa":
+                drawBadgeIcon(canvas, cx, cy, r, Color.rgb(149, 191, 229), Color.rgb(103, 14, 54), Color.YELLOW, "AVL");
+                break;
+            case "team_tottenham":
+                drawBadgeIcon(canvas, cx, cy, r, Color.rgb(19, 34, 87), Color.WHITE, Color.rgb(19, 34, 87), "TOT");
+                break;
+            case "team_chelsea":
+                drawBadgeIcon(canvas, cx, cy, r, Color.rgb(3, 70, 148), Color.WHITE, Color.rgb(3, 70, 148), "CHE");
+                break;
+            case "team_newcastle":
+                drawBadgeIcon(canvas, cx, cy, r, Color.BLACK, Color.WHITE, Color.BLACK, "NEW");
+                break;
+            case "team_man_utd":
+                drawBadgeIcon(canvas, cx, cy, r, Color.rgb(218, 41, 28), Color.BLACK, Color.YELLOW, "MUN");
+                break;
+            case "team_westham":
+                drawBadgeIcon(canvas, cx, cy, r, Color.rgb(122, 38, 58), Color.rgb(27, 177, 231), Color.WHITE, "WHU");
+                break;
+            case "team_brighton":
+                drawBadgeIcon(canvas, cx, cy, r, Color.rgb(0, 87, 184), Color.WHITE, Color.rgb(0, 87, 184), "BHA");
+                break;
+
+            // --- SPAIN (La Liga) ---
+            case "team_real_madrid":
+                drawBadgeIcon(canvas, cx, cy, r, Color.WHITE, Color.rgb(254, 190, 16), Color.BLACK, "RM");
+                break;
+            case "team_girona":
+                drawBadgeIcon(canvas, cx, cy, r, Color.RED, Color.WHITE, Color.RED, "GIR");
+                break;
+            case "team_barcelona":
+                drawBadgeIcon(canvas, cx, cy, r, Color.rgb(0, 77, 152), Color.rgb(165, 0, 68), Color.YELLOW, "BAR");
+                break;
+            case "team_atletico":
+                drawBadgeIcon(canvas, cx, cy, r, Color.rgb(203, 53, 36), Color.WHITE, Color.BLUE, "ATM");
+                break;
+            case "team_bilbao":
+                drawBadgeIcon(canvas, cx, cy, r, Color.RED, Color.BLACK, Color.WHITE, "ATH");
+                break;
+            case "team_sociedad":
+                drawBadgeIcon(canvas, cx, cy, r, Color.BLUE, Color.WHITE, Color.BLUE, "RSO");
+                break;
+            case "team_betis":
+                drawBadgeIcon(canvas, cx, cy, r, Color.rgb(0, 150, 69), Color.WHITE, Color.BLACK, "BET");
+                break;
+            case "team_valencia":
+                drawBadgeIcon(canvas, cx, cy, r, Color.WHITE, Color.BLACK, Color.BLACK, "VAL");
+                break;
+            case "team_villarreal":
+                drawBadgeIcon(canvas, cx, cy, r, Color.YELLOW, Color.YELLOW, Color.BLUE, "VIL");
+                break;
+            case "team_sevilla":
+                drawBadgeIcon(canvas, cx, cy, r, Color.WHITE, Color.RED, Color.BLACK, "SEV");
+                break;
+
+            // --- GERMANY (Bundesliga) ---
+            case "team_leverkusen":
+                drawBadgeIcon(canvas, cx, cy, r, Color.BLACK, Color.RED, Color.WHITE, "B04");
+                break;
+            case "team_bayern":
+                drawBadgeIcon(canvas, cx, cy, r, Color.rgb(220, 5, 45), Color.WHITE, Color.rgb(220, 5, 45), "FCB");
+                break;
+            case "team_stuttgart":
+                drawBadgeIcon(canvas, cx, cy, r, Color.WHITE, Color.RED, Color.BLACK, "VFB");
+                break;
+            case "team_leipzig":
+                drawBadgeIcon(canvas, cx, cy, r, Color.WHITE, Color.RED, Color.rgb(23, 23, 50), "RBL");
+                break;
+            case "team_dortmund":
+                drawBadgeIcon(canvas, cx, cy, r, Color.rgb(253, 225, 0), Color.BLACK, Color.rgb(253, 225, 0), "BVB");
+                break;
+            case "team_frankfurt":
+                drawBadgeIcon(canvas, cx, cy, r, Color.RED, Color.BLACK, Color.WHITE, "SGE");
+                break;
+            case "team_hoffenheim":
+                drawBadgeIcon(canvas, cx, cy, r, Color.BLUE, Color.WHITE, Color.BLUE, "TSG");
+                break;
+            case "team_bremen":
+                drawBadgeIcon(canvas, cx, cy, r, Color.rgb(0, 150, 69), Color.WHITE, Color.rgb(0, 150, 69), "SVW");
+                break;
+            case "team_freiburg":
+                drawBadgeIcon(canvas, cx, cy, r, Color.BLACK, Color.WHITE, Color.BLACK, "SCF");
+                break;
+            case "team_augsburg":
+                drawBadgeIcon(canvas, cx, cy, r, Color.WHITE, Color.rgb(186, 55, 51), Color.GREEN, "FCA");
+                break;
+
+            // --- FRANCE (Ligue 1) ---
+            case "team_psg":
+                drawBadgeIcon(canvas, cx, cy, r, Color.rgb(0, 65, 112), Color.RED, Color.WHITE, "PSG");
+                break;
+            case "team_monaco":
+                drawBadgeIcon(canvas, cx, cy, r, Color.RED, Color.WHITE, Color.rgb(203, 161, 53), "ASM");
+                break;
+            case "team_brest":
+                drawBadgeIcon(canvas, cx, cy, r, Color.RED, Color.WHITE, Color.RED, "SB29");
+                break;
+            case "team_lille":
+                drawBadgeIcon(canvas, cx, cy, r, Color.RED, Color.rgb(23, 23, 50), Color.WHITE, "LOSC");
+                break;
+            case "team_nice":
+                drawBadgeIcon(canvas, cx, cy, r, Color.BLACK, Color.RED, Color.WHITE, "OGC");
+                break;
+            case "team_lens":
+                drawBadgeIcon(canvas, cx, cy, r, Color.rgb(255, 215, 0), Color.RED, Color.BLACK, "RCL");
+                break;
+            case "team_marseille":
+                drawBadgeIcon(canvas, cx, cy, r, Color.WHITE, Color.rgb(137, 203, 235), Color.rgb(137, 203, 235), "OM");
+                break;
+            case "team_lyon":
+                drawBadgeIcon(canvas, cx, cy, r, Color.WHITE, Color.rgb(23, 23, 50), Color.rgb(218, 41, 28), "OL");
+                break;
+            case "team_rennes":
+                drawBadgeIcon(canvas, cx, cy, r, Color.RED, Color.BLACK, Color.WHITE, "SRFC");
+                break;
+            case "team_reims":
+                drawBadgeIcon(canvas, cx, cy, r, Color.RED, Color.WHITE, Color.RED, "SDR");
+                break;
+
             case "brazil":
                 p.setColor(Color.rgb(0, 153, 51));
                 canvas.drawCircle(cx, cy, r, p);
@@ -924,5 +1287,37 @@ public class NeonShopItem extends View {
 
     public String getItemName() {
         return itemName;
+    }
+
+    private void drawBadgeIcon(Canvas canvas, float cx, float cy, float r, int outerColor, int innerColor,
+            int textColor, String text) {
+        // Outer Board (Primary)
+        Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
+        p.setStyle(Paint.Style.FILL);
+        p.setColor(outerColor);
+        canvas.drawCircle(cx, cy, r, p);
+
+        // Inner Circle (Secondary)
+        p.setColor(innerColor);
+        canvas.drawCircle(cx, cy, r * 0.75f, p);
+
+        // Inner Ring (Outer Color again for contrast)
+        p.setStyle(Paint.Style.STROKE);
+        p.setStrokeWidth(r * 0.1f);
+        p.setColor(outerColor);
+        canvas.drawCircle(cx, cy, r * 0.70f, p);
+
+        // Text
+        p.setStyle(Paint.Style.FILL);
+        p.setColor(textColor);
+        p.setTextAlign(Paint.Align.CENTER);
+        p.setFakeBoldText(true);
+        // Adjust text size based on length
+        p.setTextSize(text.length() > 2 ? r * 0.6f : r * 0.8f);
+
+        // Center text vertically
+        Paint.FontMetrics fm = p.getFontMetrics();
+        float textY = cy - (fm.descent + fm.ascent) / 2;
+        canvas.drawText(text, cx, textY, p);
     }
 }

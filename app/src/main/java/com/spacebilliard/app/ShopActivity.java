@@ -129,6 +129,8 @@ public class ShopActivity extends Activity {
                 descriptionText.setTextSize(16);
                 descriptionText.setTypeface(Typeface.SERIF, Typeface.ITALIC);
                 descriptionText.setGravity(Gravity.CENTER);
+                descriptionText.setLines(3); // Fixed height to prevent jumping
+                descriptionText.setEllipsize(android.text.TextUtils.TruncateAt.END);
                 infoPanel.addView(descriptionText);
                 mainPanel.addView(infoPanel);
 
@@ -319,6 +321,102 @@ public class ShopActivity extends Activity {
                         addItem(grid, "INDONESIA", current.equals("indonesia"), Color.RED, "Indonesia Flag",
                                         "indonesia");
 
+                        // Soccer Teams
+                        // --- TURKEY (Super Lig) ---
+                        addItem(grid, "GALATASARAY", current.equals("team_galatasaray"), Color.rgb(169, 4, 50),
+                                        "Turkish Lions", "team_galatasaray");
+                        addItem(grid, "FENERBAHCE", current.equals("team_fenerbahce"), Color.rgb(0, 32, 91),
+                                        "Turkish Canaries", "team_fenerbahce");
+                        addItem(grid, "BESIKTAS", current.equals("team_besiktas"), Color.WHITE, "Turkish Eagles",
+                                        "team_besiktas");
+                        addItem(grid, "TRABZON", current.equals("team_trabzon"), Color.rgb(125, 0, 48), "Turkish Storm",
+                                        "team_trabzon");
+                        addItem(grid, "BASAKSEHIR", current.equals("team_basaksehir"), Color.rgb(235, 96, 11), "Owls",
+                                        "team_basaksehir");
+                        addItem(grid, "ADANA DEMIR", current.equals("team_adana"), Color.rgb(40, 93, 161),
+                                        "Blue Lightning", "team_adana");
+                        addItem(grid, "SAMSUN", current.equals("team_samsun"), Color.RED, "Red Lightning",
+                                        "team_samsun");
+                        addItem(grid, "GOZTEPE", current.equals("team_goztepe"), Color.YELLOW, "Goz Goz",
+                                        "team_goztepe");
+                        addItem(grid, "SIVAS", current.equals("team_sivas"), Color.RED, "Yigidos", "team_sivas");
+                        addItem(grid, "KONYA", current.equals("team_konya"), Color.GREEN, "Eagles", "team_konya");
+
+                        // --- ENGLAND (Premier League) ---
+                        addItem(grid, "MAN CITY", current.equals("team_man_city"), Color.CYAN, "Cityzens",
+                                        "team_man_city");
+                        addItem(grid, "ARSENAL", current.equals("team_arsenal"), Color.RED, "Gunners", "team_arsenal");
+                        addItem(grid, "LIVERPOOL", current.equals("team_liverpool"), Color.RED, "The Reds",
+                                        "team_liverpool");
+                        addItem(grid, "ASTON VILLA", current.equals("team_aston_villa"), Color.rgb(103, 14, 54),
+                                        "Villans", "team_aston_villa");
+                        addItem(grid, "TOTTENHAM", current.equals("team_tottenham"), Color.WHITE, "Spurs",
+                                        "team_tottenham");
+                        addItem(grid, "CHELSEA", current.equals("team_chelsea"), Color.BLUE, "The Blues",
+                                        "team_chelsea");
+                        addItem(grid, "NEWCASTLE", current.equals("team_newcastle"), Color.BLACK, "Magpies",
+                                        "team_newcastle");
+                        addItem(grid, "MAN UTD", current.equals("team_man_utd"), Color.RED, "Red Devils",
+                                        "team_man_utd");
+                        addItem(grid, "WEST HAM", current.equals("team_westham"), Color.rgb(122, 38, 58), "Hammers",
+                                        "team_westham");
+                        addItem(grid, "BRIGHTON", current.equals("team_brighton"), Color.BLUE, "Seagulls",
+                                        "team_brighton");
+
+                        // --- SPAIN (La Liga) ---
+                        addItem(grid, "R.MADRID", current.equals("team_real_madrid"), Color.WHITE, "Los Blancos",
+                                        "team_real_madrid");
+                        addItem(grid, "GIRONA", current.equals("team_girona"), Color.RED, "Gironistes", "team_girona");
+                        addItem(grid, "BARCELONA", current.equals("team_barcelona"), Color.rgb(165, 0, 68), "Blaugrana",
+                                        "team_barcelona");
+                        addItem(grid, "ATLETICO", current.equals("team_atletico"), Color.RED, "Colchoneros",
+                                        "team_atletico");
+                        addItem(grid, "ATH.BILBAO", current.equals("team_bilbao"), Color.RED, "Lions", "team_bilbao");
+                        addItem(grid, "SOCIEDAD", current.equals("team_sociedad"), Color.BLUE, "White & Blue",
+                                        "team_sociedad");
+                        addItem(grid, "BETIS", current.equals("team_betis"), Color.GREEN, "Beticos", "team_betis");
+                        addItem(grid, "VALENCIA", current.equals("team_valencia"), Color.WHITE, "The Bats",
+                                        "team_valencia");
+                        addItem(grid, "VILLARREAL", current.equals("team_villarreal"), Color.YELLOW, "Yellow Sub",
+                                        "team_villarreal");
+                        addItem(grid, "SEVILLA", current.equals("team_sevilla"), Color.WHITE, "Sevillistas",
+                                        "team_sevilla");
+
+                        // --- GERMANY (Bundesliga) ---
+                        addItem(grid, "LEVERKUSEN", current.equals("team_leverkusen"), Color.BLACK, "Die Werkself",
+                                        "team_leverkusen");
+                        addItem(grid, "BAYERN", current.equals("team_bayern"), Color.RED, "The Bavarians",
+                                        "team_bayern");
+                        addItem(grid, "STUTTGART", current.equals("team_stuttgart"), Color.WHITE, "Die Schwaben",
+                                        "team_stuttgart");
+                        addItem(grid, "LEIPZIG", current.equals("team_leipzig"), Color.WHITE, "Red Bulls",
+                                        "team_leipzig");
+                        addItem(grid, "DORTMUND", current.equals("team_dortmund"), Color.YELLOW, "Black & Yellow",
+                                        "team_dortmund");
+                        addItem(grid, "FRANKFURT", current.equals("team_frankfurt"), Color.RED, "The Eagles",
+                                        "team_frankfurt");
+                        addItem(grid, "HOFFENHEIM", current.equals("team_hoffenheim"), Color.BLUE, "Die Kraichgauer",
+                                        "team_hoffenheim");
+                        addItem(grid, "BREMEN", current.equals("team_bremen"), Color.GREEN, "Werder", "team_bremen");
+                        addItem(grid, "FREIBURG", current.equals("team_freiburg"), Color.BLACK, "Breisgau",
+                                        "team_freiburg");
+                        addItem(grid, "AUGSBURG", current.equals("team_augsburg"), Color.WHITE, "Fugger",
+                                        "team_augsburg");
+
+                        // --- FRANCE (Ligue 1) ---
+                        addItem(grid, "PSG", current.equals("team_psg"), Color.BLUE, "Les Parisiens", "team_psg");
+                        addItem(grid, "MONACO", current.equals("team_monaco"), Color.RED, "Les Monegasques",
+                                        "team_monaco");
+                        addItem(grid, "BREST", current.equals("team_brest"), Color.RED, "Les Pirates", "team_brest");
+                        addItem(grid, "LILLE", current.equals("team_lille"), Color.RED, "Les Dogues", "team_lille");
+                        addItem(grid, "NICE", current.equals("team_nice"), Color.BLACK, "Les Aiglons", "team_nice");
+                        addItem(grid, "LENS", current.equals("team_lens"), Color.YELLOW, "Sang et Or", "team_lens");
+                        addItem(grid, "MARSEILLE", current.equals("team_marseille"), Color.CYAN, "Les Phoceens",
+                                        "team_marseille");
+                        addItem(grid, "LYON", current.equals("team_lyon"), Color.WHITE, "Les Gones", "team_lyon");
+                        addItem(grid, "RENNES", current.equals("team_rennes"), Color.RED, "Les Rouges", "team_rennes");
+                        addItem(grid, "REIMS", current.equals("team_reims"), Color.RED, "Les Rouges", "team_reims");
+
                         // Premium
                         addItem(grid, "CYBER", current.equals("cyber_core"), Color.CYAN, "Metallic Cyber Core",
                                         "cyber_core");
@@ -329,35 +427,48 @@ public class ShopActivity extends Activity {
 
                 } else if (currentCategory == 1) { // TRAILS
                         String currentTrail = prefs.getString("selectedTrail", "none");
-                        addItem(grid, "RED TRAIL", currentTrail.equals("red"), Color.RED, "Basic Red Path",
-                                        "trail_red");
-                        addItem(grid, "BLUE TRAIL", currentTrail.equals("blue"), Color.BLUE, "Basic Blue Path",
+                        addItem(grid, "RED", currentTrail.contains("red"), Color.RED, "Basic Red Path", "trail_red");
+                        addItem(grid, "BLUE", currentTrail.contains("blue"), Color.BLUE, "Basic Blue Path",
                                         "trail_blue");
-                        addItem(grid, "GREEN TRAIL", currentTrail.equals("green"), Color.GREEN, "Basic Green Path",
+                        addItem(grid, "GREEN", currentTrail.contains("green"), Color.GREEN, "Basic Green Path",
                                         "trail_green");
-                        addItem(grid, "GOLD TRAIL", currentTrail.equals("gold"), Color.rgb(255, 215, 0),
+                        addItem(grid, "GOLD", currentTrail.contains("gold"), Color.rgb(255, 215, 0),
                                         "Golden Luxury Path", "trail_gold");
-                        addItem(grid, "NEON TRAIL", currentTrail.equals("neon"), Color.CYAN, "Bright Neon Light",
+                        addItem(grid, "NEON", currentTrail.contains("neon"), Color.CYAN, "Bright Neon Light",
                                         "trail_neon");
-                        addItem(grid, "COSMIC", currentTrail.equals("cosmic"), Color.MAGENTA, "Cosmic Dust",
+                        addItem(grid, "COSMIC", currentTrail.contains("cosmic"), Color.MAGENTA, "Cosmic Dust",
                                         "trail_cosmic");
-                        addItem(grid, "LAVA", currentTrail.equals("lava"), Color.rgb(255, 69, 0), "Lava Trail",
+                        addItem(grid, "LAVA", currentTrail.contains("lava"), Color.rgb(255, 69, 0), "Lava Trail",
                                         "trail_lava");
-                        addItem(grid, "ELECTRIC", currentTrail.equals("electric"), Color.CYAN, "Electric Spark Path",
+                        addItem(grid, "ELECTRIC", currentTrail.contains("electric"), Color.CYAN, "Electric Spark Path",
                                         "trail_electric");
-                        addItem(grid, "RAINBOW", currentTrail.equals("rainbow"), Color.WHITE, "Rainbow Path",
+                        addItem(grid, "RAINBOW", currentTrail.contains("rainbow"), Color.WHITE, "Rainbow Path",
                                         "trail_rainbow");
-                        addItem(grid, "GHOST", currentTrail.equals("ghost"), Color.WHITE, "Ghost Fade Path",
+                        addItem(grid, "GHOST", currentTrail.contains("ghost"), Color.WHITE, "Ghost Fade Path",
                                         "trail_ghost");
-                        addItem(grid, "BUBBLE", currentTrail.equals("bubble"), Color.CYAN, "Blue Bubble Path",
+                        addItem(grid, "BUBBLE", currentTrail.contains("bubble"), Color.CYAN, "Blue Bubble Path",
                                         "trail_bubble");
-                        addItem(grid, "PIXEL", currentTrail.equals("pixel"), Color.GREEN, "Green Pixel Path",
+                        addItem(grid, "PIXEL", currentTrail.contains("pixel"), Color.GREEN, "Green Pixel Path",
                                         "trail_pixel");
-                        // New Trails
-                        addItem(grid, "DNA", currentTrail.equals("dna"), Color.MAGENTA, "Double Helix Trails",
+                        addItem(grid, "DNA", currentTrail.contains("dna"), Color.MAGENTA, "Double Helix Trails",
                                         "trail_dna");
-                        addItem(grid, "SPARKLE", currentTrail.equals("sparkle"), Color.YELLOW, "Glittering Sparkles",
+                        addItem(grid, "SPARKLE", currentTrail.contains("sparkle"), Color.YELLOW, "Glittering Sparkles",
                                         "trail_sparkle");
+                        // New Trails
+                        addItem(grid, "MATRIX", currentTrail.contains("matrix"), Color.GREEN, "Digital Rain Path",
+                                        "trail_matrix");
+                        addItem(grid, "SAKURA", currentTrail.contains("sakura"), Color.rgb(255, 183, 197),
+                                        "Cherry Blossom", "trail_sakura");
+                        addItem(grid, "VOID", currentTrail.contains("void"), Color.LTGRAY, "Abyssal Void Path",
+                                        "trail_void");
+                        addItem(grid, "CRYSTAL", currentTrail.contains("crystal"), Color.CYAN, "Crystal Shards",
+                                        "trail_crystal");
+                        addItem(grid, "MUSIC", currentTrail.contains("music"), Color.WHITE, "Melodic Notes",
+                                        "trail_music");
+                        addItem(grid, "HEARTBEAT", currentTrail.contains("heartbeat"), Color.RED, "Cardio Pulse",
+                                        "trail_heartbeat");
+                        addItem(grid, "COMET", currentTrail.contains("comet"), Color.rgb(255, 140, 0),
+                                        "Cosmic Fireball", "trail_comet");
 
                 } else if (currentCategory == 2) { // SIGHTS
                         String currentTraj = prefs.getString("selectedTrajectory", "dashed");
@@ -369,6 +480,30 @@ public class ShopActivity extends Activity {
                                         "traj_dots");
                         addItem(grid, "PLASMA SIGHT", currentTraj.equals("plasma"), Color.MAGENTA,
                                         "Glowing Plasma Guide", "traj_plasma");
+
+                        // New Unique Sights
+                        addItem(grid, "SNIPER", currentTraj.equals("sniper"), Color.RED, "Crosshair Markers",
+                                        "traj_sniper");
+                        addItem(grid, "DOUBLE", currentTraj.equals("double"), Color.CYAN, "Twin Parallel Lines",
+                                        "traj_double");
+                        addItem(grid, "RAINBOW", currentTraj.equals("rainbow"), Color.YELLOW, "Color Shifting Path",
+                                        "traj_rainbow");
+                        addItem(grid, "DASHDOT", currentTraj.equals("dashdot"), Color.WHITE, "Morse Code Style",
+                                        "traj_dashdot");
+                        addItem(grid, "STARS", currentTraj.equals("stars"), Color.YELLOW, "Starry Path",
+                                        "traj_stars");
+                        addItem(grid, "HEARTS", currentTraj.equals("hearts"), Color.rgb(255, 105, 180),
+                                        "Floating Hearts",
+                                        "traj_hearts");
+                        addItem(grid, "TECH", currentTraj.equals("tech"), Color.rgb(0, 255, 0), "Circuit Board Path",
+                                        "traj_tech");
+                        addItem(grid, "SNAKE", currentTraj.equals("snake"), Color.GREEN, "Winding S-Curve",
+                                        "traj_snake");
+                        addItem(grid, "CHEVRON", currentTraj.equals("chevron"), Color.rgb(255, 165, 0),
+                                        "Forward Arrows",
+                                        "traj_chevron");
+                        addItem(grid, "FIRE", currentTraj.equals("fire"), Color.rgb(255, 69, 0), "Burning Flame Path",
+                                        "traj_fire");
                         addItem(grid, "ARROW SIGHT", currentTraj.equals("arrow"), Color.GREEN, "Arrow Guide",
                                         "traj_arrow");
                         addItem(grid, "WAVE SIGHT", currentTraj.equals("wave"), Color.CYAN, "Sine Wave Guide",
@@ -381,19 +516,36 @@ public class ShopActivity extends Activity {
 
                 } else if (currentCategory == 3) { // EFFECTS
                         String currentBoom = prefs.getString("selectedImpact", "classic");
-                        addItem(grid, "STAR BURST", currentBoom.equals("stars"), Color.YELLOW, "Explode into Stars!",
-                                        "impact_stars");
-                        addItem(grid, "ELEC BOOM", currentBoom.equals("electric"), Color.CYAN, "Electric Shockwave!",
-                                        "impact_electric");
-                        addItem(grid, "RIPPLE", currentBoom.equals("ripple"), Color.BLUE, "Water Ripple",
-                                        "impact_ripple");
-                        addItem(grid, "CONFETTI", currentBoom.equals("confetti"), Color.MAGENTA, "Party Confetti",
-                                        "impact_confetti");
-                        // New Effects
+                        // 1. Classic (Shockwave)
+                        addItem(grid, "SHOCKWAVE", currentBoom.equals("classic"), Color.WHITE, "Classic Shockwave",
+                                        "classic");
+                        // 2. Pixel
+                        addItem(grid, "PIXEL", currentBoom.equals("pixel"), Color.GREEN, "Retro Pixel Burst",
+                                        "impact_pixel");
+                        // 3. Vortex
                         addItem(grid, "VORTEX", currentBoom.equals("vortex"), Color.rgb(100, 0, 255), "Swirling Vortex",
                                         "impact_vortex");
-                        addItem(grid, "SHATTER", currentBoom.equals("shatter"), Color.WHITE, "Glass Shatter Effect",
-                                        "impact_shatter");
+                        // 4. Sparks
+                        addItem(grid, "SPARKS", currentBoom.equals("sparks"), Color.YELLOW, "Flying Sparks",
+                                        "impact_sparks");
+                        // 5. Hearts
+                        addItem(grid, "HEARTS", currentBoom.equals("hearts"), Color.RED, "Lovely Hearts",
+                                        "impact_hearts");
+                        // 6. Skull
+                        addItem(grid, "SKULL", currentBoom.equals("skull"), Color.LTGRAY, "Deadly Skulls",
+                                        "impact_skull");
+                        // 7. Music
+                        addItem(grid, "MUSIC", currentBoom.equals("music"), Color.CYAN, "Musical Notes",
+                                        "impact_music");
+                        // 8. Lightning
+                        addItem(grid, "LIGHTNING", currentBoom.equals("lightning"), Color.CYAN, "Electric Storm",
+                                        "impact_lightning");
+                        // 9. Confetti
+                        addItem(grid, "CONFETTI", currentBoom.equals("confetti"), Color.MAGENTA, "Party Confetti",
+                                        "impact_confetti");
+                        // 10. Ghost
+                        addItem(grid, "GHOST", currentBoom.equals("ghost"), Color.WHITE, "Spooky Ghosts",
+                                        "impact_ghost");
                 }
         }
 
@@ -428,8 +580,12 @@ public class ShopActivity extends Activity {
                                 // Or explicitly list them.
 
                                 // Explicit pricing for "newest" feeling
-                                if (skinId.equals("trail_dna") || skinId.equals("trail_sparkle")
-                                                || skinId.equals("trail_pixel"))
+                                if (skinId.contains("dna") || skinId.contains("sparkle")
+                                                || skinId.contains("pixel") || skinId.contains("matrix")
+                                                || skinId.contains("sakura")
+                                                || skinId.contains("void") || skinId.contains("crystal")
+                                                || skinId.contains("music")
+                                                || skinId.contains("heartbeat") || skinId.contains("comet"))
                                         price = 40;
                                 else if (skinId.equals("trail_ghost") || skinId.equals("trail_bubble")
                                                 || skinId.equals("trail_rainbow"))
@@ -439,10 +595,21 @@ public class ShopActivity extends Activity {
                                         price = 35;
                                 else
                                         price = 30; // Basic trails
+                                price = 30; // Basic trails
                         } else if (currentCategory == 2) {
-                                price = 5; // Sights
+                                if (skinId.equals("traj_sniper") || skinId.equals("traj_double")
+                                                || skinId.equals("traj_rainbow") ||
+                                                skinId.equals("traj_dashdot") || skinId.equals("traj_stars")
+                                                || skinId.equals("traj_hearts") ||
+                                                skinId.equals("traj_tech") || skinId.equals("traj_snake")
+                                                || skinId.equals("traj_chevron") ||
+                                                skinId.equals("traj_fire")) {
+                                        price = 25; // Premium Sights
+                                } else {
+                                        price = 5; // Basic Sights
+                                }
                         } else if (currentCategory == 3) {
-                                price = 15; // Effects
+                                price = 50; // Effects Price
                         }
                 }
 
@@ -484,12 +651,18 @@ public class ShopActivity extends Activity {
                                 selectedItemOwned = true;
                         } else {
                                 // NOT OWNED -> SELECT FOR PURCHASE
-                                selectedItemId = finalSkinId;
-                                selectedItemPrice = finalPrice;
-                                selectedItemOwned = false;
+                                if (finalSkinId.equals(selectedItemId)) {
+                                        // SECOND TAP -> BUY
+                                        handlePurchase();
+                                } else {
+                                        // FIRST TAP -> SELECT
+                                        selectedItemId = finalSkinId;
+                                        selectedItemPrice = finalPrice;
+                                        selectedItemOwned = false;
 
-                                descriptionText.setText(description + "\n\n💰 " + finalPrice
-                                                + " coins - Press BUY to purchase");
+                                        descriptionText.setText(description + "\n\n💰 " + finalPrice
+                                                        + " coins - Tap again to BUY");
+                                }
                         }
                 });
 
