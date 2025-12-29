@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.spacebilliard.app-mergeDebugResources-16:/values-ta/values-ta.xml",
+            "outputFile": "com.spacebilliard.app-mergeDebugResources-23:/values-ta/values-ta.xml",
             "map": [
                 {
                     "source": "C:\\Users\\raufk\\.gradle\\caches\\9.0-milestone-1\\transforms\\bba0f5a7539fa5c4c472fd516c09f271\\transformed\\jetified-play-services-base-18.0.0\\res\\values-ta\\values.xml",
@@ -55,6 +55,23 @@
                     }
                 },
                 {
+                    "source": "C:\\Users\\raufk\\.gradle\\caches\\9.0-milestone-1\\transforms\\1d55769f61e2e54889e43374c247969a\\transformed\\browser-1.7.0\\res\\values-ta\\values-ta.xml",
+                    "from": {
+                        "startLines": "2,3,4,5",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "55,172,274,381",
+                        "endColumns": "116,101,106,103",
+                        "endOffsets": "167,269,376,480"
+                    },
+                    "to": {
+                        "startLines": "27,28,29,30",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "3037,3154,3256,3363",
+                        "endColumns": "116,101,106,103",
+                        "endOffsets": "3149,3251,3358,3462"
+                    }
+                },
+                {
                     "source": "C:\\Users\\raufk\\.gradle\\caches\\9.0-milestone-1\\transforms\\92af7687f5e7bd1f73aa69f8ea3ffdab\\transformed\\jetified-play-services-basement-18.2.0\\res\\values-ta\\values.xml",
                     "from": {
                         "startLines": "4",
@@ -69,23 +86,6 @@
                         "startOffsets": "1785",
                         "endColumns": "160",
                         "endOffsets": "1941"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\raufk\\.gradle\\caches\\9.0-milestone-1\\transforms\\f068a5336ae1f79b32ab2bf54899d1f1\\transformed\\browser-1.4.0\\res\\values-ta\\values-ta.xml",
-                    "from": {
-                        "startLines": "2,3,4,5",
-                        "startColumns": "4,4,4,4",
-                        "startOffsets": "55,172,274,381",
-                        "endColumns": "116,101,106,103",
-                        "endOffsets": "167,269,376,480"
-                    },
-                    "to": {
-                        "startLines": "27,28,29,30",
-                        "startColumns": "4,4,4,4",
-                        "startOffsets": "3037,3154,3256,3363",
-                        "endColumns": "116,101,106,103",
-                        "endOffsets": "3149,3251,3358,3462"
                     }
                 }
             ]

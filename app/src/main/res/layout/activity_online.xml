@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#05050A"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- Header -->
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🌐 ONLINE MODE"
+            android:textColor="#00F2FF"
+            android:textSize="26sp"
+            android:textStyle="bold|italic"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:paddingRight="8dp"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- Commander Card -->
+        <LinearLayout
+            android:id="@+id/cardCommander"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_card"
+            android:orientation="vertical"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp">
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="USERNAME"
+                android:textColor="#888888"
+                android:textSize="10sp"/>
+                
+            <EditText
+                android:id="@+id/editCommanderName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter username"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#666666"
+                android:background="@android:color/transparent"
+                android:paddingTop="4dp"
+                android:textStyle="bold"
+                android:textSize="14sp"/>
+        </LinearLayout>
+
+        <!-- Room Selection Card -->
+        <LinearLayout
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:background="@drawable/bg_card"
+             android:orientation="vertical"
+             android:padding="12dp"
+             android:layout_marginBottom="12dp">
+
+             <TextView
+                  android:text="MISSION IDENTIFIER"
+                  android:textSize="10sp"
+                  android:textColor="#888888"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_marginBottom="6dp"/>
+
+             <EditText
+                android:id="@+id/editRoomName"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:hint="Room Name..."
+                android:textColorHint="#444444"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/bg_input_field"
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp"
+                android:textSize="14sp"
+                android:layout_marginBottom="10dp"/>
+             
+            <LinearLayout
+                android:id="@+id/actionButtons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnCreateRoom"
+                    android:layout_width="0dp"
+                    android:layout_height="45dp"
+                    android:layout_weight="1"
+                    android:text="CREATE"
+                    android:background="@drawable/bg_button_green"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    android:layout_marginRight="6dp"
+                    android:clickable="true"
+                    android:focusable="true"/>
+
+                <Button
+                    android:id="@+id/btnRefresh"
+                    android:layout_width="0dp"
+                    android:layout_height="45dp"
+                    android:layout_weight="1"
+                    android:text="REFRESH"
+                    android:background="@drawable/bg_button_refresh"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    android:layout_marginLeft="6dp"
+                    android:clickable="true"
+                    android:focusable="true"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Available Missions Header -->
+        <TextView
+            android:id="@+id/headerMissions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="AVAILABLE MISSIONS"
+            android:textColor="#FF1493"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Room List Container -->
+        <LinearLayout
+             android:id="@+id/roomListContainer"
+             android:layout_width="match_parent"
+             android:layout_height="0dp"
+             android:layout_weight="1"
+             android:minHeight="80dp"
+             android:orientation="vertical"
+             android:layout_marginBottom="16dp">
+             <!-- Items will be added here -->
+        </LinearLayout>
+
+        <!-- Win/Loss Stats - Two Cards (Reduced Size) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+            
+            <!-- Wins Card -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_win"
+                android:padding="6dp"
+                android:gravity="center"
+                android:layout_marginRight="6dp">
+                
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="WINS"
+                    android:textColor="#00FFAA"
+                    android:textSize="9sp"
+                    android:textStyle="bold"/>
+                    
+                <TextView
+                    android:id="@+id/textWins"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="#00FFAA"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="2dp"/>
+            </LinearLayout>
+
+            <!-- Losses Card -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card_loss"
+                android:padding="6dp"
+                android:gravity="center"
+                android:layout_marginLeft="6dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="LOSSES"
+                    android:textColor="#FF4466"
+                    android:textSize="9sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/textLosses"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="#FF4466"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="2dp"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnBack"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="BACK TO MENU"
+            android:background="@drawable/bg_button_red"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="14sp"/>
+
+    </LinearLayout>
+</ScrollView>

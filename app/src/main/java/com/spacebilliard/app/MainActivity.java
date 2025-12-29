@@ -15,7 +15,7 @@ import android.widget.LinearLayout;
 import com.spacebilliard.app.ui.NeonButton;
 import com.spacebilliard.app.ui.NeonInfoPanel;
 import com.spacebilliard.app.ui.NeonPowerPanel;
-import com.spacebilliard.app.ui.NeonMainMenuPanel;
+
 import com.spacebilliard.app.ui.NeonGameOverPanel;
 
 // AdMob imports
@@ -35,8 +35,9 @@ public class MainActivity extends Activity {
     private NeonInfoPanel infoPanel;
     private NeonPowerPanel powerPanel;
 
-    // New UI Panels
-    private NeonMainMenuPanel mainMenuPanel;
+    // Removed UI Panels
+    // private NeonMainMenuPanel mainMenuPanel; // Moved to MainMenuActivity
+
     private NeonGameOverPanel gameOverPanel;
 
     // AdMob fields
@@ -128,55 +129,45 @@ public class MainActivity extends Activity {
 
         root.addView(bannerAd);
 
-        // --- Initialize New Panels ---
-
-        // Main Menu Panel
-        mainMenuPanel = new NeonMainMenuPanel(this);
+        // Game Over Panel
+        gameOverPanel = new NeonGameOverPanel(this);
         FrameLayout.LayoutParams menuParams = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
-        mainMenuPanel.setLayoutParams(menuParams);
-        root.addView(mainMenuPanel);
-
-        // Game Over Panel
-        gameOverPanel = new NeonGameOverPanel(this);
         gameOverPanel.setLayoutParams(menuParams);
         gameOverPanel.setVisibility(View.GONE); // Initially hidden
         root.addView(gameOverPanel);
 
         // --- Setup Listeners ---
-        setupMainMenuListeners();
+        // setupMainMenuListeners(); // Gone
         setupGameOverListeners();
 
         setContentView(root);
+
+        // Handle incoming intent actions (HowTo, HoF)
+        boolean handled = handleIntentActions();
+
+        // Only start game if we didn't open a special panel
+        if (!handled) {
+            gameView.startGame();
+        }
     }
 
-    private void setupMainMenuListeners() {
-        mainMenuPanel.btnStart.setOnClickListener(v -> {
-            gameView.startGame();
-            hideAllPanels();
-        });
-
-        mainMenuPanel.btnShop.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, ShopActivity.class);
-            startActivity(intent);
-        });
-
-        mainMenuPanel.btnPlayOnline.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, OnlineActivity.class);
-            startActivity(intent);
-        });
-
-        mainMenuPanel.btnHowTo.setOnClickListener(v -> {
-            gameView.showInstructions();
-            // main menu stays visible? No, instructions overlay handles it
-            mainMenuPanel.setVisibility(View.GONE);
-        });
-
-        mainMenuPanel.btnHallOfFame.setOnClickListener(v -> {
-            gameView.showHighScore();
-            mainMenuPanel.setVisibility(View.GONE);
-        });
+    // Returns true if an action was handled (HoF or Instructions opened)
+    private boolean handleIntentActions() {
+        if (getIntent() != null) {
+            String action = getIntent().getStringExtra("ACTION");
+            if (action != null) {
+                if (action.equals("SHOW_HOWTO")) {
+                    gameView.showInstructions();
+                    return true;
+                } else if (action.equals("SHOW_HOF")) {
+                    gameView.showHighScore();
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private void setupGameOverListeners() {
@@ -196,30 +187,35 @@ public class MainActivity extends Activity {
 
         gameOverPanel.btnMainMenu.setOnClickListener(v -> {
             gameView.resetToMainMenu();
-            showMainMenu();
+            finish(); // Return to MainMenuActivity
         });
     }
 
     // UI Helpers
 
-    public void showMainMenu() {
-        runOnUiThread(() -> {
-            mainMenuPanel.setVisibility(View.VISIBLE);
-            gameOverPanel.setVisibility(View.GONE);
-        });
-    }
+    // showMainMenu method removed as we use an Activity now
 
     public void showGameOverScreen() {
         runOnUiThread(() -> {
             gameOverPanel.setVisibility(View.VISIBLE);
-            mainMenuPanel.setVisibility(View.GONE);
+
+            // Hide top panels in Game Over too
+            if (infoPanel != null)
+                infoPanel.setVisibility(View.GONE);
+            if (powerPanel != null)
+                powerPanel.setVisibility(View.GONE);
         });
     }
 
     public void hideAllPanels() {
         runOnUiThread(() -> {
-            mainMenuPanel.setVisibility(View.GONE);
             gameOverPanel.setVisibility(View.GONE);
+
+            // Show Info/Power panels when in game
+            if (infoPanel != null)
+                infoPanel.setVisibility(View.VISIBLE);
+            if (powerPanel != null)
+                powerPanel.setVisibility(View.VISIBLE);
         });
     }
 

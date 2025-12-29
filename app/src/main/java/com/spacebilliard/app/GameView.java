@@ -429,7 +429,7 @@ public class GameView extends SurfaceView implements Runnable {
                 mainActivity.showGameOverScreen();
             } else if (!gameStarted && !gameCompleted) {
                 // Main Menu
-                mainActivity.showMainMenu();
+                mainActivity.finish();
             } else {
                 // In Game
                 mainActivity.hideAllPanels();

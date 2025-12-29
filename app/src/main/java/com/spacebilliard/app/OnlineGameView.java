@@ -31,6 +31,8 @@ public class OnlineGameView extends SurfaceView implements Runnable {
     private Ball hostBall, guestBall;
     private ArrayList<Ball> coloredBalls = new ArrayList<>();
     private ArrayList<Particle> particles = new ArrayList<>();
+    // Object Pool for Balls to reduce GC pressure
+    private ArrayList<Ball> ballPool = new ArrayList<>();
 
     // Online
     private OnlineGameManager gameManager;
@@ -51,6 +53,7 @@ public class OnlineGameView extends SurfaceView implements Runnable {
     private float dragStartX, dragStartY;
     private float currentTouchX, currentTouchY;
     private Ball myBall;
+    private long lastShotTime = 0; // Cooldown tracker
 
     public OnlineGameView(Context context) {
         super(context);
@@ -100,13 +103,13 @@ public class OnlineGameView extends SurfaceView implements Runnable {
                 if (hostBall == null)
                     hostBall = new Ball(x, y, ballRadius, color);
 
-                // Don't update position if we're dragging this ball
+                // Direct position update (no interpolation)
                 if (!(isDragging && isHost)) {
                     hostBall.x = x;
                     hostBall.y = y;
                 }
                 hostBall.color = color;
-                hostBall.radius = ballRadius; // Always update
+                hostBall.radius = ballRadius;
             }
 
             if (guestJson != null && !guestJson.equals("null")) {
@@ -117,45 +120,47 @@ public class OnlineGameView extends SurfaceView implements Runnable {
                 if (guestBall == null)
                     guestBall = new Ball(x, y, ballRadius, color);
 
-                // Don't update position if we're dragging this ball
+                // Direct position update (no interpolation)
                 if (!(isDragging && !isHost)) {
                     guestBall.x = x;
                     guestBall.y = y;
                 }
                 guestBall.color = color;
-                guestBall.radius = ballRadius; // Always update
+                guestBall.radius = ballRadius;
             }
 
             if (ballsJson != null && !ballsJson.equals("null")) {
                 JSONArray arr = new JSONArray(ballsJson);
                 synchronized (coloredBalls) {
-                    // Check for destroyed balls (explosion effect)
-                    if (arr.length() < coloredBalls.size()) {
-                        // Ball was destroyed! Create explosion
-                        for (Ball ball : coloredBalls) {
-                            boolean found = false;
-                            for (int i = 0; i < arr.length(); i++) {
-                                JSONObject b = arr.getJSONObject(i);
-                                float bx = (float) b.optDouble("x", 0.5) * screenWidth;
-                                float by = (float) b.optDouble("y", 0.5) * screenHeight;
-                                if (Math.abs(ball.x - bx) < 10 && Math.abs(ball.y - by) < 10) {
-                                    found = true;
-                                    break;
-                                }
-                            }
-                            if (!found) {
-                                createExplosion(ball.x, ball.y, ball.color);
-                            }
+                    int newCount = arr.length();
+
+                    // 1. Add needed balls from pool or create new ones
+                    while (coloredBalls.size() < newCount) {
+                        if (!ballPool.isEmpty()) {
+                            coloredBalls.add(ballPool.remove(ballPool.size() - 1));
+                        } else {
+                            coloredBalls.add(new Ball(0, 0, 0, 0));
                         }
                     }
 
-                    coloredBalls.clear();
-                    for (int i = 0; i < arr.length(); i++) {
+                    // 2. Remove excess balls to pool
+                    while (coloredBalls.size() > newCount) {
+                        Ball removed = coloredBalls.remove(coloredBalls.size() - 1);
+                        ballPool.add(removed);
+                    }
+
+                    // 3. Update properties of active balls (direct updates, no interpolation)
+                    for (int i = 0; i < newCount; i++) {
                         JSONObject b = arr.getJSONObject(i);
                         float x = (float) b.optDouble("x", 0.5) * screenWidth;
                         float y = (float) b.optDouble("y", 0.5) * screenHeight;
                         int color = Color.parseColor(b.optString("color", "#FF0055"));
-                        coloredBalls.add(new Ball(x, y, circleRadius * 0.055f, color));
+
+                        Ball ball = coloredBalls.get(i);
+                        ball.x = x;
+                        ball.y = y;
+                        ball.color = color;
+                        ball.radius = circleRadius * 0.055f;
                     }
                 }
             }
@@ -164,7 +169,7 @@ public class OnlineGameView extends SurfaceView implements Runnable {
         }
     }
 
-    private void createExplosion(float x, float y, int color) {
+    public void createExplosion(float x, float y, int color) {
         // Create 30 particles for explosion (synchronized)
         synchronized (particles) {
             for (int i = 0; i < 30; i++) {
@@ -211,6 +216,11 @@ public class OnlineGameView extends SurfaceView implements Runnable {
         float touchX = event.getX();
         float touchY = event.getY();
 
+        // Check cooldown (0.75s wait)
+        if (System.currentTimeMillis() - lastShotTime < 750) {
+            return true;
+        }
+
         myBall = isHost ? hostBall : guestBall;
         if (myBall == null)
             return true;
@@ -223,7 +233,6 @@ public class OnlineGameView extends SurfaceView implements Runnable {
             case MotionEvent.ACTION_DOWN:
                 // NEW: Allow grabbing ball from anywhere in bottom 40% of screen
                 // Check if touch is in bottom zone (red area)
-                // Check if touch is in bottom zone (red area)
                 if (touchY >= bottomZoneStart) {
                     isDragging = true;
                     dragStartX = touchX;
@@ -231,9 +240,11 @@ public class OnlineGameView extends SurfaceView implements Runnable {
                     currentTouchX = touchX;
                     currentTouchY = touchY;
 
-                    // Stop the ball on the server so it doesn't keep hitting things while aiming!
-                    if (gameManager != null) {
-                        gameManager.sendStopBall();
+                    // Stop the ball on the server AND freeze it at current visual position
+                    if (gameManager != null && myBall != null) {
+                        float normX = myBall.x / screenWidth;
+                        float normY = myBall.y / screenHeight;
+                        gameManager.sendStopBall(normX, normY);
                     }
                 }
                 // ALSO Check if touching the ball directly (Classic control)
@@ -250,7 +261,9 @@ public class OnlineGameView extends SurfaceView implements Runnable {
                         currentTouchY = touchY;
 
                         if (gameManager != null) {
-                            gameManager.sendStopBall();
+                            float normX = myBall.x / screenWidth;
+                            float normY = myBall.y / screenHeight;
+                            gameManager.sendStopBall(normX, normY);
                         }
                     }
                 }
@@ -277,6 +290,10 @@ public class OnlineGameView extends SurfaceView implements Runnable {
                         float normX = myBall.x / screenWidth;
                         float normY = myBall.y / screenHeight;
                         gameManager.sendShot(angle, power, normX, normY);
+
+                        // Set cooldown
+                        lastShotTime = System.currentTimeMillis();
+
                         // Create drag trail particles (synchronized)
                         synchronized (particles) {
                             for (int i = 0; i < 10; i++) {
@@ -369,14 +386,16 @@ public class OnlineGameView extends SurfaceView implements Runnable {
             paint.setColor(Color.WHITE);
             paint.setTextSize(60);
             paint.setTextAlign(Paint.Align.CENTER);
-            canvas.drawText(String.format("Time: %d", timeLeft / 1000), centerX, centerY + circleRadius + 120, paint);
+            // Time display removed (shown in score panel instead)
+            // canvas.drawText(String.format("Time: %d", timeLeft / 1000), centerX, centerY
+            // + circleRadius + 120, paint);
         }
 
         // Draw Set Finished Overlay
         if (setFinishedAlpha > 0) {
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(Color.YELLOW);
-            paint.setTextSize(120); // Bigger text
+            paint.setTextSize(100); // Bigger text
             paint.setAlpha(setFinishedAlpha);
             paint.setTextAlign(Paint.Align.CENTER);
 
@@ -411,7 +430,7 @@ public class OnlineGameView extends SurfaceView implements Runnable {
         if (winnerAlpha > 0) {
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(Color.rgb(255, 215, 0)); // Gold color
-            paint.setTextSize(140);
+            paint.setTextSize(90);
             paint.setAlpha(winnerAlpha);
             paint.setTextAlign(Paint.Align.CENTER);
 
@@ -476,13 +495,13 @@ public class OnlineGameView extends SurfaceView implements Runnable {
         }
 
         paint.setStyle(Paint.Style.FILL);
+
+        // GPU-accelerated gradient instead of setShadowLayer
         RadialGradient gradient = new RadialGradient(
                 ball.x - ball.radius / 3, ball.y - ball.radius / 3, ball.radius,
                 Color.WHITE, ball.color, Shader.TileMode.CLAMP);
         paint.setShader(gradient);
-        paint.setShadowLayer(20, 0, 0, ball.color);
         canvas.drawCircle(ball.x, ball.y, ball.radius, paint);
-        paint.clearShadowLayer();
         paint.setShader(null);
     }
 
@@ -517,11 +536,14 @@ public class OnlineGameView extends SurfaceView implements Runnable {
 
     class Ball {
         float x, y, radius;
+        float targetX, targetY; // Target positions for smooth interpolation
         int color;
 
         Ball(float x, float y, float radius, int color) {
             this.x = x;
             this.y = y;
+            this.targetX = x;
+            this.targetY = y;
             this.radius = radius;
             this.color = color;
         }
@@ -556,9 +578,8 @@ public class OnlineGameView extends SurfaceView implements Runnable {
             paint.setColor(color);
             float alpha = (float) life / maxLife;
             paint.setAlpha((int) (255 * alpha));
-            paint.setShadowLayer(10 * alpha, 0, 0, color);
+            // Removed setShadowLayer for GPU acceleration
             canvas.drawCircle(x, y, 6 * alpha, paint);
-            paint.clearShadowLayer();
             paint.setAlpha(255);
         }
     }

@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.spacebilliard.app-mergeDebugResources-16:/values-en-rIN/values-en-rIN.xml",
+            "outputFile": "com.spacebilliard.app-mergeDebugResources-23:/values-en-rIN/values-en-rIN.xml",
             "map": [
                 {
                     "source": "C:\\Users\\raufk\\.gradle\\caches\\9.0-milestone-1\\transforms\\96a788d4b25d8546e5bf24497a2f7085\\transformed\\core-1.12.0\\res\\values-en-rIN\\values-en-rIN.xml",
@@ -21,7 +21,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\raufk\\.gradle\\caches\\9.0-milestone-1\\transforms\\f068a5336ae1f79b32ab2bf54899d1f1\\transformed\\browser-1.4.0\\res\\values-en-rIN\\values-en-rIN.xml",
+                    "source": "C:\\Users\\raufk\\.gradle\\caches\\9.0-milestone-1\\transforms\\1d55769f61e2e54889e43374c247969a\\transformed\\browser-1.7.0\\res\\values-en-rIN\\values-en-rIN.xml",
                     "from": {
                         "startLines": "2,3,4,5",
                         "startColumns": "4,4,4,4",

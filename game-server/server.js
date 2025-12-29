@@ -241,7 +241,7 @@ class Room {
             return;
         }
 
-        const FRICTION = 0.99; // Increased friction for faster deceleration (better control)
+        const FRICTION = 0.998; // Sync with GameView (0.998)
         const CIRCLE_RADIUS = 0.47; // Match client: minSize * 0.47 (normalized)
 
         // Update timer
@@ -271,17 +271,17 @@ class Room {
         this.gameState.balls.forEach((ball) => {
             ball.x += ball.vx;
             ball.y += ball.vy;
-            this.reflectBall(ball, CIRCLE_RADIUS, true); // true = isColoredBall (random bounce)
-            // No friction for colored balls as requested
-            ball.vx *= 1.0;
-            ball.vy *= 1.0;
+            this.reflectBall(ball, CIRCLE_RADIUS);
+            // Apply slight friction to colored balls too for realism, similar to GameView whiteBall logic
+            ball.vx *= FRICTION;
+            ball.vy *= FRICTION;
         });
 
         // Check collisions
         this.checkCollisions();
     }
 
-    reflectBall(ball, circleRadius, isColoredBall = false) {
+    reflectBall(ball, circleRadius) {
         // IMPORTANT: Aspect Ratio Correction for Boundary Check
         const ASPECT_RATIO = 2.0;
         const dx = ball.x - 0.5;
@@ -303,34 +303,26 @@ class Room {
             ball.x -= nx * overlap;
             ball.y -= (ny * overlap) / ASPECT_RATIO;
 
-            if (isColoredBall) {
-                // Random bounce for colored balls
-                const randomAngle = Math.random() * Math.PI * 2;
-                const speed = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
-                ball.vx = Math.cos(randomAngle) * speed * 0.95;
-                ball.vy = Math.sin(randomAngle) * speed * 0.95;
-            } else {
-                // Perfect elastic reflection for player balls
-                const dotProduct = ball.vx * nx + ball.vy * ny;
-                ball.vx -= 2 * dotProduct * nx;
-                ball.vy -= 2 * dotProduct * ny;
+            // Perfect elastic reflection for all balls (removed random bounce)
+            const dotProduct = ball.vx * nx + ball.vy * ny;
+            ball.vx -= 2 * dotProduct * nx;
+            ball.vy -= 2 * dotProduct * ny;
 
-                // Apply bounce damping
-                ball.vx *= 0.95;
-                ball.vy *= 0.95;
-            }
+            // Apply bounce damping (Wall friction)
+            ball.vx *= 0.9;
+            ball.vy *= 0.9;
         }
 
         // Final safety check - clamp to circle
         const finalDx = ball.x - 0.5;
-        const finalDy = (ball.y - 0.5) * 2.0;
+        const finalDy = (ball.y - 0.5) * ASPECT_RATIO; // Use consistent Aspect Ratio
         const finalDist = Math.sqrt(finalDx * finalDx + finalDy * finalDy);
 
         if (finalDist + ballRadius > circleRadius) {
             const angle = Math.atan2(finalDy, finalDx);
             const maxDist = circleRadius - ballRadius;
             ball.x = 0.5 + Math.cos(angle) * maxDist;
-            ball.y = 0.5 + Math.sin(angle) * maxDist / 2.0;
+            ball.y = 0.5 + Math.sin(angle) * maxDist / ASPECT_RATIO; // Unscale Y
         }
     }
 
@@ -349,35 +341,34 @@ class Room {
     }
 
     checkPlayerCollision(cueBall, shooter) {
-        const ballRadius = 0.025;
-
         for (let i = this.gameState.balls.length - 1; i >= 0; i--) {
             const ball = this.gameState.balls[i];
             const dx = cueBall.x - ball.x;
             const dy = cueBall.y - ball.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
 
-            // Fix: Strict collision check (sum of radii = 0.05)
-            // Using 0.051 for slight margin but requiring full contact
-            if (dist < 0.051) {
-                // Calculate bounce/ricochet before removing ball
-                const nx = dx / dist; // Normal X
-                const ny = dy / dist; // Normal Y
+            // Stricter collision: Require actual contact (sum of radii = 0.05)
+            if (dist < 0.048) {
 
-                // Reflect cue ball velocity (elastic collision)
-                const dotProduct = cueBall.vx * nx + cueBall.vy * ny;
-                cueBall.vx = cueBall.vx - 2 * dotProduct * nx;
-                cueBall.vy = cueBall.vy - 2 * dotProduct * ny;
+                // Sync with GameView: Speed Boost on Collision!
+                // float angle = (float) Math.atan2(dy, dx);
+                // float speed = (float) Math.sqrt(wBall.vx * wBall.vx + wBall.vy * wBall.vy);
+                // wBall.vx = (float) Math.cos(angle) * speed * 1.05f;
+                // wBall.vy = (float) Math.sin(angle) * speed * 1.05f;
 
-                // Apply damping (lose some energy, realistic)
-                const dampingFactor = 0.7; // 70% energy retained
-                cueBall.vx *= dampingFactor;
-                cueBall.vy *= dampingFactor;
+                const angle = Math.atan2(dy, dx); // Angle from ball to cueBall
+                const speed = Math.sqrt(cueBall.vx * cueBall.vx + cueBall.vy * cueBall.vy);
 
-                // Push cue ball away to prevent multiple collisions
-                const separation = 0.051 - dist;
-                cueBall.x += nx * separation;
-                cueBall.y += ny * separation;
+                // Bounce off: speed increases by 5% (1.05)
+                cueBall.vx = Math.cos(angle) * speed * 1.05;
+                cueBall.vy = Math.sin(angle) * speed * 1.05;
+
+                // Store ball position and color for explosion effect
+                const destroyedBall = {
+                    x: ball.x,
+                    y: ball.y,
+                    color: ball.color
+                };
 
                 // Collision! Remove ball
                 this.gameState.balls.splice(i, 1);
@@ -389,12 +380,13 @@ class Room {
                     this.guestBallsDestroyed++;
                 }
 
-                // Broadcast score update (current set score)
+                // Broadcast score update WITH ball destruction info for explosion
                 this.broadcast({
-                    type: 'score_update', // Changed from balls_update
+                    type: 'score_update',
                     hostScore: this.hostBallsDestroyed,
                     guestScore: this.guestBallsDestroyed,
-                    destroyedBy: shooter
+                    destroyedBy: shooter,
+                    destroyedBall: destroyedBall // Add ball info for explosion
                 });
 
                 console.log(`💥 Ball destroyed by ${shooter}! Host: ${this.hostBallsDestroyed}, Guest: ${this.guestBallsDestroyed}`);
@@ -499,19 +491,19 @@ function handleMessage(client, message) {
             }));
             break;
 
-        case 'create_room':
-            createRoom(client, message.roomName);
+        case 'createRoom': // MATCHING ANDROID CLIENT
+            createRoom(client, message.data.roomName); // Android sends data object
             break;
 
-        case 'join_room':
-            joinRoom(client, message.roomId);
+        case 'joinRoom': // MATCHING ANDROID CLIENT
+            joinRoom(client, message.data.roomId);
             break;
 
-        case 'list_rooms':
+        case 'getRooms': // MATCHING ANDROID CLIENT (list_rooms -> getRooms)
             listRooms(client);
             break;
 
-        case 'leave_room':
+        case 'leaveRoom': // MATCHING ANDROID CLIENT
             leaveRoom(client);
             break;
 
@@ -524,7 +516,7 @@ function handleMessage(client, message) {
             break;
 
         case 'stop_ball':
-            handleStopBall(client);
+            handleStopBall(client, message);
             break;
 
         case 'set_ended':
@@ -558,7 +550,8 @@ function createRoom(client, roomName) {
     client.isHost = true;
 
     client.ws.send(JSON.stringify({
-        type: 'room_created',
+        type: 'roomCreated', // MATCHING ANDROID CLIENT
+        success: true,
         roomId: roomId,
         roomName: roomName,
         role: 'host'
@@ -872,16 +865,31 @@ function handleRematchRequest(client) {
     }
 }
 
-function handleStopBall(client) {
+function handleStopBall(client, message) {
     const room = rooms.get(client.roomId);
     if (!room) return;
 
+    const x = message.x;
+    const y = message.y;
+
     if (client.isHost && room.gameState.hostCueBall) {
+        // Stop velocity
         room.gameState.hostCueBall.vx = 0;
         room.gameState.hostCueBall.vy = 0;
+        // Freeze at client's visual position to prevent drift
+        if (x !== undefined && y !== undefined) {
+            room.gameState.hostCueBall.x = x;
+            room.gameState.hostCueBall.y = y;
+        }
     } else if (!client.isHost && room.gameState.guestCueBall) {
+        // Stop velocity
         room.gameState.guestCueBall.vx = 0;
         room.gameState.guestCueBall.vy = 0;
+        // Freeze at client's visual position to prevent drift
+        if (x !== undefined && y !== undefined) {
+            room.gameState.guestCueBall.x = x;
+            room.gameState.guestCueBall.y = y;
+        }
     }
 }
 

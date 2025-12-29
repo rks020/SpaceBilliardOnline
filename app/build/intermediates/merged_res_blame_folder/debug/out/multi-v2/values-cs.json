@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.spacebilliard.app-mergeDebugResources-16:/values-cs/values-cs.xml",
+            "outputFile": "com.spacebilliard.app-mergeDebugResources-23:/values-cs/values-cs.xml",
             "map": [
                 {
                     "source": "C:\\Users\\raufk\\.gradle\\caches\\9.0-milestone-1\\transforms\\92af7687f5e7bd1f73aa69f8ea3ffdab\\transformed\\jetified-play-services-basement-18.2.0\\res\\values-cs\\values.xml",
@@ -18,6 +18,23 @@
                         "startOffsets": "1780",
                         "endColumns": "142",
                         "endOffsets": "1918"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\raufk\\.gradle\\caches\\9.0-milestone-1\\transforms\\1d55769f61e2e54889e43374c247969a\\transformed\\browser-1.7.0\\res\\values-cs\\values-cs.xml",
+                    "from": {
+                        "startLines": "2,3,4,5",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "55,157,260,374",
+                        "endColumns": "101,102,113,100",
+                        "endOffsets": "152,255,369,470"
+                    },
+                    "to": {
+                        "startLines": "27,28,29,30",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "3038,3140,3243,3357",
+                        "endColumns": "101,102,113,100",
+                        "endOffsets": "3135,3238,3352,3453"
                     }
                 },
                 {
@@ -52,23 +69,6 @@
                         "startOffsets": "786,892,1052,1177,1287,1440,1567,1679,1923,2098,2209,2373,2501,2662,2817,2885,2952",
                         "endColumns": "105,159,124,109,152,126,111,100,174,110,163,127,160,154,67,66,85",
                         "endOffsets": "887,1047,1172,1282,1435,1562,1674,1775,2093,2204,2368,2496,2657,2812,2880,2947,3033"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\raufk\\.gradle\\caches\\9.0-milestone-1\\transforms\\f068a5336ae1f79b32ab2bf54899d1f1\\transformed\\browser-1.4.0\\res\\values-cs\\values-cs.xml",
-                    "from": {
-                        "startLines": "2,3,4,5",
-                        "startColumns": "4,4,4,4",
-                        "startOffsets": "55,157,260,374",
-                        "endColumns": "101,102,113,100",
-                        "endOffsets": "152,255,369,470"
-                    },
-                    "to": {
-                        "startLines": "27,28,29,30",
-                        "startColumns": "4,4,4,4",
-                        "startOffsets": "3038,3140,3243,3357",
-                        "endColumns": "101,102,113,100",
-                        "endOffsets": "3135,3238,3352,3453"
                     }
                 },
                 {

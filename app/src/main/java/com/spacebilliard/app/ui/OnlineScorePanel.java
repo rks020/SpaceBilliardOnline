@@ -22,6 +22,10 @@ public class OnlineScorePanel extends View {
     private int totalSets = 3;
     private long timeLeft = 0; // milliseconds
 
+    // Win/Loss statistics
+    private int totalWins = 0;
+    private int totalLosses = 0;
+
     private boolean isHost = true;
 
     public OnlineScorePanel(Context context) {
@@ -65,12 +69,13 @@ public class OnlineScorePanel extends View {
         textPaint.setTextAlign(Paint.Align.LEFT);
         textPaint.setColor(Color.CYAN);
         textPaint.setTextSize(48);
-        canvas.drawText(player1Name + ": " + player1BallsDestroyed, 50, 90, textPaint); // Moved down
+        // Show SET SCORE next to name (e.g., Atkafasi: 1)
+        canvas.drawText(player1Name + ": " + player1Score, 50, 70, textPaint);
 
-        // Player 1 Set Score
+        // Player 1 Balls Destroyed (Bottom)
         textPaint.setTextSize(40);
         textPaint.setColor(Color.argb(255, 0, 255, 255));
-        canvas.drawText("Score: " + player1Score, 50, height - 70, textPaint); // Moved up
+        canvas.drawText("Balls: " + player1BallsDestroyed, 50, height - 70, textPaint);
 
         // SET indicator (Center)
         textPaint.setTextAlign(Paint.Align.CENTER);
@@ -79,7 +84,7 @@ public class OnlineScorePanel extends View {
         canvas.drawText("SET " + currentSet + "/" + totalSets, width / 2f, centerY - 20, textPaint);
 
         // Timer (Below SET)
-        textPaint.setTextSize(60); // Bigger timer
+        textPaint.setTextSize(60);
         textPaint.setColor(Color.YELLOW);
         String timeStr = formatTime(timeLeft);
         canvas.drawText(timeStr, width / 2f, centerY + 60, textPaint);
@@ -88,12 +93,12 @@ public class OnlineScorePanel extends View {
         textPaint.setTextAlign(Paint.Align.RIGHT);
         textPaint.setColor(Color.GREEN);
         textPaint.setTextSize(48);
-        canvas.drawText(player2Name + ": " + player2BallsDestroyed, width - 50, 90, textPaint); // Moved down
+        canvas.drawText(player2Name + ": " + player2Score, width - 50, 70, textPaint);
 
-        // Player 2 Set Score
+        // Player 2 Balls Destroyed (Bottom)
         textPaint.setTextSize(40);
         textPaint.setColor(Color.argb(255, 0, 255, 0));
-        canvas.drawText("Score: " + player2Score, width - 50, height - 70, textPaint); // Moved up
+        canvas.drawText("Balls: " + player2BallsDestroyed, width - 50, height - 70, textPaint);
     }
 
     private String formatTime(long millis) {
@@ -134,6 +139,12 @@ public class OnlineScorePanel extends View {
 
     public void setIsHost(boolean isHost) {
         this.isHost = isHost;
+        invalidate();
+    }
+
+    public void setWinLossStats(int wins, int losses) {
+        this.totalWins = wins;
+        this.totalLosses = losses;
         invalidate();
     }
 }

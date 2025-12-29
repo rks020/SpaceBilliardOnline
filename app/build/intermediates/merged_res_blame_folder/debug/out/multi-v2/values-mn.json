@@ -1,8 +1,25 @@
 {
     "logs": [
         {
-            "outputFile": "com.spacebilliard.app-mergeDebugResources-16:/values-mn/values-mn.xml",
+            "outputFile": "com.spacebilliard.app-mergeDebugResources-23:/values-mn/values-mn.xml",
             "map": [
+                {
+                    "source": "C:\\Users\\raufk\\.gradle\\caches\\9.0-milestone-1\\transforms\\1d55769f61e2e54889e43374c247969a\\transformed\\browser-1.7.0\\res\\values-mn\\values-mn.xml",
+                    "from": {
+                        "startLines": "2,3,4,5",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "55,160,264,369",
+                        "endColumns": "104,103,104,107",
+                        "endOffsets": "155,259,364,472"
+                    },
+                    "to": {
+                        "startLines": "27,28,29,30",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "3005,3110,3214,3319",
+                        "endColumns": "104,103,104,107",
+                        "endOffsets": "3105,3209,3314,3422"
+                    }
+                },
                 {
                     "source": "C:\\Users\\raufk\\.gradle\\caches\\9.0-milestone-1\\transforms\\bba0f5a7539fa5c4c472fd516c09f271\\transformed\\jetified-play-services-base-18.0.0\\res\\values-mn\\values.xml",
                     "from": {
@@ -52,23 +69,6 @@
                         "startOffsets": "1798",
                         "endColumns": "149",
                         "endOffsets": "1943"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\raufk\\.gradle\\caches\\9.0-milestone-1\\transforms\\f068a5336ae1f79b32ab2bf54899d1f1\\transformed\\browser-1.4.0\\res\\values-mn\\values-mn.xml",
-                    "from": {
-                        "startLines": "2,3,4,5",
-                        "startColumns": "4,4,4,4",
-                        "startOffsets": "55,160,264,369",
-                        "endColumns": "104,103,104,107",
-                        "endOffsets": "155,259,364,472"
-                    },
-                    "to": {
-                        "startLines": "27,28,29,30",
-                        "startColumns": "4,4,4,4",
-                        "startOffsets": "3005,3110,3214,3319",
-                        "endColumns": "104,103,104,107",
-                        "endOffsets": "3105,3209,3314,3422"
                     }
                 },
                 {

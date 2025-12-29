@@ -1,8 +1,25 @@
 {
     "logs": [
         {
-            "outputFile": "com.spacebilliard.app-mergeDebugResources-16:/values-eu/values-eu.xml",
+            "outputFile": "com.spacebilliard.app-mergeDebugResources-23:/values-eu/values-eu.xml",
             "map": [
+                {
+                    "source": "C:\\Users\\raufk\\.gradle\\caches\\9.0-milestone-1\\transforms\\1d55769f61e2e54889e43374c247969a\\transformed\\browser-1.7.0\\res\\values-eu\\values-eu.xml",
+                    "from": {
+                        "startLines": "2,3,4,5",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "55,155,257,370",
+                        "endColumns": "99,101,112,104",
+                        "endOffsets": "150,252,365,470"
+                    },
+                    "to": {
+                        "startLines": "27,28,29,30",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "3061,3161,3263,3376",
+                        "endColumns": "99,101,112,104",
+                        "endOffsets": "3156,3258,3371,3476"
+                    }
+                },
                 {
                     "source": "C:\\Users\\raufk\\.gradle\\caches\\9.0-milestone-1\\transforms\\96a788d4b25d8546e5bf24497a2f7085\\transformed\\core-1.12.0\\res\\values-eu\\values-eu.xml",
                     "from": {
@@ -52,23 +69,6 @@
                         "startOffsets": "3481,3530,3582,3659,3733,3811,3939,4007,4126,4238,4294,4348,4470,4565,4609,4707,4745,4785,4845,4940,5090",
                         "endColumns": "48,51,76,73,77,127,67,118,111,55,53,121,94,43,97,37,39,59,94,48,59",
                         "endOffsets": "3525,3577,3654,3728,3806,3934,4002,4121,4233,4289,4343,4465,4560,4604,4702,4740,4780,4840,4935,4984,5145"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\raufk\\.gradle\\caches\\9.0-milestone-1\\transforms\\f068a5336ae1f79b32ab2bf54899d1f1\\transformed\\browser-1.4.0\\res\\values-eu\\values-eu.xml",
-                    "from": {
-                        "startLines": "2,3,4,5",
-                        "startColumns": "4,4,4,4",
-                        "startOffsets": "55,155,257,370",
-                        "endColumns": "99,101,112,104",
-                        "endOffsets": "150,252,365,470"
-                    },
-                    "to": {
-                        "startLines": "27,28,29,30",
-                        "startColumns": "4,4,4,4",
-                        "startOffsets": "3061,3161,3263,3376",
-                        "endColumns": "99,101,112,104",
-                        "endOffsets": "3156,3258,3371,3476"
                     }
                 },
                 {

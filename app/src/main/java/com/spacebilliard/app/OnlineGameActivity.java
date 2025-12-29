@@ -13,8 +13,12 @@ import android.widget.Toast;
 import android.util.Log;
 
 import com.spacebilliard.app.network.OnlineGameManager;
+import com.spacebilliard.app.network.SupabaseManager;
 import com.spacebilliard.app.ui.OnlineScorePanel;
 import com.spacebilliard.app.ui.NeonButton;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
 // import com.spacebilliard.app.SimpleOnlineGameView;
 
 public class OnlineGameActivity extends Activity implements OnlineGameManager.OnGameListener {
@@ -25,6 +29,7 @@ public class OnlineGameActivity extends Activity implements OnlineGameManager.On
     private OnlineGameView gameView;
     private OnlineScorePanel scorePanel;
     private NeonButton backBtn;
+    private AdView bannerAd;
 
     private String roomId;
     private String hostUsername;
@@ -64,20 +69,45 @@ public class OnlineGameActivity extends Activity implements OnlineGameManager.On
             gameView = new OnlineGameView(this);
             root.addView(gameView);
 
-            // Score panel
+            // Score panel (below banner ad at top)
             android.util.Log.d("OnlineGameActivity", "Creating score panel");
             scorePanel = new OnlineScorePanel(this);
             FrameLayout.LayoutParams scoreParams = new FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
-                    (int) (getResources().getDisplayMetrics().density * 160)); // Increased from 100
-            scoreParams.gravity = Gravity.TOP;
-            scoreParams.setMargins(20, 30, 20, 0);
+                    (int) (getResources().getDisplayMetrics().density * 120));
+            scoreParams.gravity = Gravity.TOP; // Move to top
+            // Position below banner ad (50dp banner height + 10dp spacing)
+            scoreParams.setMargins(20, (int) (getResources().getDisplayMetrics().density * 60), 20, 0);
             scorePanel.setLayoutParams(scoreParams);
             scorePanel.setPlayerNames(hostUsername, guestUsername);
             scorePanel.setIsHost(isHost);
             scorePanel.setCurrentSet(1, 3); // Initialize with Set 1/3
             scorePanel.setTimeLeft(30000); // Initialize with 30 seconds
+
+            // Load and display win/loss statistics
+            android.content.SharedPreferences prefs = getSharedPreferences("SpaceBilliard", MODE_PRIVATE);
+            int wins = prefs.getInt("onlineWins", 0);
+            int losses = prefs.getInt("onlineLosses", 0);
+            scorePanel.setWinLossStats(wins, losses);
+
             root.addView(scorePanel);
+
+            // Banner Ad at top
+            android.util.Log.d("OnlineGameActivity", "Creating banner ad");
+            bannerAd = new AdView(this);
+            bannerAd.setAdUnitId("ca-app-pub-3940256099942544/6300978111"); // Test banner ID
+            bannerAd.setAdSize(AdSize.BANNER);
+
+            FrameLayout.LayoutParams bannerParams = new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            bannerParams.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
+            bannerAd.setLayoutParams(bannerParams);
+
+            AdRequest adRequest = new AdRequest.Builder().build();
+            bannerAd.loadAd(adRequest);
+
+            root.addView(bannerAd);
 
             // Back button
             android.util.Log.d("OnlineGameActivity", "Creating back button");
@@ -158,6 +188,7 @@ public class OnlineGameActivity extends Activity implements OnlineGameManager.On
             this.currentSet = 1;
             if (scorePanel != null) {
                 scorePanel.setScores(0, 0);
+                scorePanel.setBallsDestroyed(0, 0);
                 scorePanel.setCurrentSet(1, 3);
             }
 
@@ -208,8 +239,31 @@ public class OnlineGameActivity extends Activity implements OnlineGameManager.On
     @Override
     public void onBallsUpdate(int hostBalls, int guestBalls) {
         runOnUiThread(() -> {
+            // These store the BALL COUNT for the current set
+            // this.hostScore = hostBalls; // Don't overwrite SET SCORE with BALL COUNT
+            // this.guestScore = guestBalls;
+
             if (scorePanel != null) {
                 scorePanel.setBallsDestroyed(hostBalls, guestBalls);
+            }
+        });
+    }
+
+    @Override
+    public void onBallDestroyed(float x, float y, String colorHex) {
+        runOnUiThread(() -> {
+            if (gameView != null) {
+                // Convert normalized coordinates (0-1) to screen coordinates
+                int screenWidth = gameView.getWidth();
+                int screenHeight = gameView.getHeight();
+                float screenX = x * screenWidth;
+                float screenY = y * screenHeight;
+
+                // Parse color from hex string
+                int color = android.graphics.Color.parseColor(colorHex);
+
+                // Trigger explosion effect
+                gameView.createExplosion(screenX, screenY, color);
             }
         });
     }
@@ -264,7 +318,11 @@ public class OnlineGameActivity extends Activity implements OnlineGameManager.On
             boolean myRequest = amIHost ? hostWants : guestWants;
             boolean oppRequest = amIHost ? guestWants : hostWants;
 
+            Log.d(TAG, "onRematchRequested: HostWants=" + hostWants + ", GuestWants=" + guestWants + ", MyRequest="
+                    + myRequest + ", OppRequest=" + oppRequest);
+
             if (oppRequest && !myRequest) {
+                Log.d(TAG, "Opponent requested rematch. Showing dialog.");
                 // Opponent wants rematch, I haven't said yes. Show Invite.
                 if (rematchDialog == null || !rematchDialog.isShowing()) {
                     android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
@@ -276,7 +334,10 @@ public class OnlineGameActivity extends Activity implements OnlineGameManager.On
                             gameManager.sendRematchRequest();
                         }
                     });
-                    builder.setNegativeButton("DECLINE", (dialog, which) -> dialog.dismiss());
+                    builder.setNegativeButton("DECLINE", (dialog, which) -> {
+                        dialog.dismiss();
+                        leaveGame();
+                    });
                     builder.setCancelable(false);
                     rematchDialog = builder.show();
                 }
@@ -299,6 +360,52 @@ public class OnlineGameActivity extends Activity implements OnlineGameManager.On
     @Override
     public void onMatchEnded(String winner, String finalScore, int hostScore, int guestScore) {
         runOnUiThread(() -> {
+            // Determine if current player won or lost
+            boolean playerWon = (isHost && winner.equals("host")) || (!isHost && winner.equals("guest"));
+
+            // Update Supabase stats
+            SupabaseManager supabaseManager = SupabaseManager.getInstance(this);
+            String deviceId = android.provider.Settings.Secure.getString(
+                    getContentResolver(),
+                    android.provider.Settings.Secure.ANDROID_ID);
+
+            // Get current profile and update
+            supabaseManager.getUserProfile(new SupabaseManager.ProfileCallback() {
+                @Override
+                public void onSuccess(SupabaseManager.UserProfile profile) {
+                    int newWins = profile.wins + (playerWon ? 1 : 0);
+                    int newLosses = profile.losses + (playerWon ? 0 : 1);
+
+                    supabaseManager.updateStats(
+                            profile.userId,
+                            newWins,
+                            newLosses,
+                            new SupabaseManager.ProfileCallback() {
+                                @Override
+                                public void onSuccess(SupabaseManager.UserProfile updatedProfile) {
+                                    android.util.Log.d("OnlineGameActivity",
+                                            "Stats updated: " + newWins + "/" + newLosses);
+
+                                    // Save last match result
+                                    getSharedPreferences("game_prefs", MODE_PRIVATE)
+                                            .edit()
+                                            .putString("last_match_result", playerWon ? "WIN" : "LOSS")
+                                            .apply();
+                                }
+
+                                @Override
+                                public void onError(String error) {
+                                    android.util.Log.e("OnlineGameActivity", "Error updating stats: " + error);
+                                }
+                            });
+                }
+
+                @Override
+                public void onError(String error) {
+                    android.util.Log.e("OnlineGameActivity", "Error getting profile: " + error);
+                }
+            });
+
             String winnerName = winner.equals("host") ? hostUsername : guestUsername;
 
             // Show winner name AFTER "SET FINISHED" disappears (3 second delay)
@@ -309,21 +416,94 @@ public class OnlineGameActivity extends Activity implements OnlineGameManager.On
 
                 // Show match end dialog after winner text displays (2 more seconds)
                 new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-                    android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-                    builder.setTitle("🏆 MATCH FINISHED!");
-                    builder.setMessage(winnerName + " won the match!\n\nFinal Score: " + finalScore);
-                    builder.setPositiveButton("OK", (dialog, which) -> {
+                    // Create Custom Dialog
+                    android.app.Dialog dialog = new android.app.Dialog(this);
+                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    dialog.setContentView(R.layout.dialog_match_finished);
+                    dialog.getWindow().setBackgroundDrawable(
+                            new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+                    dialog.setCancelable(false);
+
+                    // Initialize Views
+                    android.widget.TextView dialogMessage = dialog.findViewById(R.id.dialogMessage);
+                    android.widget.TextView dialogScoreText = dialog.findViewById(R.id.dialogScore);
+                    android.widget.Button btnOk = dialog.findViewById(R.id.btnOk);
+                    android.widget.Button btnRematch = dialog.findViewById(R.id.btnRematch);
+
+                    // Set Text
+                    dialogMessage.setText(winnerName + " won the match!");
+                    dialogScoreText.setText("Final Score: " + finalScore);
+
+                    // Button Listeners
+                    btnOk.setOnClickListener(v -> {
+                        dialog.dismiss();
                         finish();
                     });
-                    builder.setNegativeButton("REMATCH", (dialog, which) -> {
+
+                    btnRematch.setOnClickListener(v -> {
                         if (gameManager != null) {
                             gameManager.sendRematchRequest();
                             Toast.makeText(this, "Rematch request sent!", Toast.LENGTH_SHORT).show();
                         }
                     });
-                    builder.setCancelable(false);
 
+                    matchEndDialog = new android.app.AlertDialog.Builder(this).create(); // Holder to prevent null
+                                                                                         // checks failing elsewhere if
+                                                                                         // used
+                    // But wait, we are using a Dialog, not AlertDialog. Let's cast or change field
+                    // type?
+                    // Field is AlertDialog. Let's change field to Dialog or just keep local
+                    // reference and manage it?
+                    // Better: Change field type to Dialog in class if possible, OR just use local
+                    // dialog but handle dismissal in onStop/Start?
+                    // Re-using 'matchEndDialog' field requires changing its type or just using a
+                    // separate field.
+                    // For minimal diff, let's keep it local here, but we need to reference it to
+                    // dismiss in onGameStart.
+                    // Let's modify the field type later or simply cast/store it if possible.
+                    // Actually, AlertDialog extends Dialog. So we can store it in 'matchEndDialog'
+                    // IF we change declaration.
+                    // But 'matchEndDialog' is likely AlertDialog.
+                    // Let's check field definition: private android.app.AlertDialog matchEndDialog;
+                    // I need to change that definition too if I want to store this custom dialog
+                    // there.
+                    // OR I can use AlertDialog.Builder.setView() with the inflated view! That's
+                    // cleaner for keeping types.
+
+                    // APPROACH 2: Use Builder.setView
+                    android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+                    View dialogView = getLayoutInflater().inflate(R.layout.dialog_match_finished, null);
+                    builder.setView(dialogView);
+                    builder.setCancelable(false);
                     matchEndDialog = builder.create();
+                    matchEndDialog.getWindow().setBackgroundDrawable(
+                            new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT)); // Transparent
+                                                                                                              // for
+                                                                                                              // custom
+                                                                                                              // rounded
+                                                                                                              // bg
+
+                    // Init Views from dialogView
+                    android.widget.TextView txtMessage = dialogView.findViewById(R.id.dialogMessage);
+                    android.widget.TextView txtScore = dialogView.findViewById(R.id.dialogScore);
+                    android.widget.Button bOk = dialogView.findViewById(R.id.btnOk);
+                    android.widget.Button bRematch = dialogView.findViewById(R.id.btnRematch);
+
+                    txtMessage.setText(winnerName + " won the match!");
+                    txtScore.setText("Final Score: " + finalScore);
+
+                    bOk.setOnClickListener(v -> {
+                        matchEndDialog.dismiss();
+                        finish();
+                    });
+
+                    bRematch.setOnClickListener(v -> {
+                        if (gameManager != null) {
+                            gameManager.sendRematchRequest();
+                            Toast.makeText(this, "Rematch request sent!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
                     matchEndDialog.show();
                 }, 2000); // 2 second delay to show winner text
             }, 3000); // 3 second delay - wait for SET FINISHED to fade
@@ -331,17 +511,29 @@ public class OnlineGameActivity extends Activity implements OnlineGameManager.On
     }
 
     private void leaveGame() {
-        new android.app.AlertDialog.Builder(this)
-                .setTitle("Leave Game")
-                .setMessage("Are you sure you want to leave?")
-                .setPositiveButton("Yes", (dialog, which) -> {
-                    if (gameManager != null) {
-                        gameManager.leaveRoom();
-                    }
-                    finish();
-                })
-                .setNegativeButton("No", null)
-                .show();
+        // Create Custom Dialog
+        android.app.Dialog dialog = new android.app.Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_leave_game);
+        dialog.getWindow().setBackgroundDrawable(
+                new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+        dialog.setCancelable(false);
+
+        // Init Buttons
+        android.widget.Button btnConfirm = dialog.findViewById(R.id.btnConfirm);
+        android.widget.Button btnCancel = dialog.findViewById(R.id.btnCancel);
+
+        btnConfirm.setOnClickListener(v -> {
+            dialog.dismiss();
+            if (gameManager != null) {
+                gameManager.leaveRoom();
+            }
+            finish();
+        });
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
     }
 
     @Override

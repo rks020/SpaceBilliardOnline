@@ -16,13 +16,15 @@ import java.util.concurrent.TimeUnit;
 
 public class OnlineGameManager {
     private static final String TAG = "OnlineGameManager";
-    private static final String SERVER_URL = "wss://3e703ea54ca1.ngrok-free.app";
+    private static final String SERVER_URL = "wss://3865e024b1d3.ngrok-free.app";
 
     private WebSocket webSocket;
     private OkHttpClient client;
     private Gson gson;
     private OnConnectionListener connectionListener;
     private OnGameListener gameListener;
+    private OnRoomsListener roomsListener;
+    private OnRoomListener roomListener; // Added this line
     private OnlineActivity activity;
 
     private String clientId;
@@ -47,6 +49,18 @@ public class OnlineGameManager {
         void onError(String error);
     }
 
+    public interface OnRoomListener {
+        void onRoomCreated(String roomId);
+
+        void onError(String error);
+    }
+
+    public interface OnRoomsListener {
+        void onRoomsReceived(java.util.List<RoomInfo> rooms);
+
+        void onError(String error);
+    }
+
     public interface OnGameListener {
         void onPlayerJoined(String username);
 
@@ -63,6 +77,8 @@ public class OnlineGameManager {
         void onOpponentShot(float angle, float power);
 
         void onBallsUpdate(int hostBalls, int guestBalls);
+
+        void onBallDestroyed(float x, float y, String colorHex); // For explosion effects
 
         void onSetEnded(String winner, int hostScore, int guestScore, int currentSet);
 
@@ -87,6 +103,17 @@ public class OnlineGameManager {
         this.username = username;
         this.connectionListener = listener;
 
+        if (webSocket != null) {
+            // Already connected check?
+            // If we have clientId, we are good
+            if (clientId != null) {
+                Log.d(TAG, "Already connected, firing callback immediately");
+                if (listener != null)
+                    listener.onConnected();
+                return;
+            }
+        }
+
         Request request = new Request.Builder()
                 .url(SERVER_URL)
                 .build();
@@ -104,9 +131,9 @@ public class OnlineGameManager {
 
             @Override
             public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-                Log.e(TAG, "WebSocket error: " + t.getMessage());
+                Log.e(TAG, "WebSocket Connection FAILED: " + t.getMessage(), t);
                 if (connectionListener != null) {
-                    connectionListener.onError(t.getMessage());
+                    connectionListener.onError("Conn Fail: " + t.getMessage());
                 }
             }
 
@@ -146,20 +173,25 @@ public class OnlineGameManager {
                         jsonObj.addProperty("username", username);
                         return jsonObj;
                     });
-
-                    if (connectionListener != null) {
-                        connectionListener.onConnected();
-                    }
                     break;
 
-                case "room_created":
-                    currentRoomId = json.get("roomId").getAsString();
-                    isHost = true;
-                    Log.d(TAG, "Room created: " + currentRoomId);
+                case "username_set":
+                    Log.d(TAG, "Username set confirmed by server");
+                    // NOW we're truly connected and ready
+                    if (connectionListener != null) {
+                        Log.d(TAG, "Calling connectionListener.onConnected()");
+                        connectionListener.onConnected();
+                    } else {
+                        Log.w(TAG, "connectionListener is NULL!");
+                    }
                     break;
 
                 case "room_list":
                     handleRoomList(json);
+                    break;
+
+                case "roomCreated":
+                    handleRoomCreated(json);
                     break;
 
                 case "player_joined":
@@ -242,7 +274,17 @@ public class OnlineGameManager {
                     if (gameListener != null && json.has("hostScore") && json.has("guestScore")) {
                         int hostScore = json.get("hostScore").getAsInt();
                         int guestScore = json.get("guestScore").getAsInt();
-                        gameListener.onBallsUpdate(hostScore, guestScore); // Using onBallsUpdate for score
+
+                        // Trigger explosion effect if ball was destroyed
+                        if (json.has("destroyedBall")) {
+                            JsonObject ball = json.getAsJsonObject("destroyedBall");
+                            float x = ball.get("x").getAsFloat();
+                            float y = ball.get("y").getAsFloat();
+                            String colorHex = ball.get("color").getAsString();
+                            gameListener.onBallDestroyed(x, y, colorHex);
+                        }
+
+                        gameListener.onBallsUpdate(hostScore, guestScore);
                     }
                     break;
 
@@ -297,7 +339,32 @@ public class OnlineGameManager {
             });
         }
 
-        activity.updateRoomList(rooms);
+        // Use callback instead of activity method
+        if (roomsListener != null) {
+            roomsListener.onRoomsReceived(rooms);
+        }
+    }
+
+    private void handleRoomCreated(JsonObject json) {
+        Log.d(TAG, "handleRoomCreated() called with JSON: " + json.toString());
+        Log.d(TAG, "roomListener state: " + (roomListener != null ? "SET" : "NULL"));
+
+        if (roomListener == null) {
+            Log.w(TAG, "Room created but no listener!");
+            return;
+        }
+
+        if (json.has("success") && json.get("success").getAsBoolean()) {
+            String roomId = json.has("roomId") ? json.get("roomId").getAsString() : "unknown";
+            Log.d(TAG, "Room created successfully: " + roomId);
+            currentRoomId = roomId; // Update currentRoomId
+            isHost = true; // Set isHost to true
+            roomListener.onRoomCreated(roomId);
+        } else {
+            String error = json.has("error") ? json.get("error").getAsString() : "Unknown error";
+            Log.e(TAG, "Room creation failed: " + error);
+            roomListener.onError(error);
+        }
     }
 
     private void handlePlayerJoined(JsonObject json) {
@@ -342,6 +409,80 @@ public class OnlineGameManager {
         sendMessage("leave_room", jsonObj -> jsonObj);
     }
 
+    public void createRoom(String roomName, OnRoomListener listener) {
+        Log.d(TAG, "createRoom() called with roomName: " + roomName);
+        Log.d(TAG, "WebSocket state: " + (webSocket != null ? "connected" : "NULL"));
+
+        if (webSocket == null) {
+            Log.e(TAG, "WebSocket is NULL! Cannot create room.");
+            listener.onError("Not connected to server");
+            return;
+        }
+
+        this.roomListener = listener;
+        Log.d(TAG, "Room listener stored");
+
+        try {
+            JsonObject message = new JsonObject();
+            message.addProperty("type", "createRoom");
+
+            JsonObject data = new JsonObject();
+            data.addProperty("roomName", roomName);
+            data.addProperty("username", username);
+
+            message.add("data", data);
+
+            String jsonMessage = gson.toJson(message);
+            Log.d(TAG, "Sending createRoom message: " + jsonMessage);
+            webSocket.send(jsonMessage);
+            Log.d(TAG, "Message sent successfully");
+        } catch (Exception e) {
+            Log.e(TAG, "Error creating room", e);
+            listener.onError(e.getMessage());
+        }
+    }
+
+    public void getRooms(OnRoomsListener listener) {
+        if (webSocket == null) {
+            listener.onError("Not connected to server");
+            return;
+        }
+
+        this.roomsListener = listener;
+
+        JsonObject message = new JsonObject();
+        message.addProperty("type", "getRooms");
+
+        String jsonMessage = gson.toJson(message);
+        Log.d(TAG, "Sending getRooms: " + jsonMessage);
+        webSocket.send(jsonMessage);
+    }
+
+    public void joinRoom(String roomId, OnRoomListener listener) {
+        if (webSocket == null) {
+            listener.onError("Not connected to server");
+            return;
+        }
+
+        try {
+            JsonObject message = new JsonObject();
+            message.addProperty("type", "joinRoom");
+
+            JsonObject data = new JsonObject();
+            data.addProperty("roomId", roomId);
+            data.addProperty("username", username);
+
+            message.add("data", data);
+
+            String jsonMessage = gson.toJson(message);
+            Log.d(TAG, "Sending joinRoom: " + jsonMessage);
+            webSocket.send(jsonMessage);
+        } catch (Exception e) {
+            Log.e(TAG, "Error joining room", e);
+            listener.onError(e.getMessage());
+        }
+    }
+
     public void sendShot(float angle, float power, float x, float y) {
         sendMessage("shot", jsonObj -> {
             jsonObj.addProperty("angle", angle);
@@ -364,8 +505,12 @@ public class OnlineGameManager {
         sendMessage("ready", jsonObj -> jsonObj);
     }
 
-    public void sendStopBall() {
-        sendMessage("stop_ball", jsonObj -> jsonObj);
+    public void sendStopBall(float x, float y) {
+        sendMessage("stop_ball", jsonObj -> {
+            jsonObj.addProperty("x", x);
+            jsonObj.addProperty("y", y);
+            return jsonObj;
+        });
     }
 
     public void sendRematchRequest() {

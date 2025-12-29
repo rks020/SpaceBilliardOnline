@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.spacebilliard.app-mergeDebugResources-16:/values-az/values-az.xml",
+            "outputFile": "com.spacebilliard.app-mergeDebugResources-23:/values-az/values-az.xml",
             "map": [
                 {
                     "source": "C:\\Users\\raufk\\.gradle\\caches\\9.0-milestone-1\\transforms\\92af7687f5e7bd1f73aa69f8ea3ffdab\\transformed\\jetified-play-services-basement-18.2.0\\res\\values-az\\values.xml",
@@ -18,6 +18,23 @@
                         "startOffsets": "1794",
                         "endColumns": "161",
                         "endOffsets": "1951"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\raufk\\.gradle\\caches\\9.0-milestone-1\\transforms\\1d55769f61e2e54889e43374c247969a\\transformed\\browser-1.7.0\\res\\values-az\\values-az.xml",
+                    "from": {
+                        "startLines": "2,3,4,5",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "55,151,255,363",
+                        "endColumns": "95,103,107,102",
+                        "endOffsets": "146,250,358,461"
+                    },
+                    "to": {
+                        "startLines": "27,28,29,30",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "3028,3124,3228,3336",
+                        "endColumns": "95,103,107,102",
+                        "endOffsets": "3119,3223,3331,3434"
                     }
                 },
                 {
@@ -69,23 +86,6 @@
                         "startOffsets": "55,156,258,361,465,566,671,4853",
                         "endColumns": "100,101,102,103,100,104,110,100",
                         "endOffsets": "151,253,356,460,561,666,777,4949"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\raufk\\.gradle\\caches\\9.0-milestone-1\\transforms\\f068a5336ae1f79b32ab2bf54899d1f1\\transformed\\browser-1.4.0\\res\\values-az\\values-az.xml",
-                    "from": {
-                        "startLines": "2,3,4,5",
-                        "startColumns": "4,4,4,4",
-                        "startOffsets": "55,151,255,363",
-                        "endColumns": "95,103,107,102",
-                        "endOffsets": "146,250,358,461"
-                    },
-                    "to": {
-                        "startLines": "27,28,29,30",
-                        "startColumns": "4,4,4,4",
-                        "startOffsets": "3028,3124,3228,3336",
-                        "endColumns": "95,103,107,102",
-                        "endOffsets": "3119,3223,3331,3434"
                     }
                 }
             ]

@@ -1,8 +1,25 @@
 {
     "logs": [
         {
-            "outputFile": "com.spacebilliard.app-mergeDebugResources-16:/values-it/values-it.xml",
+            "outputFile": "com.spacebilliard.app-mergeDebugResources-23:/values-it/values-it.xml",
             "map": [
+                {
+                    "source": "C:\\Users\\raufk\\.gradle\\caches\\9.0-milestone-1\\transforms\\1d55769f61e2e54889e43374c247969a\\transformed\\browser-1.7.0\\res\\values-it\\values-it.xml",
+                    "from": {
+                        "startLines": "2,3,4,5",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "55,155,253,363",
+                        "endColumns": "99,97,109,102",
+                        "endOffsets": "150,248,358,461"
+                    },
+                    "to": {
+                        "startLines": "27,28,29,30",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "3024,3124,3222,3332",
+                        "endColumns": "99,97,109,102",
+                        "endOffsets": "3119,3217,3327,3430"
+                    }
+                },
                 {
                     "source": "C:\\Users\\raufk\\.gradle\\caches\\9.0-milestone-1\\transforms\\bba0f5a7539fa5c4c472fd516c09f271\\transformed\\jetified-play-services-base-18.0.0\\res\\values-it\\values.xml",
                     "from": {
@@ -52,23 +69,6 @@
                         "startOffsets": "3435,3481,3532,3600,3670,3746,3848,3915,4027,4132,4186,4248,4378,4474,4520,4623,4662,4701,4758,4844,4994",
                         "endColumns": "45,50,67,69,75,101,66,111,104,53,61,129,95,45,102,38,38,56,85,48,59",
                         "endOffsets": "3476,3527,3595,3665,3741,3843,3910,4022,4127,4181,4243,4373,4469,4515,4618,4657,4696,4753,4839,4888,5049"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\raufk\\.gradle\\caches\\9.0-milestone-1\\transforms\\f068a5336ae1f79b32ab2bf54899d1f1\\transformed\\browser-1.4.0\\res\\values-it\\values-it.xml",
-                    "from": {
-                        "startLines": "2,3,4,5",
-                        "startColumns": "4,4,4,4",
-                        "startOffsets": "55,155,253,363",
-                        "endColumns": "99,97,109,102",
-                        "endOffsets": "150,248,358,461"
-                    },
-                    "to": {
-                        "startLines": "27,28,29,30",
-                        "startColumns": "4,4,4,4",
-                        "startOffsets": "3024,3124,3222,3332",
-                        "endColumns": "99,97,109,102",
-                        "endOffsets": "3119,3217,3327,3430"
                     }
                 },
                 {

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#141428"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="20dp"
+        android:paddingTop="40dp"
+        android:gravity="center_horizontal">
+
+        <!-- MENU HEADER -->
+        <TextView
+            android:id="@+id/menuTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MENU"
+            android:textColor="#FF00FF"
+            android:textSize="48sp"
+            android:textStyle="bold|italic"
+            android:shadowColor="#FF00FF"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="30"
+            android:paddingEnd="20dp"
+            android:paddingRight="20dp"
+            android:layout_marginBottom="40dp"/>
+
+        <!-- BUTTONS CONTAINER -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="60dp"
+            android:paddingRight="60dp">
+
+            <Button
+                android:id="@+id/btnStart"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="START GAME"
+                android:background="@drawable/bg_button_rounded_cyan"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginBottom="12dp" />
+
+            <Button
+                android:id="@+id/btnOnline"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="PLAY ONLINE"
+                android:background="@drawable/bg_button_rounded_green"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginBottom="12dp" />
+
+            <Button
+                android:id="@+id/btnHowTo"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="HOW TO PLAY"
+                android:background="@drawable/bg_button_rounded_purple"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginBottom="12dp" />
+
+            <Button
+                android:id="@+id/btnHallOfFame"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="HALL OF FAME"
+                android:background="@drawable/bg_button_rounded_gold"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginBottom="12dp" />
+
+            <Button
+                android:id="@+id/btnShop"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="SHOP"
+                android:background="@drawable/bg_button_rounded_red"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginBottom="12dp" />
+
+            <Button
+                android:id="@+id/btnSettings"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="SETTINGS"
+                android:background="@drawable/bg_button_rounded_orange"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginBottom="24dp"/>
+        </LinearLayout>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- FOOTER -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SYSTEM READY"
+            android:textColor="#666666"
+            android:letterSpacing="0.4"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="20dp"/>
+
+    </LinearLayout>
+</ScrollView>

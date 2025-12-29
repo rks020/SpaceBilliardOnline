@@ -94,7 +94,7 @@ public class NeonButton extends View {
         float w = getWidth();
         float h = getHeight();
         float margin = 4 * density;
-        float radius = 12 * density;
+        float radius = h / 2; // Pill shape
 
         if (bounds == null) {
             bounds = new RectF();

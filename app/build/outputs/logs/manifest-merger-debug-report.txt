@@ -1,11 +1,10 @@
 -- Merging decision tree log ---
 manifest
-ADDED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:2:1-58:12
-INJECTED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:2:1-58:12
-INJECTED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:2:1-58:12
-INJECTED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:2:1-58:12
+ADDED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:2:1-68:12
+INJECTED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:2:1-68:12
+INJECTED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:2:1-68:12
+INJECTED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:2:1-68:12
 MERGED from [com.google.android.gms:play-services-ads:23.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\76bd5522a9076ad76cdb75b370372134\transformed\jetified-play-services-ads-23.0.0\AndroidManifest.xml:17:1-25:12
-MERGED from [androidx.browser:browser:1.4.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\f068a5336ae1f79b32ab2bf54899d1f1\transformed\browser-1.4.0\AndroidManifest.xml:17:1-24:12
 MERGED from [com.google.android.gms:play-services-ads-lite:23.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\2f2376e76b0ce388815ae6a890163e13\transformed\jetified-play-services-ads-lite-23.0.0\AndroidManifest.xml:17:1-95:12
 MERGED from [com.google.android.gms:play-services-ads-base:23.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\c4f4db975def1d2a1bd8cd458aefcccc\transformed\jetified-play-services-ads-base-23.0.0\AndroidManifest.xml:2:1-9:12
 MERGED from [com.google.android.gms:play-services-ads-identifier:18.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\4448b72345c7559a3c6481d108df4151\transformed\jetified-play-services-ads-identifier-18.0.0\AndroidManifest.xml:17:1-27:12
@@ -28,28 +27,40 @@ MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.0.0] C:\Users\raufk\
 MERGED from [androidx.customview:customview:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\9c1fc1d5fa559fbbd0ab5e359c3247c1\transformed\customview-1.0.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\778937e0eee15b14e957e2bb407e7ec1\transformed\swiperefreshlayout-1.0.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.asynclayoutinflater:asynclayoutinflater:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\c2eba7d49c8b8dc4d08fd924bee75a2e\transformed\asynclayoutinflater-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [io.github.jan-tennert.supabase:postgrest-kt-android-debug:2.0.3] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\5eb60f5218fa7dc433ddb02a896820c3\transformed\jetified-postgrest-kt-debug\AndroidManifest.xml:2:1-7:12
+MERGED from [io.github.jan-tennert.supabase:gotrue-kt-android-debug:2.0.3] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\f95a8b117dc135b15c653f630e4def58\transformed\jetified-gotrue-kt-debug\AndroidManifest.xml:2:1-20:12
+MERGED from [androidx.browser:browser:1.7.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\1d55769f61e2e54889e43374c247969a\transformed\browser-1.7.0\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.core:core:1.12.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\96a788d4b25d8546e5bf24497a2f7085\transformed\core-1.12.0\AndroidManifest.xml:17:1-30:12
 MERGED from [androidx.privacysandbox.ads:ads-adservices-java:1.0.0-beta05] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\e44ab178dbb5865c4bf598ce6874fdf9\transformed\jetified-ads-adservices-java-1.0.0-beta05\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.privacysandbox.ads:ads-adservices:1.0.0-beta05] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\cd4c20c13fe7b7da1e8c3befec5d09c3\transformed\jetified-ads-adservices-1.0.0-beta05\AndroidManifest.xml:17:1-28:12
 MERGED from [androidx.core:core-ktx:1.12.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\c6b6dbc8c698ec9da1f82874235780de\transformed\jetified-core-ktx-1.12.0\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.annotation:annotation-experimental:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\3dbfee5916922fadd62d062e83728464\transformed\jetified-annotation-experimental-1.3.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\cbde5c6016fb5b2cecfb8f4a8b862381\transformed\interpolator-1.0.0\AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.lifecycle:lifecycle-service:2.1.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\7176ce7a3d249d22c788511a297c68ac\transformed\jetified-lifecycle-service-2.1.0\AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.lifecycle:lifecycle-runtime:2.3.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\4a499144acd3cda0b95bd9e3e1eaba0d\transformed\lifecycle-runtime-2.3.1\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\7adb3cf7515dee087afbebc4488930db\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:17:1-27:12
-MERGED from [androidx.lifecycle:lifecycle-livedata:2.1.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\8669bb019f0940c38e8cda980f2a59b2\transformed\lifecycle-livedata-2.1.0\AndroidManifest.xml:17:1-22:12
+MERGED from [io.github.jan-tennert.supabase:supabase-kt-android-debug:2.0.3] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\f8ee491c7676ddcfd82d4f4a796583a7\transformed\jetified-supabase-kt-debug\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.6.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\76d4bfb8a30c92fbf1504b7b6763bff5\transformed\lifecycle-livedata-core-2.6.2\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.6.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\712560c932611c61e89739ad198f9451\transformed\lifecycle-viewmodel-2.6.2\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-service:2.6.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\7bdd3738fb124529d496efb6fe96f6b0\transformed\jetified-lifecycle-service-2.6.2\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.6.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\e9ba0715e1b5c0a694be3682ca34e763\transformed\lifecycle-livedata-2.6.2\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\5e807e9c2cb44bfb2224fcc78ea7b8dc\transformed\jetified-lifecycle-process-2.6.2\AndroidManifest.xml:17:1-35:12
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.6.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\71af9b5bd91e4816b49c66b16856ab9c\transformed\lifecycle-runtime-2.6.2\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\66e629ec963cf0ee525b66cff38c5c1c\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:17:1-55:12
 MERGED from [androidx.room:room-runtime:2.2.5] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\3b752ac5b5cbf0c79d9822d7936cc8d0\transformed\room-runtime-2.2.5\AndroidManifest.xml:17:1-31:12
-MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.1.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\5756492df3d645c2d4405fc31809be85\transformed\lifecycle-livedata-core-2.1.0\AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.arch.core:core-runtime:2.1.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\ac4e415a61d9886541cdd673403a861b\transformed\core-runtime-2.1.0\AndroidManifest.xml:17:1-24:12
-MERGED from [androidx.startup:startup-runtime:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\07175e34072864ee29fa42a8e4a9959c\transformed\jetified-startup-runtime-1.0.0\AndroidManifest.xml:17:1-33:12
 MERGED from [androidx.sqlite:sqlite-framework:2.1.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\9e535949157532fb33785302e426aff8\transformed\sqlite-framework-2.1.0\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.sqlite:sqlite:2.1.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\9c8787e914fb6f6046ae8bc92e18df10\transformed\sqlite-2.1.0\AndroidManifest.xml:17:1-24:12
-MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\70c48dfb0a2c5a779e12d76e6736522c\transformed\lifecycle-viewmodel-2.0.0\AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.tracing:tracing:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\24aa52ae71fe60ce85a3155c44ef495d\transformed\jetified-tracing-1.0.0\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\7335ffa44067a9562385dc4992051b1a\transformed\cursoradapter-1.0.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.documentfile:documentfile:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\6e37b5705a9ae968e87b7d1649f09aab\transformed\documentfile-1.0.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\6ca0ac15ed52759e5fc60049fe81697f\transformed\localbroadcastmanager-1.0.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.print:print:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\786a29c4de8deff971c93ffc3dc2a8d3\transformed\print-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [com.russhwolf:multiplatform-settings-no-arg-android-debug:1.1.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\2c659f9e01330ba9635406146e06ad48\transformed\jetified-multiplatform-settings-no-arg-debug\AndroidManifest.xml:17:1-35:12
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\b4aafa527ddf619ad2202ce3de2c2531\transformed\jetified-startup-runtime-1.1.1\AndroidManifest.xml:17:1-33:12
+MERGED from [androidx.tracing:tracing:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\24aa52ae71fe60ce85a3155c44ef495d\transformed\jetified-tracing-1.0.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\3d7f3cce9387beee5e69e82a7281f369\transformed\core-runtime-2.2.0\AndroidManifest.xml:17:1-22:12
+MERGED from [com.soywiz.korlibs.krypto:krypto-android:4.0.10] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\24be0e6add6f6be41dd98bbb66bf7aa5\transformed\jetified-krypto-debug\AndroidManifest.xml:2:1-9:12
+MERGED from [co.touchlab:kermit-android-debug:2.0.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\97ba7c9bd33c9e0c7d9839740442a193\transformed\jetified-kermit-debug\AndroidManifest.xml:2:1-7:12
+MERGED from [co.touchlab:kermit-core-android-debug:2.0.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\2b60364ec52d949680fe624bd40c743d\transformed\jetified-kermit-core-debug\AndroidManifest.xml:2:1-7:12
+MERGED from [com.russhwolf:multiplatform-settings-coroutines-android-debug:1.1.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\4d0f70833ca2fe7bcf00bf51683b9f42\transformed\jetified-multiplatform-settings-coroutines-debug\AndroidManifest.xml:2:1-7:12
+MERGED from [com.russhwolf:multiplatform-settings-android-debug:1.1.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\93e66cce1fb5730d52a05b170284a0f2\transformed\jetified-multiplatform-settings-debug\AndroidManifest.xml:2:1-7:12
 	package
 		ADDED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:3:5-36
 		INJECTED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml
@@ -78,8 +89,8 @@ MERGED from [androidx.work:work-runtime:2.7.0] C:\Users\raufk\.gradle\caches\9.0
 	android:name
 		ADDED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:7:22-76
 application
-ADDED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:9:5-56:19
-INJECTED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:9:5-56:19
+ADDED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:9:5-66:19
+INJECTED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:9:5-66:19
 MERGED from [com.google.android.gms:play-services-ads-lite:23.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\2f2376e76b0ce388815ae6a890163e13\transformed\jetified-play-services-ads-lite-23.0.0\AndroidManifest.xml:53:5-93:19
 MERGED from [com.google.android.gms:play-services-ads-lite:23.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\2f2376e76b0ce388815ae6a890163e13\transformed\jetified-play-services-ads-lite-23.0.0\AndroidManifest.xml:53:5-93:19
 MERGED from [com.google.android.gms:play-services-ads-base:23.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\c4f4db975def1d2a1bd8cd458aefcccc\transformed\jetified-play-services-ads-base-23.0.0\AndroidManifest.xml:7:5-20
@@ -98,16 +109,24 @@ MERGED from [com.google.android.gms:play-services-basement:18.2.0] C:\Users\rauf
 MERGED from [com.google.android.gms:play-services-basement:18.2.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\92af7687f5e7bd1f73aa69f8ea3ffdab\transformed\jetified-play-services-basement-18.2.0\AndroidManifest.xml:20:5-24:19
 MERGED from [androidx.work:work-runtime:2.7.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\9564a5f975dcf7367fbad24408f9555e\transformed\work-runtime-2.7.0\AndroidManifest.xml:30:5-143:19
 MERGED from [androidx.work:work-runtime:2.7.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\9564a5f975dcf7367fbad24408f9555e\transformed\work-runtime-2.7.0\AndroidManifest.xml:30:5-143:19
+MERGED from [io.github.jan-tennert.supabase:gotrue-kt-android-debug:2.0.3] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\f95a8b117dc135b15c653f630e4def58\transformed\jetified-gotrue-kt-debug\AndroidManifest.xml:8:5-18:19
+MERGED from [io.github.jan-tennert.supabase:gotrue-kt-android-debug:2.0.3] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\f95a8b117dc135b15c653f630e4def58\transformed\jetified-gotrue-kt-debug\AndroidManifest.xml:8:5-18:19
 MERGED from [androidx.core:core:1.12.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\96a788d4b25d8546e5bf24497a2f7085\transformed\core-1.12.0\AndroidManifest.xml:28:5-89
 MERGED from [androidx.core:core:1.12.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\96a788d4b25d8546e5bf24497a2f7085\transformed\core-1.12.0\AndroidManifest.xml:28:5-89
 MERGED from [androidx.privacysandbox.ads:ads-adservices:1.0.0-beta05] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\cd4c20c13fe7b7da1e8c3befec5d09c3\transformed\jetified-ads-adservices-1.0.0-beta05\AndroidManifest.xml:22:5-26:19
 MERGED from [androidx.privacysandbox.ads:ads-adservices:1.0.0-beta05] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\cd4c20c13fe7b7da1e8c3befec5d09c3\transformed\jetified-ads-adservices-1.0.0-beta05\AndroidManifest.xml:22:5-26:19
 MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\7adb3cf7515dee087afbebc4488930db\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:24:5-25:19
 MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\7adb3cf7515dee087afbebc4488930db\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\5e807e9c2cb44bfb2224fcc78ea7b8dc\transformed\jetified-lifecycle-process-2.6.2\AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\5e807e9c2cb44bfb2224fcc78ea7b8dc\transformed\jetified-lifecycle-process-2.6.2\AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\66e629ec963cf0ee525b66cff38c5c1c\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:23:5-53:19
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\66e629ec963cf0ee525b66cff38c5c1c\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:23:5-53:19
 MERGED from [androidx.room:room-runtime:2.2.5] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\3b752ac5b5cbf0c79d9822d7936cc8d0\transformed\room-runtime-2.2.5\AndroidManifest.xml:24:5-29:19
 MERGED from [androidx.room:room-runtime:2.2.5] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\3b752ac5b5cbf0c79d9822d7936cc8d0\transformed\room-runtime-2.2.5\AndroidManifest.xml:24:5-29:19
-MERGED from [androidx.startup:startup-runtime:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\07175e34072864ee29fa42a8e4a9959c\transformed\jetified-startup-runtime-1.0.0\AndroidManifest.xml:25:5-31:19
-MERGED from [androidx.startup:startup-runtime:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\07175e34072864ee29fa42a8e4a9959c\transformed\jetified-startup-runtime-1.0.0\AndroidManifest.xml:25:5-31:19
+MERGED from [com.russhwolf:multiplatform-settings-no-arg-android-debug:1.1.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\2c659f9e01330ba9635406146e06ad48\transformed\jetified-multiplatform-settings-no-arg-debug\AndroidManifest.xml:23:5-33:19
+MERGED from [com.russhwolf:multiplatform-settings-no-arg-android-debug:1.1.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\2c659f9e01330ba9635406146e06ad48\transformed\jetified-multiplatform-settings-no-arg-debug\AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\b4aafa527ddf619ad2202ce3de2c2531\transformed\jetified-startup-runtime-1.1.1\AndroidManifest.xml:25:5-31:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\b4aafa527ddf619ad2202ce3de2c2531\transformed\jetified-startup-runtime-1.1.1\AndroidManifest.xml:25:5-31:19
 	android:extractNativeLibs
 		INJECTED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml
 	android:appComponentFactory
@@ -190,14 +209,28 @@ ADDED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\Andro
 		ADDED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:55:13-71
 	android:name
 		ADDED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:53:13-68
+activity#com.spacebilliard.app.MainMenuActivity
+ADDED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:57:9-60:73
+	android:screenOrientation
+		ADDED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:59:13-49
+	android:theme
+		ADDED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:60:13-71
+	android:name
+		ADDED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:58:13-66
+activity#com.spacebilliard.app.SettingsActivity
+ADDED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:62:9-65:73
+	android:screenOrientation
+		ADDED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:64:13-49
+	android:theme
+		ADDED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:65:13-71
+	android:name
+		ADDED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:63:13-66
 uses-sdk
 INJECTED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml
 INJECTED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml
 MERGED from [com.google.android.gms:play-services-ads:23.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\76bd5522a9076ad76cdb75b370372134\transformed\jetified-play-services-ads-23.0.0\AndroidManifest.xml:21:5-23:52
 MERGED from [com.google.android.gms:play-services-ads:23.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\76bd5522a9076ad76cdb75b370372134\transformed\jetified-play-services-ads-23.0.0\AndroidManifest.xml:21:5-23:52
-MERGED from [androidx.browser:browser:1.4.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\f068a5336ae1f79b32ab2bf54899d1f1\transformed\browser-1.4.0\AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.browser:browser:1.4.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\f068a5336ae1f79b32ab2bf54899d1f1\transformed\browser-1.4.0\AndroidManifest.xml:20:5-22:41
 MERGED from [com.google.android.gms:play-services-ads-lite:23.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\2f2376e76b0ce388815ae6a890163e13\transformed\jetified-play-services-ads-lite-23.0.0\AndroidManifest.xml:21:5-44
 MERGED from [com.google.android.gms:play-services-ads-lite:23.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\2f2376e76b0ce388815ae6a890163e13\transformed\jetified-play-services-ads-lite-23.0.0\AndroidManifest.xml:21:5-44
 MERGED from [com.google.android.gms:play-services-ads-base:23.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\c4f4db975def1d2a1bd8cd458aefcccc\transformed\jetified-play-services-ads-base-23.0.0\AndroidManifest.xml:5:5-44
@@ -242,6 +275,12 @@ MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.0.0] C:\Users\rauf
 MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\778937e0eee15b14e957e2bb407e7ec1\transformed\swiperefreshlayout-1.0.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.asynclayoutinflater:asynclayoutinflater:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\c2eba7d49c8b8dc4d08fd924bee75a2e\transformed\asynclayoutinflater-1.0.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.asynclayoutinflater:asynclayoutinflater:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\c2eba7d49c8b8dc4d08fd924bee75a2e\transformed\asynclayoutinflater-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [io.github.jan-tennert.supabase:postgrest-kt-android-debug:2.0.3] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\5eb60f5218fa7dc433ddb02a896820c3\transformed\jetified-postgrest-kt-debug\AndroidManifest.xml:5:5-44
+MERGED from [io.github.jan-tennert.supabase:postgrest-kt-android-debug:2.0.3] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\5eb60f5218fa7dc433ddb02a896820c3\transformed\jetified-postgrest-kt-debug\AndroidManifest.xml:5:5-44
+MERGED from [io.github.jan-tennert.supabase:gotrue-kt-android-debug:2.0.3] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\f95a8b117dc135b15c653f630e4def58\transformed\jetified-gotrue-kt-debug\AndroidManifest.xml:6:5-44
+MERGED from [io.github.jan-tennert.supabase:gotrue-kt-android-debug:2.0.3] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\f95a8b117dc135b15c653f630e4def58\transformed\jetified-gotrue-kt-debug\AndroidManifest.xml:6:5-44
+MERGED from [androidx.browser:browser:1.7.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\1d55769f61e2e54889e43374c247969a\transformed\browser-1.7.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.browser:browser:1.7.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\1d55769f61e2e54889e43374c247969a\transformed\browser-1.7.0\AndroidManifest.xml:5:5-44
 MERGED from [androidx.core:core:1.12.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\96a788d4b25d8546e5bf24497a2f7085\transformed\core-1.12.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.core:core:1.12.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\96a788d4b25d8546e5bf24497a2f7085\transformed\core-1.12.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.privacysandbox.ads:ads-adservices-java:1.0.0-beta05] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\e44ab178dbb5865c4bf598ce6874fdf9\transformed\jetified-ads-adservices-java-1.0.0-beta05\AndroidManifest.xml:5:5-44
@@ -254,30 +293,30 @@ MERGED from [androidx.annotation:annotation-experimental:1.3.0] C:\Users\raufk\.
 MERGED from [androidx.annotation:annotation-experimental:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\3dbfee5916922fadd62d062e83728464\transformed\jetified-annotation-experimental-1.3.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\cbde5c6016fb5b2cecfb8f4a8b862381\transformed\interpolator-1.0.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\cbde5c6016fb5b2cecfb8f4a8b862381\transformed\interpolator-1.0.0\AndroidManifest.xml:20:5-44
-MERGED from [androidx.lifecycle:lifecycle-service:2.1.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\7176ce7a3d249d22c788511a297c68ac\transformed\jetified-lifecycle-service-2.1.0\AndroidManifest.xml:20:5-44
-MERGED from [androidx.lifecycle:lifecycle-service:2.1.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\7176ce7a3d249d22c788511a297c68ac\transformed\jetified-lifecycle-service-2.1.0\AndroidManifest.xml:20:5-44
-MERGED from [androidx.lifecycle:lifecycle-runtime:2.3.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\4a499144acd3cda0b95bd9e3e1eaba0d\transformed\lifecycle-runtime-2.3.1\AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.lifecycle:lifecycle-runtime:2.3.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\4a499144acd3cda0b95bd9e3e1eaba0d\transformed\lifecycle-runtime-2.3.1\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\7adb3cf7515dee087afbebc4488930db\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\7adb3cf7515dee087afbebc4488930db\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.lifecycle:lifecycle-livedata:2.1.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\8669bb019f0940c38e8cda980f2a59b2\transformed\lifecycle-livedata-2.1.0\AndroidManifest.xml:20:5-44
-MERGED from [androidx.lifecycle:lifecycle-livedata:2.1.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\8669bb019f0940c38e8cda980f2a59b2\transformed\lifecycle-livedata-2.1.0\AndroidManifest.xml:20:5-44
+MERGED from [io.github.jan-tennert.supabase:supabase-kt-android-debug:2.0.3] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\f8ee491c7676ddcfd82d4f4a796583a7\transformed\jetified-supabase-kt-debug\AndroidManifest.xml:5:5-44
+MERGED from [io.github.jan-tennert.supabase:supabase-kt-android-debug:2.0.3] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\f8ee491c7676ddcfd82d4f4a796583a7\transformed\jetified-supabase-kt-debug\AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.6.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\76d4bfb8a30c92fbf1504b7b6763bff5\transformed\lifecycle-livedata-core-2.6.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.6.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\76d4bfb8a30c92fbf1504b7b6763bff5\transformed\lifecycle-livedata-core-2.6.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.6.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\712560c932611c61e89739ad198f9451\transformed\lifecycle-viewmodel-2.6.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.6.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\712560c932611c61e89739ad198f9451\transformed\lifecycle-viewmodel-2.6.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-service:2.6.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\7bdd3738fb124529d496efb6fe96f6b0\transformed\jetified-lifecycle-service-2.6.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-service:2.6.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\7bdd3738fb124529d496efb6fe96f6b0\transformed\jetified-lifecycle-service-2.6.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.6.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\e9ba0715e1b5c0a694be3682ca34e763\transformed\lifecycle-livedata-2.6.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.6.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\e9ba0715e1b5c0a694be3682ca34e763\transformed\lifecycle-livedata-2.6.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\5e807e9c2cb44bfb2224fcc78ea7b8dc\transformed\jetified-lifecycle-process-2.6.2\AndroidManifest.xml:21:5-44
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\5e807e9c2cb44bfb2224fcc78ea7b8dc\transformed\jetified-lifecycle-process-2.6.2\AndroidManifest.xml:21:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.6.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\71af9b5bd91e4816b49c66b16856ab9c\transformed\lifecycle-runtime-2.6.2\AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.6.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\71af9b5bd91e4816b49c66b16856ab9c\transformed\lifecycle-runtime-2.6.2\AndroidManifest.xml:5:5-44
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\66e629ec963cf0ee525b66cff38c5c1c\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:21:5-44
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\66e629ec963cf0ee525b66cff38c5c1c\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:21:5-44
 MERGED from [androidx.room:room-runtime:2.2.5] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\3b752ac5b5cbf0c79d9822d7936cc8d0\transformed\room-runtime-2.2.5\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.room:room-runtime:2.2.5] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\3b752ac5b5cbf0c79d9822d7936cc8d0\transformed\room-runtime-2.2.5\AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.1.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\5756492df3d645c2d4405fc31809be85\transformed\lifecycle-livedata-core-2.1.0\AndroidManifest.xml:20:5-44
-MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.1.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\5756492df3d645c2d4405fc31809be85\transformed\lifecycle-livedata-core-2.1.0\AndroidManifest.xml:20:5-44
-MERGED from [androidx.arch.core:core-runtime:2.1.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\ac4e415a61d9886541cdd673403a861b\transformed\core-runtime-2.1.0\AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.arch.core:core-runtime:2.1.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\ac4e415a61d9886541cdd673403a861b\transformed\core-runtime-2.1.0\AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.startup:startup-runtime:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\07175e34072864ee29fa42a8e4a9959c\transformed\jetified-startup-runtime-1.0.0\AndroidManifest.xml:21:5-23:41
-MERGED from [androidx.startup:startup-runtime:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\07175e34072864ee29fa42a8e4a9959c\transformed\jetified-startup-runtime-1.0.0\AndroidManifest.xml:21:5-23:41
 MERGED from [androidx.sqlite:sqlite-framework:2.1.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\9e535949157532fb33785302e426aff8\transformed\sqlite-framework-2.1.0\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.sqlite:sqlite-framework:2.1.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\9e535949157532fb33785302e426aff8\transformed\sqlite-framework-2.1.0\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.sqlite:sqlite:2.1.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\9c8787e914fb6f6046ae8bc92e18df10\transformed\sqlite-2.1.0\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.sqlite:sqlite:2.1.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\9c8787e914fb6f6046ae8bc92e18df10\transformed\sqlite-2.1.0\AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\70c48dfb0a2c5a779e12d76e6736522c\transformed\lifecycle-viewmodel-2.0.0\AndroidManifest.xml:20:5-44
-MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\70c48dfb0a2c5a779e12d76e6736522c\transformed\lifecycle-viewmodel-2.0.0\AndroidManifest.xml:20:5-44
-MERGED from [androidx.tracing:tracing:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\24aa52ae71fe60ce85a3155c44ef495d\transformed\jetified-tracing-1.0.0\AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.tracing:tracing:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\24aa52ae71fe60ce85a3155c44ef495d\transformed\jetified-tracing-1.0.0\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\7335ffa44067a9562385dc4992051b1a\transformed\cursoradapter-1.0.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\7335ffa44067a9562385dc4992051b1a\transformed\cursoradapter-1.0.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.documentfile:documentfile:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\6e37b5705a9ae968e87b7d1649f09aab\transformed\documentfile-1.0.0\AndroidManifest.xml:20:5-44
@@ -286,6 +325,24 @@ MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] C:\User
 MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\6ca0ac15ed52759e5fc60049fe81697f\transformed\localbroadcastmanager-1.0.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.print:print:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\786a29c4de8deff971c93ffc3dc2a8d3\transformed\print-1.0.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.print:print:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\786a29c4de8deff971c93ffc3dc2a8d3\transformed\print-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [com.russhwolf:multiplatform-settings-no-arg-android-debug:1.1.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\2c659f9e01330ba9635406146e06ad48\transformed\jetified-multiplatform-settings-no-arg-debug\AndroidManifest.xml:21:5-44
+MERGED from [com.russhwolf:multiplatform-settings-no-arg-android-debug:1.1.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\2c659f9e01330ba9635406146e06ad48\transformed\jetified-multiplatform-settings-no-arg-debug\AndroidManifest.xml:21:5-44
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\b4aafa527ddf619ad2202ce3de2c2531\transformed\jetified-startup-runtime-1.1.1\AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\b4aafa527ddf619ad2202ce3de2c2531\transformed\jetified-startup-runtime-1.1.1\AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.tracing:tracing:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\24aa52ae71fe60ce85a3155c44ef495d\transformed\jetified-tracing-1.0.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.tracing:tracing:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\24aa52ae71fe60ce85a3155c44ef495d\transformed\jetified-tracing-1.0.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\3d7f3cce9387beee5e69e82a7281f369\transformed\core-runtime-2.2.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\3d7f3cce9387beee5e69e82a7281f369\transformed\core-runtime-2.2.0\AndroidManifest.xml:20:5-44
+MERGED from [com.soywiz.korlibs.krypto:krypto-android:4.0.10] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\24be0e6add6f6be41dd98bbb66bf7aa5\transformed\jetified-krypto-debug\AndroidManifest.xml:5:5-7:41
+MERGED from [com.soywiz.korlibs.krypto:krypto-android:4.0.10] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\24be0e6add6f6be41dd98bbb66bf7aa5\transformed\jetified-krypto-debug\AndroidManifest.xml:5:5-7:41
+MERGED from [co.touchlab:kermit-android-debug:2.0.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\97ba7c9bd33c9e0c7d9839740442a193\transformed\jetified-kermit-debug\AndroidManifest.xml:5:5-44
+MERGED from [co.touchlab:kermit-android-debug:2.0.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\97ba7c9bd33c9e0c7d9839740442a193\transformed\jetified-kermit-debug\AndroidManifest.xml:5:5-44
+MERGED from [co.touchlab:kermit-core-android-debug:2.0.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\2b60364ec52d949680fe624bd40c743d\transformed\jetified-kermit-core-debug\AndroidManifest.xml:5:5-44
+MERGED from [co.touchlab:kermit-core-android-debug:2.0.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\2b60364ec52d949680fe624bd40c743d\transformed\jetified-kermit-core-debug\AndroidManifest.xml:5:5-44
+MERGED from [com.russhwolf:multiplatform-settings-coroutines-android-debug:1.1.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\4d0f70833ca2fe7bcf00bf51683b9f42\transformed\jetified-multiplatform-settings-coroutines-debug\AndroidManifest.xml:5:5-44
+MERGED from [com.russhwolf:multiplatform-settings-coroutines-android-debug:1.1.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\4d0f70833ca2fe7bcf00bf51683b9f42\transformed\jetified-multiplatform-settings-coroutines-debug\AndroidManifest.xml:5:5-44
+MERGED from [com.russhwolf:multiplatform-settings-android-debug:1.1.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\93e66cce1fb5730d52a05b170284a0f2\transformed\jetified-multiplatform-settings-debug\AndroidManifest.xml:5:5-44
+MERGED from [com.russhwolf:multiplatform-settings-android-debug:1.1.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\93e66cce1fb5730d52a05b170284a0f2\transformed\jetified-multiplatform-settings-debug\AndroidManifest.xml:5:5-44
 	tools:overrideLibrary
 		ADDED from [com.google.android.gms:play-services-ads:23.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\76bd5522a9076ad76cdb75b370372134\transformed\jetified-play-services-ads-23.0.0\AndroidManifest.xml:23:9-49
 	android:targetSdkVersion
@@ -433,8 +490,16 @@ ADDED from [androidx.work:work-runtime:2.7.0] C:\Users\raufk\.gradle\caches\9.0-
 		ADDED from [androidx.work:work-runtime:2.7.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\9564a5f975dcf7367fbad24408f9555e\transformed\work-runtime-2.7.0\AndroidManifest.xml:28:22-74
 provider#androidx.startup.InitializationProvider
 ADDED from [androidx.work:work-runtime:2.7.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\9564a5f975dcf7367fbad24408f9555e\transformed\work-runtime-2.7.0\AndroidManifest.xml:31:9-39:20
-MERGED from [androidx.startup:startup-runtime:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\07175e34072864ee29fa42a8e4a9959c\transformed\jetified-startup-runtime-1.0.0\AndroidManifest.xml:26:9-30:34
-MERGED from [androidx.startup:startup-runtime:1.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\07175e34072864ee29fa42a8e4a9959c\transformed\jetified-startup-runtime-1.0.0\AndroidManifest.xml:26:9-30:34
+MERGED from [io.github.jan-tennert.supabase:gotrue-kt-android-debug:2.0.3] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\f95a8b117dc135b15c653f630e4def58\transformed\jetified-gotrue-kt-debug\AndroidManifest.xml:9:9-17:20
+MERGED from [io.github.jan-tennert.supabase:gotrue-kt-android-debug:2.0.3] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\f95a8b117dc135b15c653f630e4def58\transformed\jetified-gotrue-kt-debug\AndroidManifest.xml:9:9-17:20
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\5e807e9c2cb44bfb2224fcc78ea7b8dc\transformed\jetified-lifecycle-process-2.6.2\AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\5e807e9c2cb44bfb2224fcc78ea7b8dc\transformed\jetified-lifecycle-process-2.6.2\AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\66e629ec963cf0ee525b66cff38c5c1c\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\66e629ec963cf0ee525b66cff38c5c1c\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:24:9-32:20
+MERGED from [com.russhwolf:multiplatform-settings-no-arg-android-debug:1.1.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\2c659f9e01330ba9635406146e06ad48\transformed\jetified-multiplatform-settings-no-arg-debug\AndroidManifest.xml:24:9-32:20
+MERGED from [com.russhwolf:multiplatform-settings-no-arg-android-debug:1.1.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\2c659f9e01330ba9635406146e06ad48\transformed\jetified-multiplatform-settings-no-arg-debug\AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\b4aafa527ddf619ad2202ce3de2c2531\transformed\jetified-startup-runtime-1.1.1\AndroidManifest.xml:26:9-30:34
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\b4aafa527ddf619ad2202ce3de2c2531\transformed\jetified-startup-runtime-1.1.1\AndroidManifest.xml:26:9-30:34
 	tools:node
 		ADDED from [androidx.work:work-runtime:2.7.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\9564a5f975dcf7367fbad24408f9555e\transformed\work-runtime-2.7.0\AndroidManifest.xml:35:13-31
 	android:authorities
@@ -647,6 +712,12 @@ action#androidx.work.diagnostics.REQUEST_DIAGNOSTICS
 ADDED from [androidx.work:work-runtime:2.7.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\9564a5f975dcf7367fbad24408f9555e\transformed\work-runtime-2.7.0\AndroidManifest.xml:140:17-88
 	android:name
 		ADDED from [androidx.work:work-runtime:2.7.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\9564a5f975dcf7367fbad24408f9555e\transformed\work-runtime-2.7.0\AndroidManifest.xml:140:25-85
+meta-data#io.github.jan.supabase.gotrue.SupabaseInitializer
+ADDED from [io.github.jan-tennert.supabase:gotrue-kt-android-debug:2.0.3] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\f95a8b117dc135b15c653f630e4def58\transformed\jetified-gotrue-kt-debug\AndroidManifest.xml:14:13-16:52
+	android:value
+		ADDED from [io.github.jan-tennert.supabase:gotrue-kt-android-debug:2.0.3] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\f95a8b117dc135b15c653f630e4def58\transformed\jetified-gotrue-kt-debug\AndroidManifest.xml:16:17-49
+	android:name
+		ADDED from [io.github.jan-tennert.supabase:gotrue-kt-android-debug:2.0.3] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\f95a8b117dc135b15c653f630e4def58\transformed\jetified-gotrue-kt-debug\AndroidManifest.xml:15:17-81
 permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
 ADDED from [androidx.core:core:1.12.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\96a788d4b25d8546e5bf24497a2f7085\transformed\core-1.12.0\AndroidManifest.xml:22:5-24:47
 	android:protectionLevel
@@ -673,6 +744,54 @@ ADDED from [androidx.privacysandbox.ads:ads-adservices:1.0.0-beta05] C:\Users\ra
 		ADDED from [androidx.privacysandbox.ads:ads-adservices:1.0.0-beta05] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\cd4c20c13fe7b7da1e8c3befec5d09c3\transformed\jetified-ads-adservices-1.0.0-beta05\AndroidManifest.xml:25:13-37
 	android:name
 		ADDED from [androidx.privacysandbox.ads:ads-adservices:1.0.0-beta05] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\cd4c20c13fe7b7da1e8c3befec5d09c3\transformed\jetified-ads-adservices-1.0.0-beta05\AndroidManifest.xml:24:13-50
+meta-data#androidx.lifecycle.ProcessLifecycleInitializer
+ADDED from [androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\5e807e9c2cb44bfb2224fcc78ea7b8dc\transformed\jetified-lifecycle-process-2.6.2\AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\5e807e9c2cb44bfb2224fcc78ea7b8dc\transformed\jetified-lifecycle-process-2.6.2\AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\5e807e9c2cb44bfb2224fcc78ea7b8dc\transformed\jetified-lifecycle-process-2.6.2\AndroidManifest.xml:30:17-78
+meta-data#androidx.profileinstaller.ProfileInstallerInitializer
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\66e629ec963cf0ee525b66cff38c5c1c\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\66e629ec963cf0ee525b66cff38c5c1c\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\66e629ec963cf0ee525b66cff38c5c1c\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:30:17-85
+receiver#androidx.profileinstaller.ProfileInstallReceiver
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\66e629ec963cf0ee525b66cff38c5c1c\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:34:9-52:20
+	android:enabled
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\66e629ec963cf0ee525b66cff38c5c1c\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:37:13-35
+	android:exported
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\66e629ec963cf0ee525b66cff38c5c1c\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:38:13-36
+	android:permission
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\66e629ec963cf0ee525b66cff38c5c1c\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:39:13-57
+	android:directBootAware
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\66e629ec963cf0ee525b66cff38c5c1c\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:36:13-44
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\66e629ec963cf0ee525b66cff38c5c1c\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:35:13-76
+intent-filter#action:name:androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\66e629ec963cf0ee525b66cff38c5c1c\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:40:13-42:29
+action#androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\66e629ec963cf0ee525b66cff38c5c1c\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:41:17-91
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\66e629ec963cf0ee525b66cff38c5c1c\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:41:25-88
+intent-filter#action:name:androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\66e629ec963cf0ee525b66cff38c5c1c\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:43:13-45:29
+action#androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\66e629ec963cf0ee525b66cff38c5c1c\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:44:17-85
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\66e629ec963cf0ee525b66cff38c5c1c\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:44:25-82
+intent-filter#action:name:androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\66e629ec963cf0ee525b66cff38c5c1c\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:46:13-48:29
+action#androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\66e629ec963cf0ee525b66cff38c5c1c\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:47:17-88
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\66e629ec963cf0ee525b66cff38c5c1c\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:47:25-85
+intent-filter#action:name:androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\66e629ec963cf0ee525b66cff38c5c1c\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:49:13-51:29
+action#androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\66e629ec963cf0ee525b66cff38c5c1c\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:50:17-95
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\66e629ec963cf0ee525b66cff38c5c1c\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:50:25-92
 service#androidx.room.MultiInstanceInvalidationService
 ADDED from [androidx.room:room-runtime:2.2.5] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\3b752ac5b5cbf0c79d9822d7936cc8d0\transformed\room-runtime-2.2.5\AndroidManifest.xml:25:9-28:40
 	android:exported
@@ -681,3 +800,9 @@ ADDED from [androidx.room:room-runtime:2.2.5] C:\Users\raufk\.gradle\caches\9.0-
 		ADDED from [androidx.room:room-runtime:2.2.5] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\3b752ac5b5cbf0c79d9822d7936cc8d0\transformed\room-runtime-2.2.5\AndroidManifest.xml:27:13-43
 	android:name
 		ADDED from [androidx.room:room-runtime:2.2.5] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\3b752ac5b5cbf0c79d9822d7936cc8d0\transformed\room-runtime-2.2.5\AndroidManifest.xml:26:13-74
+meta-data#com.russhwolf.settings.SettingsInitializer
+ADDED from [com.russhwolf:multiplatform-settings-no-arg-android-debug:1.1.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\2c659f9e01330ba9635406146e06ad48\transformed\jetified-multiplatform-settings-no-arg-debug\AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [com.russhwolf:multiplatform-settings-no-arg-android-debug:1.1.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\2c659f9e01330ba9635406146e06ad48\transformed\jetified-multiplatform-settings-no-arg-debug\AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [com.russhwolf:multiplatform-settings-no-arg-android-debug:1.1.1] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\2c659f9e01330ba9635406146e06ad48\transformed\jetified-multiplatform-settings-no-arg-debug\AndroidManifest.xml:30:17-74

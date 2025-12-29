@@ -46,6 +46,12 @@ dependencies {
     // AdMob - Google Mobile Ads SDK
     implementation 'com.google.android.gms:play-services-ads:23.0.0'
     
+    // Supabase - Backend for user profiles and stats
+    implementation 'io.github.jan-tennert.supabase:postgrest-kt:2.0.3'
+    implementation 'io.ktor:ktor-client-android:2.3.7'
+    implementation 'io.ktor:ktor-client-core:2.3.7'
+    implementation 'io.ktor:ktor-utils:2.3.7'
+    
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
