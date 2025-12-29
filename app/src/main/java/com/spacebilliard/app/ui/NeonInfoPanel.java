@@ -76,7 +76,28 @@ public class NeonInfoPanel extends View {
         invalidate();
     }
 
+    // Animation Fields
+    private float coinTextScale = 1.0f;
+    private boolean isAnimatingCoin = false;
+    private long animationStartTime = 0;
+    private final float MAX_COIN_SCALE = 1.5f;
+
     public void setCoins(String coins) {
+        if (!this.coinsValue.equals(coins)) {
+            // Value changed, trigger animation if increasing
+            try {
+                int oldVal = Integer.parseInt(this.coinsValue);
+                int newVal = Integer.parseInt(coins);
+                if (newVal > oldVal) {
+                    isAnimatingCoin = true;
+                    animationStartTime = System.currentTimeMillis();
+                }
+            } catch (NumberFormatException e) {
+                // Ignore parsing errors
+                isAnimatingCoin = true;
+                animationStartTime = System.currentTimeMillis();
+            }
+        }
         this.coinsValue = coins;
         invalidate();
     }
@@ -101,6 +122,25 @@ public class NeonInfoPanel extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+
+        // Update Animation
+        if (isAnimatingCoin) {
+            long elapsed = System.currentTimeMillis() - animationStartTime;
+            if (elapsed < 200) {
+                // Grow
+                float ratio = elapsed / 200f;
+                coinTextScale = 1.0f + (MAX_COIN_SCALE - 1.0f) * ratio;
+            } else if (elapsed < 400) {
+                // Shrink
+                float ratio = (elapsed - 200) / 200f;
+                coinTextScale = MAX_COIN_SCALE - (MAX_COIN_SCALE - 1.0f) * ratio;
+            } else {
+                // End
+                coinTextScale = 1.0f;
+                isAnimatingCoin = false;
+            }
+            invalidate(); // Keep animating
+        }
 
         float w = getWidth();
         float h = getHeight();
@@ -159,8 +199,9 @@ public class NeonInfoPanel extends View {
         float startY = margin + headerH + 15 * density;
         float spacing = (h - startY - margin) / 3;
 
-        textPaint.setTextSize(11 * getResources().getDisplayMetrics().scaledDensity);
-        valuePaint.setTextSize(11 * getResources().getDisplayMetrics().scaledDensity);
+        float baseTextSize = 11 * getResources().getDisplayMetrics().scaledDensity;
+        textPaint.setTextSize(baseTextSize);
+        valuePaint.setTextSize(baseTextSize);
 
         // Line 1: TIME
         canvas.drawText(line1Label, leftContent, startY, textPaint);
@@ -175,7 +216,20 @@ public class NeonInfoPanel extends View {
         float iconX = leftContent;
         float iconY = startY + (spacing * 2) - iconSize / 1.5f;
         drawVectorCoin(canvas, iconX + iconSize / 2, iconY + iconSize / 2, iconSize / 2);
+
+        // APPLY ANIMATION SCALE
+        valuePaint.setTextSize(baseTextSize * coinTextScale);
+        if (isAnimatingCoin) {
+            valuePaint.setColor(Color.YELLOW); // Highlight color during animation
+        } else {
+            valuePaint.setColor(themeColor);
+        }
+
         canvas.drawText(coinsValue, iconX + iconSize + 10, startY + spacing * 2, valuePaint);
+
+        // Reset Paint
+        valuePaint.setTextSize(baseTextSize);
+        valuePaint.setColor(themeColor);
 
         // Technical accents: small "screws" in corners
         bgPaint.setColor(Color.argb(150, 200, 200, 200));

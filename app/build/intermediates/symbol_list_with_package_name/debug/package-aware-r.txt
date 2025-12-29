@@ -210,10 +210,13 @@ id btnCreateRoom
 id btnHallOfFame
 id btnHowTo
 id btnJoin
+id btnMainMenu
 id btnOk
 id btnOnline
+id btnReboot
 id btnRefresh
 id btnRematch
+id btnRevive
 id btnSave
 id btnSettings
 id btnShop
@@ -285,6 +288,7 @@ id text2
 id textHostName
 id textLosses
 id textRoomName
+id textTitle
 id textWins
 id time
 id title
@@ -295,6 +299,7 @@ id wide
 id winLossContainer
 integer google_play_services_version
 integer status_bar_notification_info_maxnum
+layout activity_game_over
 layout activity_main_menu
 layout activity_online
 layout activity_settings

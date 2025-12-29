@@ -209,10 +209,13 @@ int id btnCreateRoom 0x7f060037
 int id btnHallOfFame 0x7f060038
 int id btnHowTo 0x7f060039
 int id btnJoin 0x7f06003a
+int id btnMainMenu 0x7f06008f
 int id btnOk 0x7f06003b
 int id btnOnline 0x7f06003c
+int id btnReboot 0x7f060090
 int id btnRefresh 0x7f06003d
 int id btnRematch 0x7f06003e
+int id btnRevive 0x7f060091
 int id btnSave 0x7f06003f
 int id btnSettings 0x7f060040
 int id btnShop 0x7f060041
@@ -284,6 +287,7 @@ int id text2 0x7f060082
 int id textHostName 0x7f060083
 int id textLosses 0x7f060084
 int id textRoomName 0x7f060085
+int id textTitle 0x7f060092
 int id textWins 0x7f060086
 int id time 0x7f060087
 int id title 0x7f060088
@@ -294,6 +298,7 @@ int id wide 0x7f06008c
 int id winLossContainer 0x7f06008d
 int integer google_play_services_version 0x7f070000
 int integer status_bar_notification_info_maxnum 0x7f070001
+int layout activity_game_over 0x7f080015
 int layout activity_main_menu 0x7f080000
 int layout activity_online 0x7f080001
 int layout activity_settings 0x7f080002

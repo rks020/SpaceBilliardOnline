@@ -2,15 +2,15 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="true">
         <shape android:shape="rectangle">
-            <corners android:radius="30dp" />
-            <solid android:color="#CC8800" />
+            <corners android:radius="20dp" />
+            <solid android:color="#CCAA00" /> <!-- Darker Gold when pressed -->
             <stroke android:width="1dp" android:color="#FFFFFF" />
         </shape>
     </item>
     <item>
         <shape android:shape="rectangle">
-            <corners android:radius="30dp" />
-            <solid android:color="#FFAB00" />
+            <corners android:radius="20dp" />
+            <solid android:color="#FFD700" /> <!-- Gold -->
             <stroke android:width="0dp" android:color="#00000000" />
         </shape>
     </item>

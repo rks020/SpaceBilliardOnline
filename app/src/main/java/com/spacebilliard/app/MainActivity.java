@@ -38,7 +38,8 @@ public class MainActivity extends Activity {
     // Removed UI Panels
     // private NeonMainMenuPanel mainMenuPanel; // Moved to MainMenuActivity
 
-    private NeonGameOverPanel gameOverPanel;
+    // private NeonGameOverPanel gameOverPanel;
+    private static final int REQUEST_GAME_OVER = 999;
 
     // AdMob fields
     private AdView bannerAd;
@@ -129,18 +130,13 @@ public class MainActivity extends Activity {
 
         root.addView(bannerAd);
 
-        // Game Over Panel
-        gameOverPanel = new NeonGameOverPanel(this);
-        FrameLayout.LayoutParams menuParams = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT);
-        gameOverPanel.setLayoutParams(menuParams);
-        gameOverPanel.setVisibility(View.GONE); // Initially hidden
-        root.addView(gameOverPanel);
+        // Game Over Panel REPLACED by Activity
+        // gameOverPanel = new NeonGameOverPanel(this);
+        // ...
 
         // --- Setup Listeners ---
         // setupMainMenuListeners(); // Gone
-        setupGameOverListeners();
+        // setupGameOverListeners();
 
         setContentView(root);
 
@@ -170,26 +166,7 @@ public class MainActivity extends Activity {
         return false;
     }
 
-    private void setupGameOverListeners() {
-        gameOverPanel.btnRevive.setOnClickListener(v -> {
-            showRewardedAdForContinue();
-        });
-
-        gameOverPanel.btnReboot.setOnClickListener(v -> {
-            gameView.rebootLevel();
-            hideAllPanels();
-        });
-
-        gameOverPanel.btnHallOfFame.setOnClickListener(v -> {
-            gameView.showHighScore();
-            gameOverPanel.setVisibility(View.GONE);
-        });
-
-        gameOverPanel.btnMainMenu.setOnClickListener(v -> {
-            gameView.resetToMainMenu();
-            finish(); // Return to MainMenuActivity
-        });
-    }
+    // setupGameOverListeners removed
 
     // UI Helpers
 
@@ -197,7 +174,9 @@ public class MainActivity extends Activity {
 
     public void showGameOverScreen() {
         runOnUiThread(() -> {
-            gameOverPanel.setVisibility(View.VISIBLE);
+            // Launch GameOverActivity
+            Intent intent = new Intent(MainActivity.this, GameOverActivity.class);
+            startActivityForResult(intent, REQUEST_GAME_OVER);
 
             // Hide top panels in Game Over too
             if (infoPanel != null)
@@ -207,9 +186,32 @@ public class MainActivity extends Activity {
         });
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_GAME_OVER) {
+            if (resultCode == GameOverActivity.RESULT_REVIVE) {
+                showRewardedAdForContinue();
+            } else if (resultCode == GameOverActivity.RESULT_REBOOT) {
+                gameView.rebootLevel();
+                hideAllPanels();
+            } else if (resultCode == GameOverActivity.RESULT_HOF) {
+                gameView.showHighScore();
+                hideAllPanels();
+            } else if (resultCode == GameOverActivity.RESULT_MAIN_MENU) {
+                gameView.resetToMainMenu();
+                finish();
+            } else {
+                // Default to Main Menu if no result (e.g. back pressed without logic)
+                gameView.resetToMainMenu();
+                finish();
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
     public void hideAllPanels() {
         runOnUiThread(() -> {
-            gameOverPanel.setVisibility(View.GONE);
+            // gameOverPanel.setVisibility(View.GONE);
 
             // Show Info/Power panels when in game
             if (infoPanel != null)

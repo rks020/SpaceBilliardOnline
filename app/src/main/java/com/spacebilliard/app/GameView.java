@@ -178,6 +178,7 @@ public class GameView extends SurfaceView implements Runnable {
     private boolean extraTimeActive = false; // Added missing variable
     // Level geçiş beklemesi
     private boolean levelCompleted = false;
+    private int lastCoinAwardedLevel = 0; // Track which level last received coin reward
     private final long levelCompletionTime = 0;
     // Ses Efektleri
     private final SoundPool soundPool;
@@ -360,9 +361,15 @@ public class GameView extends SurfaceView implements Runnable {
                 whiteBall.vy = 0;
             }
 
-            // RESTORE BOSS HP ON REVIVE (User Request)
+            // RESTORE BOSS HP ON REVIVE (Reduced recovery)
             if (currentBoss != null) {
-                currentBoss.hp = Math.min(currentBoss.hp + (currentBoss.maxHp * 0.3f), currentBoss.maxHp);
+                // Reduced from 30% to 10% HP recovery
+                currentBoss.hp = Math.min(currentBoss.hp + (currentBoss.maxHp * 0.1f), currentBoss.maxHp);
+
+                // Reset boss position to starting point
+                currentBoss.x = centerX;
+                currentBoss.y = centerY - circleRadius * 0.6f;
+
                 floatingTexts.add(new FloatingText("BOSS RECOVERED!", centerX, centerY - 100, Color.RED));
             }
 
@@ -918,23 +925,24 @@ public class GameView extends SurfaceView implements Runnable {
         if (showBossDefeated && System.currentTimeMillis() - bossDefeatedTime > 3000) {
             showBossDefeated = false;
             if (coloredBalls.isEmpty() && pendingColoredBalls == 0) {
-                // Grant Reward for Boss Defeat (User Request)
-                // Access SharedPreferences via MainActivity or static context if possible.
-                // Since this update() is often on a thread, we should use runOnUiThread or
-                // commit properly.
-                // Assuming updateMainActivityPanels handles UI, but we need to update stored
-                // coins.
-                if (mainActivity != null) {
-                    android.content.SharedPreferences prefs = mainActivity.getSharedPreferences("SpaceBilliard",
-                            android.content.Context.MODE_PRIVATE);
-                    int currentCoins = prefs.getInt("coins", 0);
-                    currentCoins += 100; // Reward 100 coins
-                    prefs.edit().putInt("coins", currentCoins).apply();
+                // Grant Reward for Boss Defeat - 100 Coins
+                int oldCoins = coins;
+                coins += 100; // Reward 100 coins
+                lastCoinAwardedLevel = level; // Mark level as rewarded to prevent double reward
+                android.util.Log.d("GameView", "Boss defeated! Coins: " + oldCoins + " -> " + coins);
+                saveProgress(); // Save coins
 
-                    // Show a floating text for reward
-                    floatingTexts.add(new FloatingText("+100 COINS!", centerX, centerY, Color.YELLOW));
-                    playSound(soundPower);
+                // Force UI update to trigger animation
+                if (mainActivity != null) {
+                    mainActivity.runOnUiThread(() -> {
+                        android.util.Log.d("GameView", "Updating coin UI to: " + coins);
+                        updateMainActivityPanels();
+                    });
                 }
+
+                // Show a floating text for reward
+                floatingTexts.add(new FloatingText("+100 COINS!", centerX, centerY, Color.YELLOW));
+                playSound(soundPower);
 
                 levelCompleted = true;
                 showStageCleared = true;
@@ -1053,25 +1061,49 @@ public class GameView extends SurfaceView implements Runnable {
         }
 
         // Tüm toplar toplandı mı? (Ve Boss yoksa)
-        // Tüm toplar toplandı mı? (Ve Boss yoksa)
-        if (coloredBalls.size() == 0 && pendingColoredBalls == 0 && currentBoss == null && !levelCompleted
-                && !showBossDefeated) {
-            levelCompleted = true;
-            showStageCleared = true;
-            stageClearedTime = System.currentTimeMillis();
+        // DEBUG LOGGING - Track condition state
+        if (coloredBalls.size() == 0) {
+            android.util.Log.d("GameView", "All colored balls cleared! pendingBalls=" + pendingColoredBalls +
+                    ", boss=" + (currentBoss != null ? "EXISTS" : "null") +
+                    ", levelCompleted=" + levelCompleted +
+                    ", showBossDefeated=" + showBossDefeated);
+        }
 
-            // Her stage tamamlandığında 5 coin kazan
+        // Tüm toplar toplandı mı? (Ve Boss yoksa)
+        // Award coins only once per stage clear
+        if (coloredBalls.size() == 0 && pendingColoredBalls == 0 && currentBoss == null && !showBossDefeated
+                && level > lastCoinAwardedLevel) {
+
+            // Award 5 coins for stage completion
+            int oldCoins = coins;
             coins += 5;
+            lastCoinAwardedLevel = level; // Mark this level as rewarded
+            android.util.Log.d("GameView", "Stage " + level + " cleared! Coins: " + oldCoins + " -> " + coins);
             saveProgress(); // Coin'i kaydet
 
-            // Siyah topları yok et
-            blackBalls.clear();
+            // Force UI update to trigger animation
+            if (mainActivity != null) {
+                mainActivity.runOnUiThread(() -> {
+                    android.util.Log.d("GameView", "Updating coin UI to: " + coins);
+                    updateMainActivityPanels();
+                });
+            }
 
-            // Partiküller oluştur
-            for (int i = 0; i < 30; i++) {
-                float angle = random.nextFloat() * (float) (2 * Math.PI);
-                float speed = random.nextFloat() * 8 + 4;
-                particles.add(new Particle(centerX, centerY, angle, speed, Color.rgb(255, 215, 0)));
+            // Now trigger level completion animation
+            if (!levelCompleted) {
+                levelCompleted = true;
+                showStageCleared = true;
+                stageClearedTime = System.currentTimeMillis();
+
+                // Siyah topları yok et
+                blackBalls.clear();
+
+                // Partiküller oluştur
+                for (int i = 0; i < 30; i++) {
+                    float angle = random.nextFloat() * (float) (2 * Math.PI);
+                    float speed = random.nextFloat() * 8 + 4;
+                    particles.add(new Particle(centerX, centerY, angle, speed, Color.rgb(255, 215, 0)));
+                }
             }
         }
 
@@ -1264,7 +1296,9 @@ public class GameView extends SurfaceView implements Runnable {
         updateMissiles();
 
         // Blast wave
-        if (blastWave != null) {
+        if (blastWave != null)
+
+        {
             blastWave.update();
             if (blastWave.isDead())
                 blastWave = null;

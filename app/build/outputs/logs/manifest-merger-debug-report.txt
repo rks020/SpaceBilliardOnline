@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:2:1-68:12
-INJECTED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:2:1-68:12
-INJECTED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:2:1-68:12
-INJECTED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:2:1-68:12
+ADDED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:2:1-73:12
+INJECTED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:2:1-73:12
+INJECTED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:2:1-73:12
+INJECTED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:2:1-73:12
 MERGED from [com.google.android.gms:play-services-ads:23.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\76bd5522a9076ad76cdb75b370372134\transformed\jetified-play-services-ads-23.0.0\AndroidManifest.xml:17:1-25:12
 MERGED from [com.google.android.gms:play-services-ads-lite:23.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\2f2376e76b0ce388815ae6a890163e13\transformed\jetified-play-services-ads-lite-23.0.0\AndroidManifest.xml:17:1-95:12
 MERGED from [com.google.android.gms:play-services-ads-base:23.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\c4f4db975def1d2a1bd8cd458aefcccc\transformed\jetified-play-services-ads-base-23.0.0\AndroidManifest.xml:2:1-9:12
@@ -89,8 +89,8 @@ MERGED from [androidx.work:work-runtime:2.7.0] C:\Users\raufk\.gradle\caches\9.0
 	android:name
 		ADDED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:7:22-76
 application
-ADDED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:9:5-66:19
-INJECTED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:9:5-66:19
+ADDED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:9:5-71:19
+INJECTED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:9:5-71:19
 MERGED from [com.google.android.gms:play-services-ads-lite:23.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\2f2376e76b0ce388815ae6a890163e13\transformed\jetified-play-services-ads-lite-23.0.0\AndroidManifest.xml:53:5-93:19
 MERGED from [com.google.android.gms:play-services-ads-lite:23.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\2f2376e76b0ce388815ae6a890163e13\transformed\jetified-play-services-ads-lite-23.0.0\AndroidManifest.xml:53:5-93:19
 MERGED from [com.google.android.gms:play-services-ads-base:23.0.0] C:\Users\raufk\.gradle\caches\9.0-milestone-1\transforms\c4f4db975def1d2a1bd8cd458aefcccc\transformed\jetified-play-services-ads-base-23.0.0\AndroidManifest.xml:7:5-20
@@ -225,6 +225,14 @@ ADDED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\Andro
 		ADDED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:65:13-71
 	android:name
 		ADDED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:63:13-66
+activity#com.spacebilliard.app.GameOverActivity
+ADDED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:67:9-70:85
+	android:screenOrientation
+		ADDED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:69:13-49
+	android:theme
+		ADDED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:70:13-83
+	android:name
+		ADDED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml:68:13-66
 uses-sdk
 INJECTED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from C:\Users\raufk\OneDrive\Desktop\SpaceBillardOnline\app\src\main\AndroidManifest.xml
