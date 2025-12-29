@@ -610,8 +610,6 @@ public class GameView extends SurfaceView implements Runnable {
         particles.clear();
         magmaPatches.clear();
         missiles.clear();
-        missiles.clear();
-        electricEffects.clear();
         electricEffects.clear();
         floatingTexts.clear();
         inventory.clear(); // Clear inventory on level start/restart
@@ -825,10 +823,10 @@ public class GameView extends SurfaceView implements Runnable {
             }
 
             long frameTime = System.currentTimeMillis() - startTime;
-            // Target ~144 FPS (approx 7ms)
-            if (frameTime < 7) {
+            // Target 60 FPS (16ms per frame) - optimized for 90% of Android devices
+            if (frameTime < 16) {
                 try {
-                    Thread.sleep(7 - frameTime);
+                    Thread.sleep(16 - frameTime);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -966,6 +964,7 @@ public class GameView extends SurfaceView implements Runnable {
 
         long currentTime = System.currentTimeMillis();
         long deltaTime = currentTime - lastTime;
+        deltaTime = Math.min(deltaTime, 50); // Clamp to 50ms max to prevent physics explosions during GC
         lastTime = currentTime;
 
         // Zaman
@@ -1316,23 +1315,41 @@ public class GameView extends SurfaceView implements Runnable {
         for (int i = particles.size() - 1; i >= 0; i--) {
             Particle p = particles.get(i);
             p.update();
-            if (p.isDead())
-                particles.remove(i);
+            if (p.isDead()) {
+                // Swap & pop pattern for O(1) removal instead of O(n)
+                int lastIdx = particles.size() - 1;
+                if (i != lastIdx) {
+                    particles.set(i, particles.get(lastIdx));
+                }
+                particles.remove(lastIdx);
+            }
         }
 
         for (int i = impactArcs.size() - 1; i >= 0; i--) {
             ImpactArc arc = impactArcs.get(i);
             arc.update();
-            if (arc.isDead())
-                impactArcs.remove(i);
+            if (arc.isDead()) {
+                // Swap & pop pattern for O(1) removal
+                int lastIdx = impactArcs.size() - 1;
+                if (i != lastIdx) {
+                    impactArcs.set(i, impactArcs.get(lastIdx));
+                }
+                impactArcs.remove(lastIdx);
+            }
         }
 
         // Floating texts update
         for (int i = floatingTexts.size() - 1; i >= 0; i--) {
             FloatingText ft = floatingTexts.get(i);
             ft.update();
-            if (ft.isDead())
-                floatingTexts.remove(i);
+            if (ft.isDead()) {
+                // Swap & pop pattern for O(1) removal
+                int lastIdx = floatingTexts.size() - 1;
+                if (i != lastIdx) {
+                    floatingTexts.set(i, floatingTexts.get(lastIdx));
+                }
+                floatingTexts.remove(lastIdx);
+            }
         }
 
         // Yıldızları güncelle
