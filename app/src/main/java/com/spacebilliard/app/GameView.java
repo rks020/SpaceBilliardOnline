@@ -8377,9 +8377,11 @@ public class GameView extends SurfaceView implements Runnable {
         }
 
         void doBurstAttack() {
-            playSound(soundLaserGun); // Laser Gun sound for 20-ball attack
-            for (int i = 0; i < 20; i++) {
-                float angle = (float) (i * (2 * Math.PI / 20));
+            playSound(soundLaserGun); // Laser Gun sound for burst attack
+            // PERFORMANCE: Reduced from 20 to 16 projectiles to prevent freeze
+            // 16 still provides excellent visual coverage with 22.5° spacing
+            for (int i = 0; i < 16; i++) {
+                float angle = (float) (i * (2 * Math.PI / 16));
                 float speed = 10;
                 Ball proj = new Ball(x, y, 20, Color.rgb(100, 0, 150));
                 proj.vx = (float) Math.cos(angle) * speed;
