@@ -9329,9 +9329,11 @@ public class GameView extends SurfaceView implements Runnable {
         canvas.drawText(text, cx, textY, paint);
     }
 
-    private void drawPassiveSlot(Canvas canvas, float slotSize) {
-        float slotX = slotSize * 1.5f; // Left side
-        float slotY = slotSize * 1.5f; // Top margin
+    private void drawPassiveSlot(Canvas canvas, float originalSlotSize) {
+        float iconSize = screenWidth * 0.1f; // Match Home button size
+        float slotSize = iconSize;
+        float slotX = iconSize * 0.8f; // Left side symmetry (Home is at width - 0.8*size)
+        float slotY = screenHeight * 0.25f; // Match Home button Y-coordinate
 
         // Draw Slot Background
         paint.setStyle(Paint.Style.STROKE);
