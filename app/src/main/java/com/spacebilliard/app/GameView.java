@@ -788,7 +788,7 @@ public class GameView extends SurfaceView implements Runnable {
              */
 
             // Special Ball Spawn logic (Higher chance in Boss Fight)
-            float spawnChance = (currentBoss != null) ? 0.002f : 0.0015f; // Reduced: 0.2% boss, 0.15% normal
+            float spawnChance = (currentBoss != null) ? 0.003f : 0.0025f; // Reduced: 0.2% boss, 0.15% normal
             // normal
             if (gameStarted && !gameOver && random.nextFloat() < spawnChance && specialBalls.size() < 8) { // Increased
                 // limit
@@ -842,12 +842,14 @@ public class GameView extends SurfaceView implements Runnable {
         String[] types;
 
         // UNLOCKED: All balls available in all modes (User Request)
-        types = new String[] { "blackhole", "blackhole", "extraTime", "extraTime", "powerBoost", "powerBoost",
-                "barrier", "barrier", "electric", "electric", "freeze", "freeze", "missile", "missile", "teleport",
-                "teleport", "split_save", "split_save", "split_save", "split_save", "split_save", "split_save",
-                "vortex", "vortex", "vortex", "vortex", "vortex", "vortex", "vortex", "vortex", "vortex", "vortex",
-                "boom", "boom", "ghost", "ghost", "multiball", "multiball", "magma", "magma", "lightning", "lightning",
-                "ufo", "ufo", "repulsor", "repulsor", "alchemy", "alchemy" };
+        types = new String[] { "blackhole", "blackhole", "extraTime", "powerBoost",
+                "barrier", "barrier", "electric", "electric", "electric", "electric", "freeze", "freeze", "missile",
+                "missile", "teleport",
+                "teleport", "teleport", "split_save", "split_save", "split_save", "split_save", "split_save",
+                "vortex", "vortex", "vortex", "vortex", "vortex", "vortex",
+                "boom", "boom", "boom", "ghost", "ghost", "multiball", "multiball", "magma", "magma", "lightning",
+                "lightning",
+                "ufo", "ufo", "repulsor", "repulsor", "alchemy", "alchemy", "alchemy", "alchemy" };
 
         String type = types[random.nextInt(types.length)];
 
@@ -1804,9 +1806,21 @@ public class GameView extends SurfaceView implements Runnable {
             }
 
             // Sınır kontrolü
+            // Sınır kontrolü
             float dx = missile.x - centerX;
             float dy = missile.y - centerY;
-            if (dx * dx + dy * dy > circleRadius * circleRadius) {
+
+            // If no balls left, fly away
+            if ((blackBalls == null || blackBalls.isEmpty()) && (coloredBalls == null || coloredBalls.isEmpty())) {
+                // Move away from center
+                float ang = (float) Math.atan2(dy, dx);
+                missile.x += Math.cos(ang) * 10;
+                missile.y += Math.sin(ang) * 10;
+                // Remove if off screen
+                if (dx * dx + dy * dy > (circleRadius * 2) * (circleRadius * 2)) {
+                    missiles.remove(i);
+                }
+            } else if (dx * dx + dy * dy > circleRadius * circleRadius) {
                 missiles.remove(i);
             }
         }
@@ -1902,16 +1916,19 @@ public class GameView extends SurfaceView implements Runnable {
                         continue;
                     }
 
+                    if (barrierActive) {
+                        createImpactBurst(p.x, p.y, Color.CYAN); // Block effect
+                        bossProjectiles.remove(i);
                         playSound(soundShield);
                         continue;
                     }
 
                     // VORTEX IMMUNITY: If a vortex is actively swirling, player is safe
                     if (activeVortex != null) {
-                         createImpactBurst(p.x, p.y, Color.CYAN); // Block effect
-                         bossProjectiles.remove(i);
-                         // Optional: Play a sound or show text?
-                         continue;
+                        createImpactBurst(p.x, p.y, Color.CYAN); // Block effect
+                        bossProjectiles.remove(i);
+                        // Optional: Play a sound or show text?
+                        continue;
                     }
 
                     playerHp -= 150; // Damage
@@ -1925,401 +1942,395 @@ public class GameView extends SurfaceView implements Runnable {
             }
         }
 
-    // Magma Collisions
-    for(
+        // Magma Collisions
+        for (
 
-    int m = magmaPatches.size() - 1;m>=0;m--)
-    {
-        MagmaPatch p = magmaPatches.get(m);
-        if (currentBoss != null) {
-            float dx = p.x - currentBoss.x;
-            float dy = p.y - currentBoss.y;
-            if (Math.sqrt(dx * dx + dy * dy) < p.radius + currentBoss.radius) {
-                currentBoss.hp -= 0.1f; // Magma damage reduced to 0.1
+                int m = magmaPatches.size() - 1; m >= 0; m--) {
+            MagmaPatch p = magmaPatches.get(m);
+            if (currentBoss != null) {
+                float dx = p.x - currentBoss.x;
+                float dy = p.y - currentBoss.y;
+                if (Math.sqrt(dx * dx + dy * dy) < p.radius + currentBoss.radius) {
+                    currentBoss.hp -= 0.1f; // Magma damage reduced to 0.1
+                }
+            }
+            // Vs Colored Balls
+            for (int i = coloredBalls.size() - 1; i >= 0; i--) {
+                Ball b = coloredBalls.get(i);
+                float dx = p.x - b.x;
+                float dy = p.y - b.y;
+                if (Math.sqrt(dx * dx + dy * dy) < p.radius * 2.0 + b.radius) { // Radius increased for easier hit
+                    createImpactBurst(b.x, b.y, b.color);
+                    coloredBalls.remove(i);
+                    playSound(soundCollision);
+                }
             }
         }
-        // Vs Colored Balls
-        for (int i = coloredBalls.size() - 1; i >= 0; i--) {
-            Ball b = coloredBalls.get(i);
-            float dx = p.x - b.x;
-            float dy = p.y - b.y;
-            if (Math.sqrt(dx * dx + dy * dy) < p.radius * 2.0 + b.radius) { // Radius increased for easier hit
-                createImpactBurst(b.x, b.y, b.color);
-                coloredBalls.remove(i);
-                playSound(soundCollision);
+
+        // --- WALL COLLISIONS (Geometric Shapes) ---
+        // Must run even during drag to keep balls inside new shapes
+        int space = ((level - 1) / 50) + 1;
+        float damping = 0.9f;
+
+        ArrayList<Ball> allBalls = new ArrayList<>();
+        if (whiteBall != null)
+            allBalls.add(whiteBall);
+        allBalls.addAll(coloredBalls);
+        allBalls.addAll(blackBalls);
+        allBalls.addAll(specialBalls);
+        try {
+            allBalls.addAll(cloneBalls);
+        } catch (Exception e) {
+        }
+
+        if (space == 2) {
+            // --- SPACE 2: SQUARE (Stages 51-100) ---
+            float boundary = circleRadius;
+            float left = centerX - boundary;
+            float right = centerX + boundary;
+            float top = centerY - boundary;
+            float bottom = centerY + boundary;
+
+            if (whiteBall != null)
+                handleBoxCollision(whiteBall, left, right, top, bottom, damping);
+            for (Ball ball : coloredBalls)
+                handleBoxCollision(ball, left, right, top, bottom, damping);
+            for (Ball ball : blackBalls)
+                handleBoxCollision(ball, left, right, top, bottom, damping);
+            for (SpecialBall ball : specialBalls)
+                handleBoxCollision(ball, left, right, top, bottom, damping);
+            for (Ball ball : cloneBalls)
+                handleBoxCollision(ball, left, right, top, bottom, damping);
+
+        } else if (space == 3) {
+            // --- SPACE 3: RECTANGLE (Stages 101-150) ---
+            float halfW = circleRadius;
+            float halfH = circleRadius * 0.7f;
+            float left = centerX - halfW;
+            float right = centerX + halfW;
+            float top = centerY - halfH;
+            float bottom = centerY + halfH;
+
+            if (whiteBall != null)
+                handleBoxCollision(whiteBall, left, right, top, bottom, damping);
+            for (Ball ball : coloredBalls)
+                handleBoxCollision(ball, left, right, top, bottom, damping);
+            for (Ball ball : blackBalls)
+                handleBoxCollision(ball, left, right, top, bottom, damping);
+            for (SpecialBall ball : specialBalls)
+                handleBoxCollision(ball, left, right, top, bottom, damping);
+            for (Ball ball : cloneBalls)
+                handleBoxCollision(ball, left, right, top, bottom, damping);
+
+        } else if (space >= 4 && space <= 10) {
+            // --- POLYGON SPACES (Stages 151-500) ---
+            int sides = 5;
+            float scale = 1.15f;
+
+            switch (space) {
+                case 4:
+                    sides = 5;
+                    scale = 1.15f;
+                    break; // Pentagon
+                case 5:
+                    sides = 6;
+                    scale = 1.15f;
+                    break; // Hexagon
+                case 6:
+                    sides = 3;
+                    scale = 1.6f;
+                    break; // Triangle
+                case 7:
+                    sides = 8;
+                    scale = 1.1f;
+                    break; // Octagon
+                case 8:
+                    sides = 4;
+                    scale = 1.35f;
+                    break; // Diamond
+                case 9:
+                    sides = 7;
+                    scale = 1.15f;
+                    break; // Heptagon
+                case 10:
+                    sides = 10;
+                    scale = 1.05f;
+                    break; // Decagon
             }
-        }
-    }
 
-    // --- WALL COLLISIONS (Geometric Shapes) ---
-    // Must run even during drag to keep balls inside new shapes
-    int space = ((level - 1) / 50) + 1;
-    float damping = 0.9f;
+            float polyRadius = circleRadius * scale;
+            if (whiteBall != null)
+                handlePolygonCollision(whiteBall, sides, polyRadius, damping);
+            for (Ball ball : coloredBalls)
+                handlePolygonCollision(ball, sides, polyRadius, damping);
+            for (Ball ball : blackBalls)
+                handlePolygonCollision(ball, sides, polyRadius, damping);
+            for (SpecialBall ball : specialBalls)
+                handlePolygonCollision(ball, sides, polyRadius, damping);
+            for (Ball ball : cloneBalls)
+                handlePolygonCollision(ball, sides, polyRadius, damping);
 
-    ArrayList<Ball> allBalls = new ArrayList<>();if(whiteBall!=null)allBalls.add(whiteBall);allBalls.addAll(coloredBalls);allBalls.addAll(blackBalls);allBalls.addAll(specialBalls);try
-    {
-        allBalls.addAll(cloneBalls);
-    }catch(
-    Exception e)
-    {
-    }
-
-    if(space==2)
-    {
-        // --- SPACE 2: SQUARE (Stages 51-100) ---
-        float boundary = circleRadius;
-        float left = centerX - boundary;
-        float right = centerX + boundary;
-        float top = centerY - boundary;
-        float bottom = centerY + boundary;
-
-        if (whiteBall != null)
-            handleBoxCollision(whiteBall, left, right, top, bottom, damping);
-        for (Ball ball : coloredBalls)
-            handleBoxCollision(ball, left, right, top, bottom, damping);
-        for (Ball ball : blackBalls)
-            handleBoxCollision(ball, left, right, top, bottom, damping);
-        for (SpecialBall ball : specialBalls)
-            handleBoxCollision(ball, left, right, top, bottom, damping);
-        for (Ball ball : cloneBalls)
-            handleBoxCollision(ball, left, right, top, bottom, damping);
-
-    }else if(space==3)
-    {
-        // --- SPACE 3: RECTANGLE (Stages 101-150) ---
-        float halfW = circleRadius;
-        float halfH = circleRadius * 0.7f;
-        float left = centerX - halfW;
-        float right = centerX + halfW;
-        float top = centerY - halfH;
-        float bottom = centerY + halfH;
-
-        if (whiteBall != null)
-            handleBoxCollision(whiteBall, left, right, top, bottom, damping);
-        for (Ball ball : coloredBalls)
-            handleBoxCollision(ball, left, right, top, bottom, damping);
-        for (Ball ball : blackBalls)
-            handleBoxCollision(ball, left, right, top, bottom, damping);
-        for (SpecialBall ball : specialBalls)
-            handleBoxCollision(ball, left, right, top, bottom, damping);
-        for (Ball ball : cloneBalls)
-            handleBoxCollision(ball, left, right, top, bottom, damping);
-
-    }else if(space>=4&&space<=10)
-    {
-        // --- POLYGON SPACES (Stages 151-500) ---
-        int sides = 5;
-        float scale = 1.15f;
-
-        switch (space) {
-            case 4:
-                sides = 5;
-                scale = 1.15f;
-                break; // Pentagon
-            case 5:
-                sides = 6;
-                scale = 1.15f;
-                break; // Hexagon
-            case 6:
-                sides = 3;
-                scale = 1.6f;
-                break; // Triangle
-            case 7:
-                sides = 8;
-                scale = 1.1f;
-                break; // Octagon
-            case 8:
-                sides = 4;
-                scale = 1.35f;
-                break; // Diamond
-            case 9:
-                sides = 7;
-                scale = 1.15f;
-                break; // Heptagon
-            case 10:
-                sides = 10;
-                scale = 1.05f;
-                break; // Decagon
+        } else {
+            // --- DEFAULT: CIRCLE (Space 1 & Others) ---
+            if (whiteBall != null)
+                handleCircleCollision(whiteBall, damping);
+            for (Ball ball : coloredBalls)
+                handleCircleCollision(ball, damping);
+            for (Ball ball : blackBalls)
+                handleCircleCollision(ball, damping);
+            for (SpecialBall ball : specialBalls)
+                handleCircleCollision(ball, damping);
+            for (Ball ball : cloneBalls)
+                handleCircleCollision(ball, damping);
         }
 
-        float polyRadius = circleRadius * scale;
-        if (whiteBall != null)
-            handlePolygonCollision(whiteBall, sides, polyRadius, damping);
-        for (Ball ball : coloredBalls)
-            handlePolygonCollision(ball, sides, polyRadius, damping);
-        for (Ball ball : blackBalls)
-            handlePolygonCollision(ball, sides, polyRadius, damping);
-        for (SpecialBall ball : specialBalls)
-            handlePolygonCollision(ball, sides, polyRadius, damping);
-        for (Ball ball : cloneBalls)
-            handlePolygonCollision(ball, sides, polyRadius, damping);
+        // Drag sırasında top-top çarpışması yok
+        if (isDragging) {
+            return;
+        }
 
-    }else
-    {
-        // --- DEFAULT: CIRCLE (Space 1 & Others) ---
-        if (whiteBall != null)
-            handleCircleCollision(whiteBall, damping);
-        for (Ball ball : coloredBalls)
-            handleCircleCollision(ball, damping);
-        for (Ball ball : blackBalls)
-            handleCircleCollision(ball, damping);
-        for (SpecialBall ball : specialBalls)
-            handleCircleCollision(ball, damping);
-        for (Ball ball : cloneBalls)
-            handleCircleCollision(ball, damping);
-    }
+        // --- BALL & BOSS INTERACTIONS (Restored Logic) ---
+        ArrayList<Ball> allWhiteBalls = new ArrayList<>();
+        allWhiteBalls.add(whiteBall);
+        try {
+            allWhiteBalls.addAll(cloneBalls);
+        } catch (Exception e) {
+        }
 
-    // Drag sırasında top-top çarpışması yok
-    if(isDragging)
-    {
-        return;
-    }
+        for (Ball wBall : allWhiteBalls) {
+            // Boss Interaction
+            if (currentBoss != null) {
+                float dx = wBall.x - currentBoss.x;
+                float dy = wBall.y - currentBoss.y;
+                float dist = (float) Math.sqrt(dx * dx + dy * dy);
 
-    // --- BALL & BOSS INTERACTIONS (Restored Logic) ---
-    ArrayList<Ball> allWhiteBalls = new ArrayList<>();allWhiteBalls.add(whiteBall);try
-    {
-        allWhiteBalls.addAll(cloneBalls);
-    }catch(
-    Exception e)
-    {
-    }
+                if (dist < wBall.radius + currentBoss.radius) {
+                    boolean bossShielded = (currentBoss.state == 1 || currentBoss.dashing);
+                    if (bossShielded) {
+                        playSound(soundShield);
+                        createImpactBurst(wBall.x, wBall.y, Color.CYAN);
+                        floatingTexts.add(new FloatingText("BLOCKED", wBall.x, wBall.y - 50, Color.CYAN));
 
-    for(
-    Ball wBall:allWhiteBalls)
-    {
-        // Boss Interaction
-        if (currentBoss != null) {
-            float dx = wBall.x - currentBoss.x;
-            float dy = wBall.y - currentBoss.y;
-            float dist = (float) Math.sqrt(dx * dx + dy * dy);
-
-            if (dist < wBall.radius + currentBoss.radius) {
-                boolean bossShielded = (currentBoss.state == 1 || currentBoss.dashing);
-                if (bossShielded) {
-                    playSound(soundShield);
-                    createImpactBurst(wBall.x, wBall.y, Color.CYAN);
-                    floatingTexts.add(new FloatingText("BLOCKED", wBall.x, wBall.y - 50, Color.CYAN));
-
-                    if (currentBoss.dashing && !currentBoss.charging && wBall == whiteBall) {
-                        if (barrierActive || ghostModeActive) {
-                            if (barrierActive) {
-                                barrierActive = false;
-                                floatingTexts.add(new FloatingText("BARRIER BROKEN!", whiteBall.x, whiteBall.y + 50,
-                                        Color.YELLOW));
+                        if (currentBoss.dashing && !currentBoss.charging && wBall == whiteBall) {
+                            if (barrierActive || ghostModeActive) {
+                                if (barrierActive) {
+                                    barrierActive = false;
+                                    floatingTexts.add(new FloatingText("BARRIER BROKEN!", whiteBall.x, whiteBall.y + 50,
+                                            Color.YELLOW));
+                                    playSound(soundCollision);
+                                }
+                            } else {
+                                playerHp -= 40;
+                                floatingTexts.add(new FloatingText("-40", whiteBall.x, whiteBall.y - 50, Color.RED));
+                                createImpactBurst(whiteBall.x, whiteBall.y, Color.RED);
+                                cameraShakeX = 30;
+                                shakeEndTime = System.currentTimeMillis() + 400;
                                 playSound(soundCollision);
                             }
+                        }
+                    } else {
+                        long now = System.currentTimeMillis();
+                        if (now < electricModeEndTime) {
+                            currentBoss.hp -= 40;
+                            floatingTexts.add(new FloatingText("-40", wBall.x, wBall.y - 50, Color.CYAN));
+                            electricEffects.add(new ElectricEffect(wBall.x, wBall.y, currentBoss.x, currentBoss.y, 0));
+                            createImpactBurst(wBall.x, wBall.y, Color.CYAN);
+                            createParticles(wBall.x, wBall.y, Color.CYAN);
+                            playSound(soundBlackExplosion);
                         } else {
-                            playerHp -= 40;
-                            floatingTexts.add(new FloatingText("-40", whiteBall.x, whiteBall.y - 50, Color.RED));
-                            createImpactBurst(whiteBall.x, whiteBall.y, Color.RED);
-                            cameraShakeX = 30;
-                            shakeEndTime = System.currentTimeMillis() + 400;
+                            currentBoss.hp -= 25;
+                            createParticles(wBall.x, wBall.y, currentBoss.color);
                             playSound(soundCollision);
+                            floatingTexts.add(new FloatingText("-25", wBall.x, wBall.y - 50, Color.WHITE));
                         }
                     }
-                } else {
-                    long now = System.currentTimeMillis();
-                    if (now < electricModeEndTime) {
-                        currentBoss.hp -= 40;
-                        floatingTexts.add(new FloatingText("-40", wBall.x, wBall.y - 50, Color.CYAN));
-                        electricEffects.add(new ElectricEffect(wBall.x, wBall.y, currentBoss.x, currentBoss.y, 0));
-                        createImpactBurst(wBall.x, wBall.y, Color.CYAN);
-                        createParticles(wBall.x, wBall.y, Color.CYAN);
+
+                    // Reflect Ball
+                    float angle = (float) Math.atan2(dy, dx);
+                    float speed = (float) Math.sqrt(wBall.vx * wBall.vx + wBall.vy * wBall.vy);
+                    speed = Math.min(speed * 1.1f, 60f);
+                    wBall.vx = (float) Math.cos(angle) * speed;
+                    wBall.vy = (float) Math.sin(angle) * speed;
+                    float overlap = (wBall.radius + currentBoss.radius) - dist + 2;
+                    wBall.x += Math.cos(angle) * overlap;
+                    wBall.y += Math.sin(angle) * overlap;
+
+                    if (currentBoss.hp <= 0) {
+                        currentBoss = null;
+                        showBossDefeated = true;
+                        bossDefeatedTime = System.currentTimeMillis();
+                        for (int k = 0; k < 5; k++)
+                            createImpactBurst(centerX + (random.nextFloat() - 0.5f) * 300,
+                                    centerY + (random.nextFloat() - 0.5f) * 300, Color.RED);
                         playSound(soundBlackExplosion);
-                    } else {
-                        currentBoss.hp -= 25;
-                        createParticles(wBall.x, wBall.y, currentBoss.color);
-                        playSound(soundCollision);
-                        floatingTexts.add(new FloatingText("-25", wBall.x, wBall.y - 50, Color.WHITE));
                     }
-                }
-
-                // Reflect Ball
-                float angle = (float) Math.atan2(dy, dx);
-                float speed = (float) Math.sqrt(wBall.vx * wBall.vx + wBall.vy * wBall.vy);
-                speed = Math.min(speed * 1.1f, 60f);
-                wBall.vx = (float) Math.cos(angle) * speed;
-                wBall.vy = (float) Math.sin(angle) * speed;
-                float overlap = (wBall.radius + currentBoss.radius) - dist + 2;
-                wBall.x += Math.cos(angle) * overlap;
-                wBall.y += Math.sin(angle) * overlap;
-
-                if (currentBoss.hp <= 0) {
-                    currentBoss = null;
-                    showBossDefeated = true;
-                    bossDefeatedTime = System.currentTimeMillis();
-                    for (int k = 0; k < 5; k++)
-                        createImpactBurst(centerX + (random.nextFloat() - 0.5f) * 300,
-                                centerY + (random.nextFloat() - 0.5f) * 300, Color.RED);
-                    playSound(soundBlackExplosion);
                 }
             }
-        }
 
-        // Colored Balls (Scoring)
-        for (int i = coloredBalls.size() - 1; i >= 0; i--) {
-            Ball ball = coloredBalls.get(i);
-            if (checkBallCollision(wBall, ball)) {
-                score++;
-                timeLeft += 1000;
-                comboCounter++;
+            // Colored Balls (Scoring)
+            for (int i = coloredBalls.size() - 1; i >= 0; i--) {
+                Ball ball = coloredBalls.get(i);
+                if (checkBallCollision(wBall, ball)) {
+                    score++;
+                    timeLeft += 1000;
+                    comboCounter++;
 
-                // Combo Logic
-                long currentTime = System.currentTimeMillis();
-                if (currentTime - lastHitTime < 2000) { // COMBO_TIMEOUT hardcoded as 2000 here or check constant
-                    comboHits++;
-                    if (comboHits > maxCombo)
-                        maxCombo = comboHits;
-                    if (comboHits >= 3) {
-                        floatingTexts.add(new FloatingText("COMBO x" + (comboHits), centerX,
-                                centerY - screenHeight * 0.15f, Color.rgb(255, 215, 0)));
+                    // Combo Logic
+                    long currentTime = System.currentTimeMillis();
+                    if (currentTime - lastHitTime < 2000) { // COMBO_TIMEOUT hardcoded as 2000 here or check constant
+                        comboHits++;
+                        if (comboHits > maxCombo)
+                            maxCombo = comboHits;
+                        if (comboHits >= 3) {
+                            floatingTexts.add(new FloatingText("COMBO x" + (comboHits), centerX,
+                                    centerY - screenHeight * 0.15f, Color.rgb(255, 215, 0)));
+                        }
+                    } else {
+                        comboHits = 1;
                     }
-                } else {
-                    comboHits = 1;
+                    lastHitTime = currentTime;
+
+                    createImpactBurst(ball.x, ball.y, ball.color);
+                    coloredBalls.remove(i);
+                    playSound(soundCollision);
+
+                    if (coloredBalls.isEmpty() && pendingColoredBalls == 0 && currentBoss == null
+                            && !showBossDefeated) {
+                        levelCompleted = true;
+                        showStageCleared = true;
+                        stageClearedTime = System.currentTimeMillis();
+                        for (Ball b : blackBalls)
+                            createImpactBurst(b.x, b.y, Color.BLACK);
+                        blackBalls.clear();
+                    }
+
+                    // Physics bounce roughly
+                    float dx = wBall.x - ball.x;
+                    float dy = wBall.y - ball.y;
+                    float angle = (float) Math.atan2(dy, dx);
+                    float speed = (float) Math.sqrt(wBall.vx * wBall.vx + wBall.vy * wBall.vy);
+                    wBall.vx = (float) Math.cos(angle) * speed * 1.05f;
+                    wBall.vy = (float) Math.sin(angle) * speed * 1.05f;
                 }
-                lastHitTime = currentTime;
+            }
 
-                createImpactBurst(ball.x, ball.y, ball.color);
-                coloredBalls.remove(i);
-                playSound(soundCollision);
-
-                if (coloredBalls.isEmpty() && pendingColoredBalls == 0 && currentBoss == null
-                        && !showBossDefeated) {
-                    levelCompleted = true;
-                    showStageCleared = true;
-                    stageClearedTime = System.currentTimeMillis();
-                    for (Ball b : blackBalls)
-                        createImpactBurst(b.x, b.y, Color.BLACK);
-                    blackBalls.clear();
-                }
-
-                // Physics bounce roughly
+            // Black Balls (Damage)
+            for (int i = blackBalls.size() - 1; i >= 0; i--) {
+                Ball ball = blackBalls.get(i);
                 float dx = wBall.x - ball.x;
                 float dy = wBall.y - ball.y;
-                float angle = (float) Math.atan2(dy, dx);
-                float speed = (float) Math.sqrt(wBall.vx * wBall.vx + wBall.vy * wBall.vy);
-                wBall.vx = (float) Math.cos(angle) * speed * 1.05f;
-                wBall.vy = (float) Math.sin(angle) * speed * 1.05f;
-            }
-        }
+                if (dx * dx + dy * dy < (wBall.radius + ball.radius) * (wBall.radius + ball.radius)) {
+                    // Check immunity or teleport state
+                    if (System.currentTimeMillis() < immuneEndTime || isTeleporting)
+                        continue;
+                    if (wBall != whiteBall)
+                        continue; // Clones are immune
 
-        // Black Balls (Damage)
-        for (int i = blackBalls.size() - 1; i >= 0; i--) {
-            Ball ball = blackBalls.get(i);
-            float dx = wBall.x - ball.x;
-            float dy = wBall.y - ball.y;
-            if (dx * dx + dy * dy < (wBall.radius + ball.radius) * (wBall.radius + ball.radius)) {
-                // Check immunity or teleport state
-                if (System.currentTimeMillis() < immuneEndTime || isTeleporting)
-                    continue;
-                if (wBall != whiteBall)
-                    continue; // Clones are immune
+                    if (barrierActive || ghostModeActive) {
+                        long currentTime = System.currentTimeMillis();
+                        if (currentTime - lastShieldSoundTime > 500) {
+                            playSound(soundShield);
+                            lastShieldSoundTime = currentTime;
+                        }
+                    } else if (activePassivePower.equals("teleport")) {
+                        // PASSIVE TELEPORT SAVE triggers
+                        activePassivePower = "none"; // Consume passive
 
-                if (barrierActive || ghostModeActive) {
-                    long currentTime = System.currentTimeMillis();
-                    if (currentTime - lastShieldSoundTime > 500) {
-                        playSound(soundShield);
-                        lastShieldSoundTime = currentTime;
-                    }
-                } else if (activePassivePower.equals("teleport")) {
-                    // PASSIVE TELEPORT SAVE triggers
-                    activePassivePower = "none"; // Consume passive
+                        // Start Teleport Sequence (Disappear)
+                        isTeleporting = true;
+                        teleportEndTime = System.currentTimeMillis() + 500; // 500ms delay
 
-                    // Start Teleport Sequence (Disappear)
-                    isTeleporting = true;
-                    teleportEndTime = System.currentTimeMillis() + 500; // 500ms delay
+                        // Vanish Particles at old location
+                        createImpactBurst(wBall.x, wBall.y, Color.GREEN);
+                        for (int p = 0; p < 30; p++) {
+                            float pAngle = random.nextFloat() * (float) (2 * Math.PI);
+                            float pSpeed = random.nextFloat() * 10 + 5;
+                            particles.add(new Particle(wBall.x, wBall.y, pAngle, pSpeed, Color.GREEN));
+                        }
 
-                    // Vanish Particles at old location
-                    createImpactBurst(wBall.x, wBall.y, Color.GREEN);
-                    for (int p = 0; p < 30; p++) {
-                        float pAngle = random.nextFloat() * (float) (2 * Math.PI);
-                        float pSpeed = random.nextFloat() * 10 + 5;
-                        particles.add(new Particle(wBall.x, wBall.y, pAngle, pSpeed, Color.GREEN));
-                    }
-
-                    // Stop movement immediately
-                    wBall.vx = 0;
-                    wBall.vy = 0;
-                    // Note: Reappear logic is in update()
-                } else if (activePassivePower.equals("split_save")) {
-                    // PASSIVE SPLIT SAVE
-                    activePassivePower = "none";
-
-                    createImpactBurst(wBall.x, wBall.y, Color.MAGENTA);
-                    playSound(soundPower);
-                    floatingTexts.add(new FloatingText("SPLIT SAVE!", centerX, centerY, Color.MAGENTA));
-
-                    // Spawn 3 Mini Clones
-                    for (int k = 0; k < 3; k++) {
-                        // Spawn smaller clones with 4s lifetime
-                        Ball clone = new Ball(wBall.x, wBall.y, wBall.radius * 0.6f, Color.MAGENTA, 4000);
-                        float angle = (float) (k * (2 * Math.PI / 3));
-                        clone.vx = (float) Math.cos(angle) * 15;
-                        clone.vy = (float) Math.sin(angle) * 15;
-                        cloneBalls.add(clone);
-                    }
-
-                    // MODIFIED: Do NOT hide/teleport the main ball.
-                    // Instead, make it immune and let it continue moving.
-                    immuneEndTime = System.currentTimeMillis() + 4000; // 4s Immunity
-
-                    // We do NOT reset vx/vy so it continues its trajectory.
-                    // We do NOT move x/y to -9999.
-
-                    isSplitSaveActive = true;
-                    cloneExpirationTime = System.currentTimeMillis() + 4000; // 4s
-
-                } else if (activePassivePower.equals("vortex")) {
-                    // PASSIVE VORTEX SAVE vs BLACK BALL
-                    activePassivePower = "none";
-
-                    // Create vortex
-                    activeVortex = new Vortex(wBall.x, wBall.y);
-
-                    // Visual feedback
-                    createImpactBurst(wBall.x, wBall.y, Color.CYAN);
-                    for (int pIdx = 0; pIdx < 30; pIdx++) {
-                        float pAngle = random.nextFloat() * (float) (2 * Math.PI);
-                        float pSpeed = random.nextFloat() * 10 + 5;
-                        particles.add(new Particle(wBall.x, wBall.y, pAngle, pSpeed, Color.CYAN));
-                    }
-                    playSound(soundPower);
-                    floatingTexts.add(new FloatingText("VORTEX!", wBall.x, wBall.y - 50, Color.CYAN));
-
-                    // Give immunity during vortex
-                    immuneEndTime = System.currentTimeMillis() + 2500;
-
-                } else {
-                    lives--;
-                    comboCounter = 0;
-                    createParticles(ball.x, ball.y, Color.BLACK);
-                    shakeEndTime = System.currentTimeMillis() + 500;
-                    if (lives <= 0) {
-                        gameOver = true;
-                        saveProgress();
-                        playSound(soundGameOver);
-                        updateUIPanels();
-                    } else {
-                        wBall.x = centerX;
-                        wBall.y = centerY;
+                        // Stop movement immediately
                         wBall.vx = 0;
                         wBall.vy = 0;
-                        immuneEndTime = System.currentTimeMillis() + 2000;
+                        // Note: Reappear logic is in update()
+                    } else if (activePassivePower.equals("split_save")) {
+                        // PASSIVE SPLIT SAVE
+                        activePassivePower = "none";
+
+                        createImpactBurst(wBall.x, wBall.y, Color.MAGENTA);
+                        playSound(soundPower);
+                        floatingTexts.add(new FloatingText("SPLIT SAVE!", centerX, centerY, Color.MAGENTA));
+
+                        // Spawn 3 Mini Clones
+                        for (int k = 0; k < 3; k++) {
+                            // Spawn smaller clones with 4s lifetime
+                            Ball clone = new Ball(wBall.x, wBall.y, wBall.radius * 0.6f, Color.MAGENTA, 4000);
+                            float angle = (float) (k * (2 * Math.PI / 3));
+                            clone.vx = (float) Math.cos(angle) * 15;
+                            clone.vy = (float) Math.sin(angle) * 15;
+                            cloneBalls.add(clone);
+                        }
+
+                        // MODIFIED: Do NOT hide/teleport the main ball.
+                        // Instead, make it immune and let it continue moving.
+                        immuneEndTime = System.currentTimeMillis() + 4000; // 4s Immunity
+
+                        // We do NOT reset vx/vy so it continues its trajectory.
+                        // We do NOT move x/y to -9999.
+
+                        isSplitSaveActive = true;
+                        cloneExpirationTime = System.currentTimeMillis() + 4000; // 4s
+
+                    } else if (activePassivePower.equals("vortex")) {
+                        // PASSIVE VORTEX SAVE vs BLACK BALL
+                        activePassivePower = "none";
+
+                        // Create vortex
+                        activeVortex = new Vortex(wBall.x, wBall.y);
+
+                        // Visual feedback
+                        createImpactBurst(wBall.x, wBall.y, Color.CYAN);
+                        for (int pIdx = 0; pIdx < 30; pIdx++) {
+                            float pAngle = random.nextFloat() * (float) (2 * Math.PI);
+                            float pSpeed = random.nextFloat() * 10 + 5;
+                            particles.add(new Particle(wBall.x, wBall.y, pAngle, pSpeed, Color.CYAN));
+                        }
+                        playSound(soundPower);
+                        floatingTexts.add(new FloatingText("VORTEX!", wBall.x, wBall.y - 50, Color.CYAN));
+
+                        // Give immunity during vortex
+                        immuneEndTime = System.currentTimeMillis() + 2500;
+
+                    } else {
+                        lives--;
+                        comboCounter = 0;
+                        createParticles(ball.x, ball.y, Color.BLACK);
+                        shakeEndTime = System.currentTimeMillis() + 500;
+                        if (lives <= 0) {
+                            gameOver = true;
+                            saveProgress();
+                            playSound(soundGameOver);
+                            updateUIPanels();
+                        } else {
+                            wBall.x = centerX;
+                            wBall.y = centerY;
+                            wBall.vx = 0;
+                            wBall.vy = 0;
+                            immuneEndTime = System.currentTimeMillis() + 2000;
+                        }
                     }
                 }
             }
-        }
 
-        // Special Balls
-        for (int i = specialBalls.size() - 1; i >= 0; i--) {
-            SpecialBall ball = specialBalls.get(i);
-            if (checkBallCollision(wBall, ball)) {
-                activateSpecialPower(ball.type, wBall);
-                createParticles(ball.x, ball.y, ball.getColor());
-                specialBalls.remove(i);
+            // Special Balls
+            for (int i = specialBalls.size() - 1; i >= 0; i--) {
+                SpecialBall ball = specialBalls.get(i);
+                if (checkBallCollision(wBall, ball)) {
+                    activateSpecialPower(ball.type, wBall);
+                    createParticles(ball.x, ball.y, ball.getColor());
+                    specialBalls.remove(i);
+                }
             }
         }
-    }
     }
 
     private void createFlame(float x, float y) {
@@ -7157,7 +7168,7 @@ public class GameView extends SurfaceView implements Runnable {
         float x, y;
         float pullRadius = 0;
         float maxRadius = 200;
-        int life = 150; // ~2.5 seconds at 60fps
+        int life = 900; // Increased to ~15 seconds at 60fps (was 150)
         float rotationAngle = 0;
 
         Vortex(float x, float y) {
@@ -7748,7 +7759,7 @@ public class GameView extends SurfaceView implements Runnable {
                 if (dist < radius * 2.5f) {
                     // Heat Damage
                     if (now % 60 == 0) { // Approx once per second
-                        playerHp -= 10;
+                        playerHp -= 3;
                         createParticles(whiteBall.x, whiteBall.y, Color.rgb(255, 100, 0));
                         floatingTexts
                                 .add(new FloatingText("BURN", whiteBall.x, whiteBall.y - 20, Color.rgb(255, 69, 0)));
