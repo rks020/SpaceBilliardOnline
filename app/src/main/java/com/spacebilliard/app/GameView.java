@@ -788,7 +788,7 @@ public class GameView extends SurfaceView implements Runnable {
              */
 
             // Special Ball Spawn logic (Higher chance in Boss Fight)
-            float spawnChance = (currentBoss != null) ? 0.003f : 0.0025f; // Reduced: 0.2% boss, 0.15% normal
+            float spawnChance = (currentBoss != null) ? 0.003f : 0.002f; // Reduced: 0.2% boss, 0.15% normal
             // normal
             if (gameStarted && !gameOver && random.nextFloat() < spawnChance && specialBalls.size() < 8) { // Increased
                 // limit
@@ -843,13 +843,12 @@ public class GameView extends SurfaceView implements Runnable {
 
         // UNLOCKED: All balls available in all modes (User Request)
         types = new String[] { "blackhole", "blackhole", "extraTime", "powerBoost",
-                "barrier", "barrier", "electric", "electric", "electric", "electric", "freeze", "freeze", "missile",
+                "barrier", "barrier", "electric", "electric", "freeze", "freeze", "missile", "missile", "missile",
                 "missile", "teleport",
-                "teleport", "teleport", "split_save", "split_save", "split_save", "split_save", "split_save",
-                "vortex", "vortex", "vortex", "vortex", "vortex", "vortex",
-                "boom", "boom", "boom", "ghost", "ghost", "multiball", "multiball", "magma", "magma", "lightning",
-                "lightning",
-                "ufo", "ufo", "repulsor", "repulsor", "alchemy", "alchemy", "alchemy", "alchemy" };
+                "teleport", "teleport", "split_save", "split_save", "split_save", "split_save",
+                "vortex", "vortex", "vortex", "vortex", "vortex", "vortex", "vortex",
+                "boom", "boom", "ghost", "ghost", "multiball", "multiball", "magma", "magma", "lightning", "lightning",
+                "ufo", "ufo", "repulsor", "repulsor", "alchemy", "alchemy" };
 
         String type = types[random.nextInt(types.length)];
 
@@ -1806,21 +1805,9 @@ public class GameView extends SurfaceView implements Runnable {
             }
 
             // Sınır kontrolü
-            // Sınır kontrolü
             float dx = missile.x - centerX;
             float dy = missile.y - centerY;
-
-            // If no balls left, fly away
-            if ((blackBalls == null || blackBalls.isEmpty()) && (coloredBalls == null || coloredBalls.isEmpty())) {
-                // Move away from center
-                float ang = (float) Math.atan2(dy, dx);
-                missile.x += Math.cos(ang) * 10;
-                missile.y += Math.sin(ang) * 10;
-                // Remove if off screen
-                if (dx * dx + dy * dy > (circleRadius * 2) * (circleRadius * 2)) {
-                    missiles.remove(i);
-                }
-            } else if (dx * dx + dy * dy > circleRadius * circleRadius) {
+            if (dx * dx + dy * dy > circleRadius * circleRadius) {
                 missiles.remove(i);
             }
         }
@@ -7168,7 +7155,7 @@ public class GameView extends SurfaceView implements Runnable {
         float x, y;
         float pullRadius = 0;
         float maxRadius = 200;
-        int life = 900; // Increased to ~15 seconds at 60fps (was 150)
+        int life = 200; // ~2.5 seconds at 60fps
         float rotationAngle = 0;
 
         Vortex(float x, float y) {
@@ -7179,7 +7166,7 @@ public class GameView extends SurfaceView implements Runnable {
         void update() {
             // Expand radius over time - FIXED: starts at maxRadius, shrinks as life
             // decreases
-            pullRadius = maxRadius * (1 - (life / 150f) * 0.3f); // Starts at 100%, goes to 70%
+            pullRadius = maxRadius * (1 - (life / 200f) * 0.3f); // Starts at 100%, goes to 70%
             life--;
             rotationAngle += 10; // Rotate spiral
 
@@ -7759,7 +7746,7 @@ public class GameView extends SurfaceView implements Runnable {
                 if (dist < radius * 2.5f) {
                     // Heat Damage
                     if (now % 60 == 0) { // Approx once per second
-                        playerHp -= 3;
+                        playerHp -= 10;
                         createParticles(whiteBall.x, whiteBall.y, Color.rgb(255, 100, 0));
                         floatingTexts
                                 .add(new FloatingText("BURN", whiteBall.x, whiteBall.y - 20, Color.rgb(255, 69, 0)));
