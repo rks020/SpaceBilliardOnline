@@ -97,6 +97,10 @@
             android:name="com.spacebilliard.app.HallOfFameActivity"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="com.spacebilliard.app.LevelSelectActivity"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
         <!-- Include the AdActivity and InAppPurchaseActivity configChanges and themes. -->
         <activity
             android:name="com.google.android.gms.ads.AdActivity"
@@ -145,6 +149,9 @@
             android:authorities="com.spacebilliard.app.androidx-startup"
             android:exported="false" >
             <meta-data
+                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+                android:value="androidx.startup" />
+            <meta-data
                 android:name="androidx.work.WorkManagerInitializer"
                 android:value="androidx.startup" />
             <meta-data
@@ -154,10 +161,10 @@
                 android:name="androidx.lifecycle.ProcessLifecycleInitializer"
                 android:value="androidx.startup" />
             <meta-data
-                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+                android:name="com.russhwolf.settings.SettingsInitializer"
                 android:value="androidx.startup" />
             <meta-data
-                android:name="com.russhwolf.settings.SettingsInitializer"
+                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
                 android:value="androidx.startup" />
         </provider>
 

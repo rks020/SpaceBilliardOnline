@@ -28,6 +28,8 @@ import com.google.android.gms.ads.initialization.OnInitializationCompleteListene
 import com.google.android.gms.ads.rewarded.RewardedAd;
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
 import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.FullScreenContentCallback;
+import com.google.android.gms.ads.AdError;
 
 public class MainActivity extends Activity {
 
@@ -145,7 +147,12 @@ public class MainActivity extends Activity {
 
         // Only start game if we didn't open a special panel
         if (!handled) {
-            gameView.startGame();
+            int startLevel = getIntent().getIntExtra("LEVEL", -1);
+            if (startLevel != -1) {
+                gameView.startGameAtLevel(startLevel);
+            } else {
+                gameView.startGame();
+            }
         }
     }
 
@@ -286,14 +293,25 @@ public class MainActivity extends Activity {
     // Show rewarded ad and give the reward (continuing the game)
     public void showRewardedAdForContinue() {
         if (rewardedAd != null) {
+            rewardedAd.setFullScreenContentCallback(new FullScreenContentCallback() {
+                @Override
+                public void onAdDismissedFullScreenContent() {
+                    rewardedAd = null;
+                    loadRewardedAd();
+                }
+
+                @Override
+                public void onAdFailedToShowFullScreenContent(AdError adError) {
+                    rewardedAd = null;
+                }
+            });
+
             rewardedAd.show(this, rewardItem -> {
                 // User watched ad, grant continue
                 if (gameView != null) {
                     gameView.continueAfterAd();
                     hideAllPanels(); // Success
                 }
-                // Load next ad
-                loadRewardedAd();
             });
         } else {
             // Ad not ready, just continue anyway (fallback)

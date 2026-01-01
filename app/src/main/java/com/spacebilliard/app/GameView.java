@@ -172,13 +172,16 @@ public class GameView extends SurfaceView implements Runnable {
     // PERFORMANCE: Changed from CopyOnWriteArrayList (copies entire list on every
     // add/remove!)
     private final ArrayList<Ball> bossProjectiles = new ArrayList<>();
+    private long lastImpactSoundTime = 0; // Throttle impact sounds
     private float playerHp = 1000, playerMaxHp = 1000;
     private int coins = 0;
     private int pendingColoredBalls = 0; // Toplar yavaş yavaş gelecek
     private boolean extraTimeActive = false; // Added missing variable
     // Level geçiş beklemesi
     private boolean levelCompleted = false;
-    private int lastCoinAwardedLevel = 0; // Track which level last received coin reward
+    private int lastCoinAwardedLevel = 0;
+    private int lastCoinAwardedStage = 0;
+
     private final long levelCompletionTime = 0;
     // Ses Efektleri
     private final SoundPool soundPool;
@@ -201,6 +204,10 @@ public class GameView extends SurfaceView implements Runnable {
     private RadialGradient cachedMeteorShading;
     private final android.graphics.PorterDuffXfermode cachedXfermode;
     private Bitmap cachedBossBackground; // NEW: Performance optimization for 60FPS
+
+    // Level Info Overlay
+    private String levelInfoText = "";
+    private long levelInfoEndTime = 0;
 
     // PERFORMANCE: Cached polygon paths (created once, reused every frame)
     private Path cachedPolygonPath = null;
@@ -250,6 +257,7 @@ public class GameView extends SurfaceView implements Runnable {
         maxCombo = prefs.getInt("maxCombo", 0);
         // maxUnlockedLevel'ı yükle (ilerlemeyi kaydet)
         maxUnlockedLevel = prefs.getInt("maxUnlockedLevel", 1);
+        maxUnlockedLevel = 500; // TEST MODE: Unlock all levels
         // Coinleri yükle
         coins = prefs.getInt("coins", 0);
 
@@ -305,8 +313,38 @@ public class GameView extends SurfaceView implements Runnable {
 
     public void startGame() {
         reloadPreferences(); // Ensure prefs are fresh when game starts
-        showLevelSelector = true;
+        showLevelSelector = false; // Disable old selector
         updateUIPanels();
+    }
+
+    public void startGameAtLevel(int startLevel) {
+        reloadPreferences();
+        showLevelSelector = false;
+
+        level = startLevel;
+        stage = 1;
+
+        if (screenWidth > 0 && screenHeight > 0) {
+            // View is ready, verify whiteBall exists
+            if (whiteBall == null) {
+                // Initialize physics objects if missing (should be in onSizeChanged but safe
+                // fallback)
+                int minSize = Math.min(screenWidth, screenHeight);
+                centerX = screenWidth / 2f;
+                centerY = screenHeight / 2f;
+                circleRadius = minSize * 0.47f;
+                whiteBall = new Ball(centerX, centerY, minSize * 0.02f, Color.WHITE);
+            }
+            initLevel(level);
+            gameStarted = true;
+            gameOver = false;
+            updateUIPanels();
+        } else {
+            // View not ready. We set the level variable, and onSizeChanged will pick it up.
+            // Do NOT set gameStarted = true here, as physics objects (whiteBall) are
+            // missing.
+            // onSizeChanged will initialize whiteBall and then set gameStarted = true.
+        }
     }
 
     public void showInstructions() {
@@ -374,9 +412,8 @@ public class GameView extends SurfaceView implements Runnable {
         showPlayerDefeated = false;
         showBossDefeated = false;
 
-        // Calculate start of current level block (Stage 1)
-        int startStage = level - ((level - 1) % 5);
-        level = startStage;
+        // Reset to stage 1 of current level
+        stage = 1;
 
         // CLEAR BOSS PROJECTILES TO PREVENT PERSISTENCE
         if (bossProjectiles != null) {
@@ -444,7 +481,18 @@ public class GameView extends SurfaceView implements Runnable {
         // Beyaz topu başlat
         if (whiteBall == null) {
             whiteBall = new Ball(centerX, centerY, minSize * 0.02f, Color.WHITE);
-            initLevel(1);
+            // If startGameAtLevel was called, 'level' is already set to target.
+            // If normal start, 'level' defaults to 1.
+            // So just use 'level' here instead of hardcoding 1.
+
+            // Reset stage to 1 for fresh level start
+            stage = 1;
+
+            initLevel(level);
+
+            // Now that objects are created, we can safely start the game loop logic
+            gameStarted = true;
+            gameOver = false;
         } else {
             updatePositionsAfterResize();
         }
@@ -576,6 +624,14 @@ public class GameView extends SurfaceView implements Runnable {
 
     private void initLevel(int lv) {
         level = lv;
+
+        // Level Info Screen logic - ONLY SHOW ON STAGE 1 & START OF SPACE (Level 1, 11,
+        // 21...)
+        if (stage == 1 && (lv % 10 == 1)) {
+            levelInfoText = "LEVEL " + lv;
+
+            levelInfoEndTime = System.currentTimeMillis() + 6000;
+        }
         // Zorluk Ayarı
         lives = 3;
         // Level 6'dan sonra süre artar, ama level arttıkça top sayısı da artar
@@ -639,21 +695,30 @@ public class GameView extends SurfaceView implements Runnable {
         // Initialize Boss (Every 50th stage = End of every 10th Level)
         currentBoss = null;
 
-        // SPACE 3 AREA ADJUSTMENT (Levels 101-150)
+        // SPACE-BASED AREA ADJUSTMENTS
         float minSize = Math.min(screenWidth, screenHeight);
-        if (lv > 100 && lv <= 150) {
-            circleRadius = minSize * 0.49f; // Enlarged Area for Space 3 (further reduced)
+        int currentSpace = ((lv - 1) / 10) + 1;
+
+        if (currentSpace == 2) {
+            // Space 2: Square play area (larger)
+            circleRadius = minSize * 0.49f;
+        } else if (currentSpace == 3) {
+            // Space 3: Even larger area
+            circleRadius = minSize * 0.49f;
         } else {
-            circleRadius = minSize * 0.47f; // Default Area
+            // Default area for other spaces
+            circleRadius = minSize * 0.47f;
         }
 
-        if (lv % 50 == 0 && lv <= 500) { // Bosses at global stages 50, 100, 150... (Levels 10, 20, 30...)
+        // Boss only appears at Level X0 Stage 5 (e.g., Level 10 Stage 5, Level 20 Stage
+        // 5)
+        if (lv % 10 == 0 && stage == 5) {
             spawnBoss(lv);
             return; // Skip normal ball layout
         }
 
         // Her level (5 stage) için top sayısını sıfırla ve yeniden başlat
-        int stageInLevel = ((lv - 1) % 5) + 1;
+        int stageInLevel = stage; // Use explicit stage variable
         int ballCount = 10 + stageInLevel; // Start higher (11 balls at stage 1)
 
         // Spawn 4 balls initially
@@ -709,47 +774,47 @@ public class GameView extends SurfaceView implements Runnable {
         String name = "Boss";
         float hp = 2000 + (lv * 200); // Scaling HP
         int color = Color.RED;
-        long duration = 240000; // 4 mins default
+        long duration = 120000; // 2 mins for boss battles
 
         // Boss assignment based on level
         // Boss assignment based on global stage count (50 stages = 10 Levels)
-        if (lv == 50) { // Level 10 (Stage 50) - 1st Boss
+        if (lv == 10) { // Level 10 Stage 5 - 1st Boss
             name = "VOID TITAN";
             hp = 2000;
             color = Color.rgb(75, 0, 130);
-        } else if (lv == 100) { // Level 20 (Stage 100) - 2nd Boss
+        } else if (lv == 20) { // Level 20 Stage 5 - 2nd Boss
             name = "LUNAR CONSTRUCT";
             hp = 2000;
             color = Color.rgb(100, 100, 100);
-        } else if (lv == 150) { // Level 30
+        } else if (lv == 30) { // Level 30
             name = "SOLARION";
             hp = 2000;
             color = Color.rgb(255, 165, 0);
-        } else if (lv == 200) { // Level 40
+        } else if (lv == 40) { // Level 40
             name = "NEBULON";
             hp = 2000;
             color = Color.rgb(218, 112, 214);
-        } else if (lv == 250) { // Level 50
+        } else if (lv == 50) { // Level 50
             name = "GRAVITON";
             hp = 2000;
             color = Color.rgb(0, 0, 139);
-        } else if (lv == 300) { // Level 60
+        } else if (lv == 60) { // Level 60
             name = "MECHA-CORE";
             hp = 2000;
             color = Color.rgb(192, 192, 192);
-        } else if (lv == 350) { // Level 70
+        } else if (lv == 70) { // Level 70
             name = "CRYO-STASIS";
             hp = 2000;
             color = Color.CYAN;
-        } else if (lv == 400) { // Level 80
+        } else if (lv == 80) { // Level 80
             name = "GEO-BREAKER";
             hp = 2000;
             color = Color.rgb(139, 69, 19);
-        } else if (lv == 450) { // Level 90
+        } else if (lv == 90) { // Level 90
             name = "BIO-HAZARD";
             hp = 2000;
             color = Color.rgb(50, 205, 50);
-        } else if (lv == 500) { // Level 100
+        } else if (lv == 100) { // Level 100
             name = "CHRONO-SHIFTER";
             hp = 2000;
             color = Color.rgb(255, 215, 0);
@@ -759,6 +824,17 @@ public class GameView extends SurfaceView implements Runnable {
 
         timeLeft = duration;
         currentBoss = new Boss(name, hp, color);
+
+        // Boss Info Screen
+        levelInfoText = "WARNING: BOSS ENCOUNTER\n" + name;
+        if (name.equals("SOLARION"))
+            levelInfoText = "WARNING: SOLARION\nDO NOT WAIT TOO MUCH NEAR THE BOSS\nYOU WILL BURN";
+        else if (name.equals("NEBULON"))
+            levelInfoText = "BOSS: NEBULON\nHIGH DENSITY - FRICTION INCREASED";
+        else if (name.equals("GRAVITON"))
+            levelInfoText = "BOSS: GRAVITON\nPASSIVE: REGENERATES HP IF IT PULLS BALLS INTO ITSELF";
+
+        levelInfoEndTime = System.currentTimeMillis() + 7000;
 
         // Player HP Setup
         playerMaxHp = 1000;
@@ -882,6 +958,11 @@ public class GameView extends SurfaceView implements Runnable {
 
     private void update() {
 
+        // PAUSE GAME IF INFO SCREEN IS ACTIVE
+        if (System.currentTimeMillis() < levelInfoEndTime) {
+            return;
+        }
+
         // Offline Logic: Lightning Sequencer
         if (pendingLightningStrikes > 0) {
             long now = System.currentTimeMillis();
@@ -900,13 +981,13 @@ public class GameView extends SurfaceView implements Runnable {
                 int oldCoins = coins;
                 coins += 100; // Reward 100 coins
                 lastCoinAwardedLevel = level; // Mark level as rewarded to prevent double reward
-                android.util.Log.d("GameView", "Boss defeated! Coins: " + oldCoins + " -> " + coins);
+
                 saveProgress(); // Save coins
 
                 // Force UI update to trigger animation
                 if (mainActivity != null) {
                     mainActivity.runOnUiThread(() -> {
-                        android.util.Log.d("GameView", "Updating coin UI to: " + coins);
+
                         updateMainActivityPanels();
                     });
                 }
@@ -941,6 +1022,24 @@ public class GameView extends SurfaceView implements Runnable {
 
         // Zaman
         timeLeft -= deltaTime;
+
+        // Space 3 Background Effect: Rising Flames
+        int currentEffectsSpace = ((level - 1) / 10) + 1;
+        if (currentEffectsSpace == 3 && !showBossDefeated && !showPlayerDefeated) {
+            // Spawn rising flames from bottom
+            if (random.nextFloat() < 0.3f) { // 30% chance per frame
+                float x = random.nextFloat() * screenWidth;
+                float y = screenHeight + 20; // Start below screen
+                float speed = 5 + random.nextFloat() * 5; // Slow rising
+                float angle = (float) (Math.PI * 1.5); // Upwards (~270 degrees)
+                // Fire colors: Red -> Orange -> Yellow
+                int r = 255;
+                int g = random.nextInt(140);
+                int b = 0;
+                // Use simple particle constructor
+                particles.add(new Particle(x, y, angle, speed, Color.rgb(r, g, b)));
+            }
+        }
 
         // Boss Projectiles Update & Collision with Player Balls
         // Prevent updates if Boss or Player is defeated (Game Paused Visual)
@@ -1051,13 +1150,16 @@ public class GameView extends SurfaceView implements Runnable {
         // Tüm toplar toplandı mı? (Ve Boss yoksa)
         // Award coins only once per stage clear
         if (coloredBalls.size() == 0 && pendingColoredBalls == 0 && currentBoss == null && !showBossDefeated
-                && level > lastCoinAwardedLevel) {
+                && !levelCompleted // Prevent spam after stage is already completed
+                && (level > lastCoinAwardedLevel || (level == lastCoinAwardedLevel && stage > lastCoinAwardedStage))) {
 
             // Award 5 coins for stage completion
             int oldCoins = coins;
             coins += 5;
-            lastCoinAwardedLevel = level; // Mark this level as rewarded
-            android.util.Log.d("GameView", "Stage " + level + " cleared! Coins: " + oldCoins + " -> " + coins);
+            lastCoinAwardedLevel = level;
+            lastCoinAwardedStage = stage; // Track stage too
+            android.util.Log.d("GameView",
+                    "Level " + level + " Stage " + stage + " cleared! Coins: " + oldCoins + " -> " + coins);
             saveProgress(); // Coin'i kaydet
 
             // Force UI update to trigger animation
@@ -1090,28 +1192,67 @@ public class GameView extends SurfaceView implements Runnable {
         if (levelCompleted && System.currentTimeMillis() - stageClearedTime > 3000) {
             levelCompleted = false;
             showStageCleared = false;
-            level++;
 
-            // Her 5 stage tamamlandığında yeni level aç
-            int completedStages = level - 1; // Tamamlanan stage sayısı
-            int unlockedLevelCount = (completedStages / 5) + 1; // Açılması gereken level sayısı
+            stage++;
 
-            if (unlockedLevelCount > maxUnlockedLevel) {
-                maxUnlockedLevel = unlockedLevelCount;
-                saveProgress();
+            if (stage > 5) {
+                stage = 1;
 
-                // New Space Unlocked? (Level 11, 21, etc.)
-                if (maxUnlockedLevel % 10 == 1 && maxUnlockedLevel > 1 && maxUnlockedLevel <= 100) {
-                    gameStarted = false;
-                    showLevelSelector = true;
-                    selectorPage = (maxUnlockedLevel - 1) / 10 + 1;
-                    // Stop here, don't init next level immediately
-                    return;
+                // Log Debug
+                android.util.Log.d("GameView", "Level Completed! Saving stars for Level: " + level);
+
+                // Save 3 stars for the completed level
+                android.content.Context ctx = getContext();
+                if (ctx != null) {
+                    android.content.SharedPreferences prefs = ctx.getSharedPreferences("SPACE_PROGRESS",
+                            android.content.Context.MODE_PRIVATE);
+                    String key = "level_" + level + "_stars";
+                    android.util.Log.d("GameView", "Attempting to save: " + key + " = 3");
+
+                    android.content.SharedPreferences.Editor editor = prefs.edit();
+                    editor.putInt(key, 3);
+                    boolean success = editor.commit(); // Use commit() instead of apply() for immediate save
+
+                    android.util.Log.d("GameView", "Save result for " + key + ": " + (success ? "SUCCESS" : "FAILED"));
+
+                    // Verify the save by reading it back
+                    int savedStars = prefs.getInt(key, 0);
+                    android.util.Log.d("GameView", "Verification read: " + key + " = " + savedStars);
+                } else {
+                    android.util.Log.e("GameView", "ERROR: Context is null, cannot save stars!");
                 }
+
+                // Show "LEVEL COMPLETE" text
+                floatingTexts.add(new FloatingText("LEVEL COMPLETE!", centerX, centerY - 100, Color.GREEN));
+                playSound(soundPower); // Victory sound
+
+                level++; // Go to next level
+                android.util.Log.d("GameView", "Advancing to Next Level: " + level);
+
+                if (level > maxUnlockedLevel) {
+                    maxUnlockedLevel = level;
+                    saveProgress(); // This saves 'maxUnlockedLevel' to 'SpaceBilliard' prefs
+                    android.util.Log.d("GameView", "New Max Unlocked Level: " + maxUnlockedLevel);
+
+                    // Show "LEVEL UNLOCKED" text
+                    floatingTexts
+                            .add(new FloatingText("LEVEL " + level + " UNLOCKED!", centerX, centerY + 50, Color.CYAN));
+                }
+            } else {
+                // Intermediate stage completed (stages 1-4), show stage cleared text
+                int completedStage = stage - 1; // We already incremented, so -1 to get completed stage
+                android.util.Log.d("GameView",
+                        "Level " + level + " Stage " + completedStage + " cleared. Next Stage: " + stage);
+                floatingTexts
+                        .add(new FloatingText("STAGE " + completedStage + " CLEARED!", centerX, centerY, Color.YELLOW));
+                playSound(soundCoin); // Lighter sound for stage clear
             }
+            // else: Just continue to next stage within same level
 
             // Check for Game Completion (Level > 500 stages = 100 Levels)
-            if (level > 500) {
+            if (level > 500)
+
+            {
                 gameCompleted = true;
                 gameStarted = false;
                 updateUIPanels();
@@ -1123,7 +1264,9 @@ public class GameView extends SurfaceView implements Runnable {
         }
 
         // Elektrik topu ikinci sıçrama kontrolü
-        if (electricSecondBounce && System.currentTimeMillis() >= electricSecondBounceTime) {
+        if (electricSecondBounce && System.currentTimeMillis() >= electricSecondBounceTime)
+
+        {
             electricSecondBounce = false;
             if (currentBoss != null) {
                 // Boss varsa ona sek
@@ -1157,6 +1300,9 @@ public class GameView extends SurfaceView implements Runnable {
             blackHoleActive = false;
 
         // Beyaz top
+        if (whiteBall == null)
+            return; // Safety check initialization
+
         if (!isDragging || draggedBall != whiteBall) {
             whiteBall.x += whiteBall.vx;
             whiteBall.y += whiteBall.vy;
@@ -1274,7 +1420,9 @@ public class GameView extends SurfaceView implements Runnable {
         updateMissiles();
 
         // Blast wave
-        if (blastWave != null) {
+        if (blastWave != null)
+
+        {
             blastWave.update();
             if (blastWave.isDead())
                 blastWave = null;
@@ -1761,9 +1909,51 @@ public class GameView extends SurfaceView implements Runnable {
     private void updateMissiles() {
         for (int i = missiles.size() - 1; i >= 0; i--) {
             GuidedMissile missile = missiles.get(i);
-            missile.update();
+
+            // SMOKE TRAIL (User Request)
+            if (random.nextInt(3) == 0) { // Frequent smoke
+                particles.add(new Particle(missile.x, missile.y, (float) (random.nextFloat() * 2 * Math.PI), 2,
+                        Color.DKGRAY));
+            }
+
+            // TARGET VALIDATION & PRIORITY (Black > Colored > None)
+            // Ensure we have a valid target or switch to high priority
+            // TARGET VALIDATION & PRIORITY (BOSS > Black > Colored > None)
+            if (currentBoss != null) {
+                missile.target = null; // Let GuidedMissile handle boss targeting internally
+            } else if (missile.target == null
+                    || (!blackBalls.contains(missile.target) && !coloredBalls.contains(missile.target))) {
+                if (blackBalls.size() > 0)
+                    missile.target = blackBalls.get(0);
+                else if (coloredBalls.size() > 0)
+                    missile.target = coloredBalls.get(0);
+                else
+                    missile.target = null;
+            }
+
+            // MOVEMENT
+            if (missile.target != null || currentBoss != null) {
+                missile.update(); // Homing
+            } else {
+                // FLY AWAY LOGIC (No targets)
+                float dx = missile.x - centerX;
+                float dy = missile.y - centerY;
+                float ang = (float) Math.atan2(dy, dx);
+                missile.x += Math.cos(ang) * 15; // Fast exit
+                missile.y += Math.sin(ang) * 15;
+            }
+
+            // REMOVEL IF OFF SCREEN (Generic for both states)
+            float distFromCenterSq = (missile.x - centerX) * (missile.x - centerX)
+                    + (missile.y - centerY) * (missile.y - centerY);
+            if (distFromCenterSq > (circleRadius * 2.5f) * (circleRadius * 2.5f)) {
+                missiles.remove(i);
+                continue;
+            }
 
             // Hedef kontrolü
+            boolean hit = false;
+            // Black Ball Collision
             for (int j = blackBalls.size() - 1; j >= 0; j--) {
                 Ball ball = blackBalls.get(j);
                 float dx = missile.x - ball.x;
@@ -1776,9 +1966,32 @@ public class GameView extends SurfaceView implements Runnable {
                     blackBalls.remove(j);
                     missiles.remove(i);
                     playSound(soundBlackExplosion);
+                    hit = true;
                     break;
                 }
             }
+            if (hit)
+                continue;
+
+            // Colored Ball Collision (FIX: Now destroys colored balls)
+            for (int j = coloredBalls.size() - 1; j >= 0; j--) {
+                Ball ball = coloredBalls.get(j);
+                float dx = missile.x - ball.x;
+                float dy = missile.y - ball.y;
+                float distSq = dx * dx + dy * dy;
+                float radSum = missile.radius + ball.radius;
+
+                if (distSq < radSum * radSum) {
+                    createParticles(ball.x, ball.y, ball.color);
+                    coloredBalls.remove(j);
+                    missiles.remove(i);
+                    playSound(soundBlackExplosion);
+                    hit = true;
+                    break;
+                }
+            }
+            if (hit)
+                continue;
 
             // Boss Collision
             if (currentBoss != null) {
@@ -1804,24 +2017,6 @@ public class GameView extends SurfaceView implements Runnable {
                     }
                     continue;
                 }
-            }
-
-            // Sınır kontrolü
-            float dx = missile.x - centerX;
-            float dy = missile.y - centerY;
-
-            // If no balls left, fly away
-            if ((blackBalls == null || blackBalls.isEmpty()) && (coloredBalls == null || coloredBalls.isEmpty())) {
-                // Move away from center
-                float ang = (float) Math.atan2(dy, dx);
-                missile.x += Math.cos(ang) * 10;
-                missile.y += Math.sin(ang) * 10;
-                // Remove if off screen
-                if (dx * dx + dy * dy > (circleRadius * 2) * (circleRadius * 2)) {
-                    missiles.remove(i);
-                }
-            } else if (dx * dx + dy * dy > circleRadius * circleRadius) {
-                missiles.remove(i);
             }
         }
     }
@@ -1931,13 +2126,16 @@ public class GameView extends SurfaceView implements Runnable {
                         continue;
                     }
 
-                    playerHp -= 150; // Damage
+                    playerHp -= 100; // Damage
                     createImpactBurst(whiteBall.x, whiteBall.y, Color.RED);
                     bossProjectiles.remove(i);
                     // Shake
                     cameraShakeX = 20;
                     shakeEndTime = System.currentTimeMillis() + 300;
-                    playSound(soundCollision);
+                    if (System.currentTimeMillis() - lastImpactSoundTime > 50) {
+                        playSound(soundCollision);
+                        lastImpactSoundTime = System.currentTimeMillis();
+                    }
                 }
             }
         }
@@ -1969,7 +2167,7 @@ public class GameView extends SurfaceView implements Runnable {
 
         // --- WALL COLLISIONS (Geometric Shapes) ---
         // Must run even during drag to keep balls inside new shapes
-        int space = ((level - 1) / 50) + 1;
+        int space = ((level - 1) / 10) + 1; // Corrected from 50 to 10 to match draw() logic
         float damping = 0.9f;
 
         ArrayList<Ball> allBalls = new ArrayList<>();
@@ -1984,11 +2182,12 @@ public class GameView extends SurfaceView implements Runnable {
         }
 
         if (space == 2) {
-            // --- SPACE 2: SQUARE (Stages 51-100) ---
+            // --- SPACE 2: SQUARE (Stages 11-20) ---
             float boundary = circleRadius;
             float left = centerX - boundary;
             float right = centerX + boundary;
-            float top = centerY - boundary;
+            // Match visual fix: top is lower (0.85f) to avoid UI overlap
+            float top = centerY - boundary * 0.85f;
             float bottom = centerY + boundary;
 
             if (whiteBall != null)
@@ -2442,8 +2641,8 @@ public class GameView extends SurfaceView implements Runnable {
             canvas.save();
             canvas.translate(cameraShakeX, cameraShakeY);
 
-            // Arka plan - 10 Space progression
-            int currentSpace = ((level - 1) / 50) + 1;
+            // Arka plan - 10 Space progression (every 10 levels = 1 space)
+            int currentSpace = ((level - 1) / 10) + 1;
 
             // DRAW CACHED BOSS BACKGROUND (Performance Optimization)
             if (currentBoss != null && cachedBossBackground != null) {
@@ -2493,10 +2692,16 @@ public class GameView extends SurfaceView implements Runnable {
                     case 3:
                     case 4:
                     case 10:
-                        // Space 3, 4, 10: Reddish Dark + Comets (No Meteor)
-                        canvas.drawColor(Color.rgb(25, 5, 10)); // Reddish dark background
-                        for (Comet c : comets) {
-                            c.draw(canvas, paint); // Already updated in update()
+                        // Space 3: Black + Rising Flames (Restored)
+                        // Space 4, 10: Keep dark (or shared logic)
+                        if (currentSpace == 3) {
+                            canvas.drawColor(Color.BLACK);
+                            // NO COMETS for Space 3
+                        } else {
+                            canvas.drawColor(Color.rgb(25, 5, 10)); // Reddish dark for others
+                            for (Comet c : comets) {
+                                c.draw(canvas, paint);
+                            }
                         }
                         break;
 
@@ -2576,12 +2781,14 @@ public class GameView extends SurfaceView implements Runnable {
             paint.setColor(Color.WHITE);
             paint.setShadowLayer(20, 0, 0, Color.CYAN);
 
-            int space = ((level - 1) / 50) + 1;
+            int space = ((level - 1) / 10) + 1;
 
             if (space == 2) {
                 // SPACE 2: SQUARE (Full Circle Radius)
                 float boundary = circleRadius;
-                canvas.drawRect(centerX - boundary, centerY - boundary, centerX + boundary, centerY + boundary, paint);
+                // Modified top (0.85f) to avoid overlapping with Top UI (Home/Passive)
+                canvas.drawRect(centerX - boundary, centerY - boundary * 0.85f, centerX + boundary, centerY + boundary,
+                        paint);
             } else if (space == 3) {
                 // SPACE 3: RECTANGLE
                 float halfW = circleRadius;
@@ -2828,14 +3035,18 @@ public class GameView extends SurfaceView implements Runnable {
             if (showStageCleared) {
                 paint.setStyle(Paint.Style.FILL);
                 paint.setTextSize(screenWidth * 0.08f); // Reduced Text Size
-                int currentStageNum = ((level - 1) % 5) + 1;
-                if (currentStageNum == 5) {
-                    int completedLevel = ((level - 1) / 5) + 1;
-                    int nextLevelToUnlock = completedLevel + 1;
+
+                // At this point, stage and level have NOT been incremented yet
+                // We're showing what was just completed
+                int completedStage = stage; // Current stage is the one that was just completed
+
+                if (stage == 5) {
+                    // We just completed stage 5, will unlock next level
+                    int nextLevelToUnlock = level + 1;
 
                     // If game is completed (or about to be), don't show unlock text for next level
                     if (nextLevelToUnlock > 100) {
-                        canvas.drawText("FINAL STAGE CLEARED!", centerX, centerY, paint);
+                        canvas.drawText("FINAL LEVEL CLEARED!", centerX, centerY, paint);
                     } else if (nextLevelToUnlock <= maxUnlockedLevel) {
                         paint.setTextSize(screenWidth * 0.06f); // Smaller text
                         canvas.drawText("LEVEL " + nextLevelToUnlock, centerX, centerY - screenHeight * 0.04f, paint);
@@ -2853,14 +3064,15 @@ public class GameView extends SurfaceView implements Runnable {
                         }
                     }
                 } else {
-                    canvas.drawText("STAGE CLEARED!", centerX, centerY, paint);
+                    // Intermediate stage (1-4) cleared, show stage number
+                    canvas.drawText("STAGE " + completedStage + " CLEARED!", centerX, centerY, paint);
                 }
                 paint.clearShadowLayer();
 
                 // Alt yazı
                 paint.setTextSize(screenWidth * 0.045f);
                 paint.setColor(Color.WHITE);
-                canvas.drawText("Stage " + currentStageNum + " Complete", centerX, centerY + screenHeight * 0.08f,
+                canvas.drawText("Stage " + completedStage + " Complete", centerX, centerY + screenHeight * 0.08f,
                         paint);
             }
 
@@ -2884,6 +3096,60 @@ public class GameView extends SurfaceView implements Runnable {
                 canvas.drawText(text, centerX, centerY, paint);
 
                 paint.clearShadowLayer();
+                paint.setTypeface(Typeface.DEFAULT);
+            }
+
+            // --- INFO SCREEN OVERLAY ---
+            if (System.currentTimeMillis() < levelInfoEndTime) {
+                // Dim Text
+                paint.setColor(Color.argb(100, 0, 0, 0));
+                paint.setStyle(Paint.Style.FILL);
+                canvas.drawRect(0, 0, screenWidth, screenHeight, paint);
+
+                // Panel Box
+                float panelW = screenWidth * 0.8f;
+                float panelH = screenHeight * 0.3f;
+                float panelL = centerX - panelW / 2;
+                float panelT = centerY - panelH / 2;
+                float panelR = centerX + panelW / 2;
+                float panelB = centerY + panelH / 2;
+
+                RectF panelRect = new RectF(panelL, panelT, panelR, panelB);
+
+                // Background
+                paint.setColor(Color.argb(230, 20, 20, 30)); // Dark Blue-Grey
+                paint.setStyle(Paint.Style.FILL);
+                canvas.drawRoundRect(panelRect, 40, 40, paint);
+
+                // Border
+                paint.setColor(Color.CYAN);
+                paint.setStyle(Paint.Style.STROKE);
+                paint.setStrokeWidth(6);
+                canvas.drawRoundRect(panelRect, 40, 40, paint);
+
+                // Text
+                paint.setColor(Color.WHITE);
+                paint.setStyle(Paint.Style.FILL);
+                paint.setTextSize(screenWidth * 0.035f); // Smaller text
+                paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+                paint.setTextAlign(Paint.Align.CENTER);
+
+                String[] lines = levelInfoText.split("\n");
+                // Calculate total text height to center vertically in box
+                float lineHeight = screenHeight * 0.06f;
+                float totalTextH = lines.length * lineHeight;
+                float textStartY = centerY - (totalTextH / 2) + (lineHeight / 2);
+
+                for (int i = 0; i < lines.length; i++) {
+                    // Title (first line) is larger? Maybe not, keep uniform for now.
+                    if (i == 0)
+                        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD_ITALIC));
+                    else
+                        paint.setTypeface(Typeface.DEFAULT);
+
+                    canvas.drawText(lines[i], centerX, textStartY + (i * lineHeight), paint);
+                }
+
                 paint.setTypeface(Typeface.DEFAULT);
             }
 
@@ -4655,8 +4921,7 @@ public class GameView extends SurfaceView implements Runnable {
         canvas.drawText("Best Score: " + highScore, centerX, cy - panelHeight * 0.05f, paint);
 
         int bestSpace = ((highLevel - 1) / 10) + 1;
-        int bestLevelInSpace = ((highLevel - 1) % 10) + 1;
-        canvas.drawText("Best Level: Space " + bestSpace + " Level " + bestLevelInSpace, centerX,
+        canvas.drawText("Best Level: Space " + bestSpace + " Level " + highLevel, centerX,
                 cy + panelHeight * 0.15f, paint);
 
         canvas.drawText("Max Combo: " + maxCombo, centerX, cy + panelHeight * 0.35f, paint);
@@ -6046,9 +6311,8 @@ public class GameView extends SurfaceView implements Runnable {
 
     private void updateMainActivityPanels() {
         if (mainActivity != null && gameStarted && !gameOver) {
-            int currentStage = ((level - 1) % 5) + 1;
-            int currentSpace = ((level - 1) / 50) + 1;
-            int currentLevelInSpace = ((level - 1) / 5) + 1;
+            int currentStage = stage;
+            int currentLevelInSpace = level;
 
             int remaining = coloredBalls.size() + pendingColoredBalls;
             String levelText = "Level " + currentLevelInSpace + " - Ball: " + remaining;
@@ -6340,12 +6604,19 @@ public class GameView extends SurfaceView implements Runnable {
 
                 // Letter
                 paint.setColor(Color.WHITE);
-                paint.setTextSize(inventorySlotSize * 0.5f);
+                paint.setTextSize(inventorySlotSize * 0.4f);
                 paint.setTextAlign(Paint.Align.CENTER);
                 canvas.drawText(letter, slotX, inventoryY + inventorySlotSize * 0.15f, paint);
+            } else {
+                // Empty Slot
+                // Draw "EMPTY" Label
+                paint.setStyle(Paint.Style.FILL);
+                paint.setColor(Color.DKGRAY);
+                paint.setTextSize(inventorySlotSize * 0.25f);
+                paint.setTextAlign(Paint.Align.CENTER);
+                canvas.drawText("EMPTY", slotX, inventoryY + inventorySlotSize * 0.1f, paint);
             }
         }
-        drawPassiveSlot(canvas, inventorySlotSize);
     }
 
     private void spawnClones(Ball parent) {
@@ -6891,15 +7162,8 @@ public class GameView extends SurfaceView implements Runnable {
                 // Calculate angle for rotation
                 angle = (float) Math.atan2(dy, dx);
 
-                // Hit Check Boss
-                if (currentBoss != null && distance < currentBoss.radius + radius) {
-                    currentBoss.hp -= 30; // Missile Damage
-                    floatingTexts.add(new FloatingText("-30", x, y, Color.RED));
-                    createImpactBurst(x, y, Color.RED);
-                    playSound(soundBlackExplosion); // Assuming sound exists
-                    dead = true;
-                    return;
-                }
+                // Hit Check Boss - REMOVED (Handled in updateMissiles)
+                // if (currentBoss != null && distance < currentBoss.radius + radius) { ... }
 
                 if (distance > speed) {
                     vx = (dx / distance) * speed;
@@ -7637,6 +7901,7 @@ public class GameView extends SurfaceView implements Runnable {
         float hp, maxHp;
         int color;
         long lastStateChangeTime;
+        long lastEventHorizonTime = 0; // New timer for periodic abilities
         int state = 0; // 0: Idle/Shoot, 1: Dash, 2: Burst
         long lastAttackTime;
         float dashTargetX, dashTargetY;
@@ -7665,7 +7930,7 @@ public class GameView extends SurfaceView implements Runnable {
             this.radius = circleRadius * 0.25f;
             this.lastStateChangeTime = System.currentTimeMillis();
             this.lastAttackTime = System.currentTimeMillis(); // CRITICAL: Initialize attack timer
-            android.util.Log.d("BOSS_DEBUG", "Boss created: " + name + " HP: " + maxHp + " State: " + state);
+
         }
 
         void update() {
@@ -7759,7 +8024,7 @@ public class GameView extends SurfaceView implements Runnable {
                 if (dist < radius * 2.5f) {
                     // Heat Damage
                     if (now % 60 == 0) { // Approx once per second
-                        playerHp -= 3;
+                        playerHp -= 8;
                         createParticles(whiteBall.x, whiteBall.y, Color.rgb(255, 100, 0));
                         floatingTexts
                                 .add(new FloatingText("BURN", whiteBall.x, whiteBall.y - 20, Color.rgb(255, 69, 0)));
@@ -7809,6 +8074,7 @@ public class GameView extends SurfaceView implements Runnable {
             // Simulates dense nebula
             float friction = 0.99f; // Standard
             friction = 0.96f; // Higher drag
+
             if (whiteBall != null) {
                 whiteBall.vx *= friction;
                 whiteBall.vy *= friction;
@@ -7836,13 +8102,20 @@ public class GameView extends SurfaceView implements Runnable {
         }
 
         private void updateGraviton(long now) {
-            // Movement: Faster Orbit (Fixed)
-            if (now - lastMoveTime > 30) {
-                float angle = (now * 0.0005f); // Faster orbit
-                x = centerX + (float) Math.cos(angle) * circleRadius * 0.4f; // Larger range
-                y = centerY + (float) Math.sin(angle) * circleRadius * 0.3f;
+            // Movement: Random Directions (User Request)
+            if (now - lastMoveTime > 2000) { // Change direction every 2 seconds
+                // Random target within 80% of radius
+                float angle = random.nextFloat() * 6.28f;
+                float dist = random.nextFloat() * (circleRadius * 0.8f);
+                moveTargetX = centerX + (float) Math.cos(angle) * dist;
+                moveTargetY = centerY + (float) Math.sin(angle) * dist;
                 lastMoveTime = now;
             }
+            // Smooth movement towards target
+            float moveDx = moveTargetX - x;
+            float moveDy = moveTargetY - y;
+            x += moveDx * 0.02f;
+            y += moveDy * 0.02f;
 
             // Phase Logic
             int phase = 1;
@@ -7879,11 +8152,61 @@ public class GameView extends SurfaceView implements Runnable {
                 lastAttackTime = now;
             }
 
-            // Phase 3: Spaghettification (High speed straight beam)
-            if (phase == 3 && now - lastStateChangeTime > 3000) {
-                shootGravityWell(); // Fires double/triple
-                shootGravityWell();
-                lastStateChangeTime = now;
+            // Phase 3: Spaghettification (High speed straight beam) & Event Horizon
+            // Expansion
+            if (phase == 3) {
+                // TIMING LOGIC: 5 seconds cycle (2.5s Active, 2.5s Cooldown)
+                if (lastEventHorizonTime == 0)
+                    lastEventHorizonTime = now;
+
+                boolean isEventHorizonActive = (now - lastEventHorizonTime) < 2500; // Active for first 2.5s
+
+                if (now - lastEventHorizonTime > 5000) {
+                    lastEventHorizonTime = now; // Reset cycle
+                    isEventHorizonActive = true;
+                    playSound(soundPower); // Sound cue for activation
+                }
+
+                if (isEventHorizonActive) {
+                    // 1. Expand Event Horizon (Visual + Logic)
+                    float eventHorizonRadius = radius * 3.5f; // Expanded radius
+
+                    // Visual Warning (Red Circle expanding/pulsing)
+                    createParticles(x, y, Color.RED); // Simple visual feedback
+
+                    // 2. Strong Pull Player
+                    if (whiteBall != null) {
+                        float dx = x - whiteBall.x;
+                        float dy = y - whiteBall.y;
+                        float dist = (float) Math.sqrt(dx * dx + dy * dy);
+
+                        // Stronger pull in Phase 3 (User requested "much faster")
+                        if (dist > 10) {
+                            float pullForce = 0.8f; // DRASTICALLY INCREASED from 0.25f
+                            whiteBall.vx += (dx / dist) * pullForce;
+                            whiteBall.vy += (dy / dist) * pullForce;
+                        }
+
+                        // 3. Event Horizon Damage & Friction
+                        if (dist < eventHorizonRadius) {
+                            // High Friction (Slows down escape)
+                            whiteBall.vx *= 0.9f;
+                            whiteBall.vy *= 0.9f;
+
+                            if (now % 20 == 0) { // Fast Damage tick (approx 3/sec)
+                                playerHp -= 15; // Increased damage
+                                createParticles(whiteBall.x, whiteBall.y, Color.RED);
+                                floatingTexts.add(new FloatingText("-15", whiteBall.x, whiteBall.y - 50, Color.RED));
+                            }
+                        }
+                    }
+                }
+
+                if (now - lastStateChangeTime > 3000) {
+                    shootGravityWell(); // Fires double/triple
+                    shootGravityWell();
+                    lastStateChangeTime = now;
+                }
             }
 
             // --- PASSIVE: Black Hole Pull (Consumes Special Balls) ---
@@ -8173,8 +8496,8 @@ public class GameView extends SurfaceView implements Runnable {
         void doSolarFlare() {
             for (int i = 0; i < 12; i++) {
                 float angle = (float) (i * Math.PI / 6);
-                float px = x + (float) Math.cos(angle) * 50;
-                float py = y + (float) Math.sin(angle) * 50;
+                float px = x + (float) Math.cos(angle) * (radius * 1.2f);
+                float py = y + (float) Math.sin(angle) * (radius * 1.2f);
                 Ball proj = new SolarBolt(px, py, 15, Color.rgb(255, 69, 0));
                 proj.vx = (float) Math.cos(angle) * 8;
                 proj.vy = (float) Math.sin(angle) * 8;
@@ -8185,7 +8508,10 @@ public class GameView extends SurfaceView implements Runnable {
 
         void doSupernova() {
             for (int i = 0; i < 8; i++) {
-                Ball proj = new SolarBolt(x, y, 30, Color.RED);
+                float angle = random.nextFloat() * 6.28f;
+                float px = x + (float) Math.cos(angle) * (radius * 1.2f);
+                float py = y + (float) Math.sin(angle) * (radius * 1.2f);
+                Ball proj = new SolarBolt(px, py, 30, Color.RED);
                 proj.vx = (random.nextFloat() - 0.5f) * 20;
                 proj.vy = (random.nextFloat() - 0.5f) * 20;
                 bossProjectiles.add(proj);
@@ -8752,6 +9078,35 @@ public class GameView extends SurfaceView implements Runnable {
                     canvas.drawArc(x - radius * 1.2f, y - radius * 1.2f, x + radius * 1.2f, y + radius * 1.2f, startA,
                             200, false, paint);
                 }
+
+                // PHASE 3: EVENT HORIZON LINES (Synced with Active State)
+                if (hp < maxHp * 0.3) {
+                    long now = System.currentTimeMillis();
+                    boolean isActive = (now - lastEventHorizonTime) < 2500;
+
+                    if (isActive) {
+                        float eventHorizonRadius = radius * 3.5f;
+                        paint.setStyle(Paint.Style.STROKE);
+                        paint.setStrokeWidth(3);
+                        paint.setColor(Color.RED);
+                        paint.setAlpha(150);
+
+                        // Draw concentric pulsing rings
+                        long phase = System.currentTimeMillis() % 1000;
+                        float pulse = phase / 1000f; // 0 to 1
+
+                        // Ring 1 (Fixed Limit)
+                        canvas.drawCircle(x, y, eventHorizonRadius, paint);
+
+                        // Ring 2 (Pulsing Inwards)
+                        float r2 = eventHorizonRadius * (1.0f - pulse * 0.5f);
+                        paint.setAlpha(100);
+                        canvas.drawCircle(x, y, r2, paint);
+                    }
+                    paint.setAlpha(255);
+                    paint.setStyle(Paint.Style.FILL);
+                }
+
                 paint.setStyle(Paint.Style.FILL);
 
             } else if (name.equals("MECHA-CORE")) {
@@ -9001,7 +9356,7 @@ public class GameView extends SurfaceView implements Runnable {
                         // Kamikaze strike!
                         createImpactBurst(x, y, Color.RED);
                         createParticles(x, y, Color.RED);
-                        currentBoss.hp -= 25; // 25 damage
+                        currentBoss.hp -= 5; // 25 damage
                         playSound(soundBlackExplosion);
 
                         // Bounce back after strike
@@ -9348,8 +9703,11 @@ public class GameView extends SurfaceView implements Runnable {
             drawBadgeIcon(canvas, slotX, slotY, slotSize * 0.4f, color, Color.BLACK, Color.WHITE, letter);
         } else {
             // Empty placeholder
-            paint.setTextSize(slotSize * 0.2f);
+            paint.setStyle(Paint.Style.FILL);
             paint.setColor(Color.DKGRAY);
+            paint.setTextSize(slotSize * 0.2f);
+            paint.setTextAlign(Paint.Align.CENTER);
+            canvas.drawText("EMPTY", slotX, slotY + slotSize * 0.1f, paint);
             canvas.drawText("EMPTY", slotX, slotY + slotSize * 0.1f, paint);
         }
     }

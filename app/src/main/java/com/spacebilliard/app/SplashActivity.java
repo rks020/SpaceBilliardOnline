@@ -81,7 +81,7 @@ public class SplashActivity extends Activity {
             paint.setFakeBoldText(true);
             paint.setColor(Color.WHITE);
             paint.setShadowLayer(20, 0, 0, Color.MAGENTA);
-            canvas.drawText("SPACE BILLIARD", centerX, centerY + 300, paint);
+            canvas.drawText("SPACE BILLIARDS", centerX, centerY + 300, paint);
             paint.clearShadowLayer();
 
             // Draw Loading indicator

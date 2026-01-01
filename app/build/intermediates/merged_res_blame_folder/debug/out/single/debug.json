@@ -1,282 +1,390 @@
 [
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_main_menu_bg.png.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/main_menu_bg.png"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_bg_button_rounded_orange.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\bg_button_rounded_orange.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_bg_menu_panel.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/bg_menu_panel.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_menu_btn_green.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\menu_btn_green.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_bg_card_win.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/bg_card_win.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_ic_lock.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\ic_lock.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_app_icon.png.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/app_icon.png"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\layout_activity_main_menu.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\layout\\activity_main_menu.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_ic_launcher_background.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/ic_launcher_background.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\mipmap-xhdpi_ic_launcher_foreground.webp.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\mipmap-xhdpi\\ic_launcher_foreground.webp"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_bg_input_field.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/bg_input_field.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_gamepad.png.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\gamepad.png"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_bg_button_dark.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/bg_button_dark.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_menu_btn_purple.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\menu_btn_purple.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/mipmap-hdpi_ic_launcher_round.webp.flat",
-        "source": "com.spacebilliard.app-main-30:/mipmap-hdpi/ic_launcher_round.webp"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\layout_dialog_match_finished.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\layout\\dialog_match_finished.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/mipmap-xxhdpi_ic_launcher.webp.flat",
-        "source": "com.spacebilliard.app-main-30:/mipmap-xxhdpi/ic_launcher.webp"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_bg_menu_panel.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\bg_menu_panel.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/raw_power_boost.mp3.flat",
-        "source": "com.spacebilliard.app-main-30:/raw/power_boost.mp3"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_ic_launcher_background.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\ic_launcher_background.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/layout_activity_game_over.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/layout/activity_game_over.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_bg_button_glossy_purple.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\bg_button_glossy_purple.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_bg_button_glossy_purple.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/bg_button_glossy_purple.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\mipmap-hdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\mipmap-hdpi\\ic_launcher_round.webp"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_bg_button_rounded_green.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/bg_button_rounded_green.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_bg_button_refresh.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\bg_button_refresh.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/raw_game_over.mp3.flat",
-        "source": "com.spacebilliard.app-main-30:/raw/game_over.mp3"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\raw_thunder.mp3.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\raw\\thunder.mp3"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/raw_retro_laser.mp3.flat",
-        "source": "com.spacebilliard.app-main-30:/raw/retro_laser.mp3"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_bg_button_rounded_cyan.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\bg_button_rounded_cyan.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/mipmap-xxhdpi_ic_launcher_foreground.webp.flat",
-        "source": "com.spacebilliard.app-main-30:/mipmap-xxhdpi/ic_launcher_foreground.webp"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_bg_input_field.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\bg_input_field.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/raw_drag_launch.mp3.flat",
-        "source": "com.spacebilliard.app-main-30:/raw/drag_launch.mp3"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_bg_button_rounded_gold.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\bg_button_rounded_gold.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/mipmap-xxhdpi_ic_launcher_round.webp.flat",
-        "source": "com.spacebilliard.app-main-30:/mipmap-xxhdpi/ic_launcher_round.webp"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_jupiter.png.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\jupiter.png"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/layout_dialog_how_to.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/layout/dialog_how_to.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_ic_quests.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\ic_quests.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_menu_btn_purple.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/menu_btn_purple.xml"
+        "merged": "com.spacebilliard.app-merged_res-36:/layout_activity_main_menu.xml.flat",
+        "source": "com.spacebilliard.app-main-38:/layout/activity_main_menu.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/mipmap-mdpi_ic_launcher.webp.flat",
-        "source": "com.spacebilliard.app-main-30:/mipmap-mdpi/ic_launcher.webp"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\raw_guided_missile.mp3.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\raw\\guided_missile.mp3"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/raw_freeze.mp3.flat",
-        "source": "com.spacebilliard.app-main-30:/raw/freeze.mp3"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\raw_drag_launch.mp3.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\raw\\drag_launch.mp3"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_bg_card.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/bg_card.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_bg_button_rounded_red.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\bg_button_rounded_red.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_menu_btn_orange.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/menu_btn_orange.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_bg_button_dark.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\bg_button_dark.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/mipmap-xxxhdpi_ic_launcher.png.flat",
-        "source": "com.spacebilliard.app-main-30:/mipmap-xxxhdpi/ic_launcher.png"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\mipmap-hdpi_ic_launcher_foreground.webp.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\mipmap-hdpi\\ic_launcher_foreground.webp"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_bg_button_rounded_gold.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/bg_button_rounded_gold.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\layout_activity_level_select.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\layout\\activity_level_select.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/layout_dialog_nickname.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/layout/dialog_nickname.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\mipmap-xxhdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\mipmap-xxhdpi\\ic_launcher.webp"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/mipmap-xhdpi_ic_launcher.webp.flat",
-        "source": "com.spacebilliard.app-main-30:/mipmap-xhdpi/ic_launcher.webp"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\mipmap-xhdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\mipmap-xhdpi\\ic_launcher.webp"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_menu_background.png.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/menu_background.png"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_bg_button_red.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\bg_button_red.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/mipmap-mdpi_ic_launcher_foreground.webp.flat",
-        "source": "com.spacebilliard.app-main-30:/mipmap-mdpi/ic_launcher_foreground.webp"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\raw_power_boost.mp3.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\raw\\power_boost.mp3"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_bg_button_red.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/bg_button_red.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_ic_arrow_left.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\ic_arrow_left.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_bg_button_rounded_cyan.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/bg_button_rounded_cyan.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\layout_item_room.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\layout\\item_room.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/mipmap-xhdpi_ic_launcher_foreground.webp.flat",
-        "source": "com.spacebilliard.app-main-30:/mipmap-xhdpi/ic_launcher_foreground.webp"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_menu_btn_cyan.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\menu_btn_cyan.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/layout_dialog_leave_game.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/layout/dialog_leave_game.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_ic_upgrades.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\ic_upgrades.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_bg_card_loss.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/bg_card_loss.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_ic_info.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\ic_info.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_bg_button_rounded_orange.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/bg_button_rounded_orange.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\mipmap-xhdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\mipmap-xhdpi\\ic_launcher_round.webp"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/mipmap-mdpi_ic_launcher_round.webp.flat",
-        "source": "com.spacebilliard.app-main-30:/mipmap-mdpi/ic_launcher_round.webp"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\mipmap-mdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\mipmap-mdpi\\ic_launcher_round.webp"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_bg_button_refresh.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/bg_button_refresh.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_bg_button_glossy_green.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\bg_button_glossy_green.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_bg_button_glossy_orange.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/bg_button_glossy_orange.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\raw_electric_ball.mp3.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\raw\\electric_ball.mp3"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_bg_button_glossy_red.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/bg_button_glossy_red.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_ic_shop.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\ic_shop.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/raw_shield_block.mp3.flat",
-        "source": "com.spacebilliard.app-main-30:/raw/shield_block.mp3"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_quests.png.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\quests.png"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/mipmap-xxxhdpi_ic_launcher_round.png.flat",
-        "source": "com.spacebilliard.app-main-30:/mipmap-xxxhdpi/ic_launcher_round.png"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_bg_card_loss.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\bg_card_loss.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/raw_collision_sound.mp3.flat",
-        "source": "com.spacebilliard.app-main-30:/raw/collision_sound.mp3"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\layout_activity_game_over.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\layout\\activity_game_over.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/raw_electric_ball.mp3.flat",
-        "source": "com.spacebilliard.app-main-30:/raw/electric_ball.mp3"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\raw_laser_gun.mp3.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\raw\\laser_gun.mp3"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/raw_black_ball_explosion.mp3.flat",
-        "source": "com.spacebilliard.app-main-30:/raw/black_ball_explosion.mp3"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_bg_play_button.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\bg_play_button.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/layout_activity_hall_of_fame.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/layout/activity_hall_of_fame.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_btn_boss.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\btn_boss.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_coin_icon.png.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/coin_icon.png"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_bg_level_locked.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\bg_level_locked.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/raw_thunder.mp3.flat",
-        "source": "com.spacebilliard.app-main-30:/raw/thunder.mp3"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\mipmap-mdpi_ic_launcher_foreground.webp.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\mipmap-mdpi\\ic_launcher_foreground.webp"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_bg_button_rounded_red.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/bg_button_rounded_red.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\layout_activity_hall_of_fame.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\layout\\activity_hall_of_fame.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_menu_btn_green.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/menu_btn_green.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_menu_btn_orange.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\menu_btn_orange.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/mipmap-hdpi_ic_launcher.webp.flat",
-        "source": "com.spacebilliard.app-main-30:/mipmap-hdpi/ic_launcher.webp"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_menu_btn_gold.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\menu_btn_gold.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_bg_button_glossy_green.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/bg_button_glossy_green.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_app_icon.png.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\app_icon.png"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/raw_coin_sound.mp3.flat",
-        "source": "com.spacebilliard.app-main-30:/raw/coin_sound.mp3"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\raw_black_ball_explosion.mp3.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\raw\\black_ball_explosion.mp3"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_bg_button_glossy_cyan.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/bg_button_glossy_cyan.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\mipmap-xxxhdpi_ic_launcher_round.png.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\mipmap-xxxhdpi\\ic_launcher_round.png"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/layout_dialog_match_finished.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/layout/dialog_match_finished.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\layout_item_level.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\layout\\item_level.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/layout_activity_how_to_play.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/layout/activity_how_to_play.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_bg_level_boss.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\bg_level_boss.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/layout_item_room.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/layout/item_room.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_bg_level_active.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\bg_level_active.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_bg_button_green.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/bg_button_green.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\layout_dialog_leave_game.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\layout\\dialog_leave_game.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/mipmap-xhdpi_ic_launcher_round.webp.flat",
-        "source": "com.spacebilliard.app-main-30:/mipmap-xhdpi/ic_launcher_round.webp"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\layout_dialog_nickname.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\layout\\dialog_nickname.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_menu_btn_cyan.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/menu_btn_cyan.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\layout_activity_how_to_play.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\layout\\activity_how_to_play.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_life_icon.png.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/life_icon.png"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\layout_dialog_how_to.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\layout\\dialog_how_to.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_menu_btn_red.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/menu_btn_red.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_btn_locked.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\btn_locked.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/mipmap-xxxhdpi_ic_launcher_foreground.webp.flat",
-        "source": "com.spacebilliard.app-main-30:/mipmap-xxxhdpi/ic_launcher_foreground.webp"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_bg_bottom_bar.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\bg_bottom_bar.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_bg_button_glossy_gold.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/bg_button_glossy_gold.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\mipmap-hdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\mipmap-hdpi\\ic_launcher.webp"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/raw_laser_gun.mp3.flat",
-        "source": "com.spacebilliard.app-main-30:/raw/laser_gun.mp3"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\mipmap-xxhdpi_ic_launcher_foreground.webp.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\mipmap-xxhdpi\\ic_launcher_foreground.webp"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/mipmap-hdpi_ic_launcher_foreground.webp.flat",
-        "source": "com.spacebilliard.app-main-30:/mipmap-hdpi/ic_launcher_foreground.webp"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\mipmap-xxhdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\mipmap-xxhdpi\\ic_launcher_round.webp"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_menu_btn_gold.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/menu_btn_gold.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_bg_neon_play.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\bg_neon_play.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/layout_activity_main_menu.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/layout/activity_main_menu.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_btn_level.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\btn_level.xml"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/drawable_bg_button_rounded_purple.xml.flat",
-        "source": "com.spacebilliard.app-main-30:/drawable/bg_button_rounded_purple.xml"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\raw_shield_block.mp3.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\raw\\shield_block.mp3"
     },
     {
-        "merged": "com.spacebilliard.app-merged_res-28:/raw_guided_missile.mp3.flat",
-        "source": "com.spacebilliard.app-main-30:/raw/guided_missile.mp3"
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_ic_arrow_right.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\ic_arrow_right.xml"
+    },
+    {
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_bg_button_green.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\bg_button_green.xml"
+    },
+    {
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\raw_retro_laser.mp3.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\raw\\retro_laser.mp3"
+    },
+    {
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_ic_trophy.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\ic_trophy.xml"
+    },
+    {
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\raw_coin_sound.mp3.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\raw\\coin_sound.mp3"
+    },
+    {
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_bg_pill_gold.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\bg_pill_gold.xml"
+    },
+    {
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_bg_button_glossy_orange.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\bg_button_glossy_orange.xml"
+    },
+    {
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_ic_play.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\ic_play.xml"
+    },
+    {
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_ic_star_small.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\ic_star_small.xml"
+    },
+    {
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_bg_pill_cyan.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\bg_pill_cyan.xml"
+    },
+    {
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\mipmap-mdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\mipmap-mdpi\\ic_launcher.webp"
+    },
+    {
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\mipmap-xxxhdpi_ic_launcher_foreground.webp.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\mipmap-xxxhdpi\\ic_launcher_foreground.webp"
+    },
+    {
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_bg_button_rounded_purple.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\bg_button_rounded_purple.xml"
+    },
+    {
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_ic_special.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\ic_special.xml"
+    },
+    {
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\font_montserrat_black.ttf.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\font\\montserrat_black.ttf"
+    },
+    {
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_bg_card_win.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\bg_card_win.xml"
+    },
+    {
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_bg_button_glossy_red.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\bg_button_glossy_red.xml"
+    },
+    {
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_bg_button_glossy_gold.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\bg_button_glossy_gold.xml"
+    },
+    {
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_menu_btn_red.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\menu_btn_red.xml"
+    },
+    {
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\mipmap-xxxhdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_bg_button_rounded_green.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\bg_button_rounded_green.xml"
+    },
+    {
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\raw_freeze.mp3.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\raw\\freeze.mp3"
+    },
+    {
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\raw_game_over.mp3.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\raw\\game_over.mp3"
+    },
+    {
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_btn_return.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\btn_return.xml"
+    },
+    {
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\raw_collision_sound.mp3.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\raw\\collision_sound.mp3"
+    },
+    {
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_bg_card.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\bg_card.xml"
+    },
+    {
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_coin_icon.png.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\coin_icon.png"
+    },
+    {
+        "merged": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-merged_res-36:\\drawable_bg_button_glossy_cyan.xml.flat",
+        "source": "C:\\Users\\raufk\\.gradle\\daemon\\9.0-milestone-1\\com.spacebilliard.app-main-38:\\drawable\\bg_button_glossy_cyan.xml"
     }
 ]

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#050B12">
+
+    <!-- Title -->
+    <LinearLayout
+        android:id="@+id/titleContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp">
+
+        <TextView
+            android:id="@+id/txtSpace"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SPACE "
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/montserrat_black"
+            android:textColor="#FFFFFF"/>
+
+        <TextView
+            android:id="@+id/txtBilliards"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="BILLIARDS"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/montserrat_black"
+            android:textColor="#00E5FF"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CAMPAIGN PROGRESS: 10%"
+        android:textSize="12sp"
+        android:textColor="#AAAAAA"
+        android:layout_below="@id/titleContainer"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"/>
+
+    <!-- Space Selector -->
+    <LinearLayout
+        android:id="@+id/spaceSelector"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/progress"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/btnPrevSpace"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_arrow_left"
+            android:padding="8dp"/>
+
+        <TextView
+            android:id="@+id/txtSpaceName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SPACE 1"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginHorizontal="24dp"/>
+
+        <ImageButton
+            android:id="@+id/btnNextSpace"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_arrow_right"
+            android:padding="8dp"/>
+    </LinearLayout>
+
+    <!-- Levels Grid -->
+    <GridLayout
+        android:id="@+id/levelGrid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:columnCount="2"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:layout_below="@id/spaceSelector"
+        android:layout_above="@id/btnReturn">
+        <!-- Items will be added dynamically -->
+    </GridLayout>
+
+    <!-- Return Button -->
+    <Button
+        android:id="@+id/btnReturn"
+        android:layout_width="220dp"
+        android:layout_height="50dp"
+        android:text="RETURN TO HQ"
+        android:textColor="#AAAAAA"
+        android:background="@drawable/btn_return"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="40dp"/>
+</RelativeLayout>

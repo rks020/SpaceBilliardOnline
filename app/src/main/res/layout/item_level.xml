@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/cardLevel"
+    android:layout_width="match_parent"
+    android:layout_height="85dp"
+    android:layout_margin="4dp"
+    android:clickable="true"
+    android:focusable="true">
+
+    <!-- Active/Locked Background set programmatically or via selector, defaults to locked style here as placeholder -->
+    <View
+        android:id="@+id/bgLevel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_level_locked"/>
+
+    <!-- Level Content (Number + Stars) -->
+    <LinearLayout
+        android:id="@+id/levelContent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <!-- Level Number (Visible if Unlocked) -->
+        <TextView
+            android:id="@+id/txtLevelNum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1"
+            android:textColor="#FFFFFF"
+            android:textSize="24sp"
+            android:textStyle="bold|italic"
+            android:fontFamily="sans-serif-black"/>
+
+        <!-- Stars Container (Visible if Completed) -->
+        <LinearLayout
+            android:id="@+id/starsContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp"
+            android:visibility="gone">
+            <ImageView android:layout_width="12dp" android:layout_height="12dp" android:src="@drawable/ic_star_small" android:layout_marginHorizontal="1dp"/>
+            <ImageView android:layout_width="12dp" android:layout_height="12dp" android:src="@drawable/ic_star_small" android:layout_marginHorizontal="1dp"/>
+            <ImageView android:layout_width="12dp" android:layout_height="12dp" android:src="@drawable/ic_star_small" android:layout_marginHorizontal="1dp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Boss Label (Visible only for Boss levels) -->
+    <TextView
+        android:id="@+id/txtBossLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginBottom="8dp"
+        android:text="BOSS"
+        android:textSize="10sp"
+        android:textColor="#D500F9"
+        android:textStyle="bold"
+        android:visibility="gone"/>
+
+    <!-- Lock Icon (Visible if Locked) -->
+    <ImageView
+        android:id="@+id/imgLock"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="center"
+        android:src="@drawable/ic_lock"
+        android:visibility="gone"/>
+
+</FrameLayout>

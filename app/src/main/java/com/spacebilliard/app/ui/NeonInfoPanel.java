@@ -73,11 +73,21 @@ public class NeonInfoPanel extends View {
         this.line1Value = l1Value;
         this.line2Label = l2Label;
         this.line2Value = l2Value;
+
+        // Check for low time (assuming l1Value is integer seconds)
+        try {
+            int time = Integer.parseInt(l1Value);
+            isTimeLow = time <= 10;
+        } catch (NumberFormatException e) {
+            isTimeLow = false;
+        }
         invalidate();
     }
 
     // Animation Fields
     private float coinTextScale = 1.0f;
+    private float timeTextScale = 1.0f;
+    private boolean isTimeLow = false;
     private boolean isAnimatingCoin = false;
     private long animationStartTime = 0;
     private final float MAX_COIN_SCALE = 1.5f;
@@ -204,8 +214,25 @@ public class NeonInfoPanel extends View {
         valuePaint.setTextSize(baseTextSize);
 
         // Line 1: TIME
+        // Time Pulse Animation
+        if (isTimeLow) {
+            long now = System.currentTimeMillis();
+            // Pulse between 1.0 and 1.5 every 500ms
+            float phase = (now % 500) / 500f;
+            timeTextScale = 1.0f + 0.5f * (float) Math.sin(phase * Math.PI);
+            valuePaint.setColor(Color.RED); // Warning color
+            invalidate(); // Keep animating
+        } else {
+            timeTextScale = 1.0f;
+            valuePaint.setColor(themeColor);
+        }
+
         canvas.drawText(line1Label, leftContent, startY, textPaint);
+
+        valuePaint.setTextSize(baseTextSize * timeTextScale);
         canvas.drawText(line1Value, leftContent + textPaint.measureText(line1Label) + 10, startY, valuePaint);
+        valuePaint.setTextSize(baseTextSize); // Restore
+        valuePaint.setColor(themeColor); // Restore
 
         // Line 2: SCORE
         canvas.drawText(line2Label, leftContent, startY + spacing, textPaint);

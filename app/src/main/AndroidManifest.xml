@@ -68,6 +68,11 @@
             android:name="com.spacebilliard.app.HallOfFameActivity"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"/>
+
+        <activity
+            android:name="com.spacebilliard.app.LevelSelectActivity"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
     </application>
 
 </manifest>

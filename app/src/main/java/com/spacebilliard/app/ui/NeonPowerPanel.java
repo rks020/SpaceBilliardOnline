@@ -27,6 +27,8 @@ public class NeonPowerPanel extends View {
     private String stage = "1/5";
     private String levelInfo = "SPACE 1 - LEVEL 1";
     private int lives = 3;
+    private float livesScale = 1.0f; // Animation scale for icon
+    private float livesTextScale = 1.0f; // Animation scale for text
 
     private int themeColor = Color.CYAN;
     private Paint energyCorePaint;
@@ -104,6 +106,11 @@ public class NeonPowerPanel extends View {
     }
 
     public void setLives(int lives) {
+        if (lives < this.lives) {
+            // Heartbeat animation trigger
+            livesScale = 2.5f;
+            livesTextScale = 2.5f;
+        }
         this.lives = lives;
         invalidate();
     }
@@ -214,14 +221,30 @@ public class NeonPowerPanel extends View {
         canvas.drawText(power + "%", w - margin - 30 * density, startY + spacing * 2, stageTextPaint);
 
         // Line 3: LIVES
+        // Animation cleanup
+        if (livesScale > 1.0f) {
+            livesScale = Math.max(1.0f, livesScale - 0.05f);
+            livesTextScale = Math.max(1.0f, livesTextScale - 0.05f);
+            invalidate(); // Continue animation
+        }
+
         float iconSize = 16 * density;
         float iconX = leftContent;
         // Add explicit offset to separate from POW bar
         float livesOffsetY = 6 * density;
         float iconY = (startY + spacing * 3) - iconSize * 0.8f + livesOffsetY;
-        drawVectorEnergyCore(canvas, iconX + iconSize / 2, iconY + iconSize / 2, iconSize / 2);
-        canvas.drawText(String.valueOf(lives), iconX + iconSize + 10, startY + spacing * 3 + livesOffsetY,
-                livesTextPaint);
+
+        // Draw Icon with Scale
+        drawVectorEnergyCore(canvas, iconX + iconSize / 2, iconY + iconSize / 2, (iconSize / 2) * livesScale);
+
+        // Draw Text with Scale
+        float textX = iconX + iconSize + 10;
+        float textY = startY + spacing * 3 + livesOffsetY;
+
+        float originalSize = livesTextPaint.getTextSize();
+        livesTextPaint.setTextSize(originalSize * livesTextScale);
+        canvas.drawText(String.valueOf(lives), textX, textY, livesTextPaint);
+        livesTextPaint.setTextSize(originalSize); // Restore
 
         // Technical accents
         bgPaint.setColor(Color.argb(150, 200, 200, 200));
