@@ -44,12 +44,41 @@ public class QuestAdapter extends RecyclerView.Adapter<QuestAdapter.QuestViewHol
             holder.progressBar.setVisibility(View.GONE);
             holder.tvProgress.setVisibility(View.GONE);
             holder.tvTitle.setTextColor(Color.parseColor("#00FF00"));
+
+            // Show claim button if not yet claimed
+            if (!quest.isClaimed()) {
+                holder.btnClaimReward.setVisibility(View.VISIBLE);
+                holder.btnClaimReward.setOnClickListener(v -> {
+                    // Claim reward
+                    quest.setClaimed(true);
+
+                    // Add coins
+                    android.content.SharedPreferences prefs = holder.itemView.getContext()
+                            .getSharedPreferences("SpaceBilliard", android.content.Context.MODE_PRIVATE);
+                    int currentCoins = prefs.getInt("coins", 0);
+                    prefs.edit().putInt("coins", currentCoins + quest.getCoinReward()).apply();
+
+                    // Save claimed status
+                    QuestManager.getInstance(holder.itemView.getContext()).saveQuestProgress();
+
+                    // Hide button
+                    holder.btnClaimReward.setVisibility(View.GONE);
+
+                    // Show toast
+                    android.widget.Toast.makeText(holder.itemView.getContext(),
+                            "+" + quest.getCoinReward() + " coins!",
+                            android.widget.Toast.LENGTH_SHORT).show();
+                });
+            } else {
+                holder.btnClaimReward.setVisibility(View.GONE);
+            }
         } else {
             holder.cardView.setAlpha(0.6f);
             holder.tvCompleted.setVisibility(View.GONE);
             holder.progressBar.setVisibility(View.VISIBLE);
             holder.tvProgress.setVisibility(View.VISIBLE);
             holder.tvTitle.setTextColor(Color.parseColor("#FFFFFF"));
+            holder.btnClaimReward.setVisibility(View.GONE);
         }
 
         // Type-based color coding
@@ -88,6 +117,7 @@ public class QuestAdapter extends RecyclerView.Adapter<QuestAdapter.QuestViewHol
         CardView cardView;
         TextView tvTitle, tvDescription, tvCoinReward, tvProgress, tvCompleted;
         ProgressBar progressBar;
+        android.widget.Button btnClaimReward;
 
         public QuestViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -98,6 +128,7 @@ public class QuestAdapter extends RecyclerView.Adapter<QuestAdapter.QuestViewHol
             tvProgress = itemView.findViewById(R.id.tvProgress);
             tvCompleted = itemView.findViewById(R.id.tvCompleted);
             progressBar = itemView.findViewById(R.id.progressBar);
+            btnClaimReward = itemView.findViewById(R.id.btnClaimReward);
         }
     }
 }

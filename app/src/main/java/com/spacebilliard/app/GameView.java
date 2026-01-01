@@ -197,6 +197,19 @@ public class GameView extends SurfaceView implements Runnable {
     // MainActivity reference for updating UI panels
     private MainActivity mainActivity;
     private QuestManager questManager;
+
+    // Quest tracking fields
+    private int ballsHitThisShot = 0; // Quest 3: Multi-hit
+    private long bossSpawnTime = 0; // Quest 16: Speed demon
+    private int playerHpAtBossStart = 0; // Quest 14: Flawless victory
+    private boolean tookDamageInBossFight = false; // Quest 14
+    private boolean wasFrozenDuringCryoFight = false; // Quest 17: Anti-freeze
+    private int consecutiveLevelWins = 0; // Quest 29: Unstoppable
+    private boolean tookDamageInLevel = false; // Quest 28: Perfection
+    private long levelStartTime = 0; // Quest 36: Endurance (5 min survival)
+    private long totalPlayTimeSeconds = 0; // Quest 37: Marathon
+    private long lastDamageTime = 0; // Quest 38: Untouchable
+    private long timeAtLowHp = 0; // Quest 39: Edge of death
     // Removed old button references
     private android.graphics.Rect startBtnBounds, howToBtnBounds, shopBtnBounds;
     private String selectedSkin = "default";
@@ -935,6 +948,11 @@ public class GameView extends SurfaceView implements Runnable {
             electricEffects.add(new ElectricEffect(b.x, -200, b.x, b.y, 1));
             createImpactBurst(b.x, b.y, Color.BLACK);
             blackBalls.remove(0);
+            // Quest 2: Dark Matter & Quest 5: Destroyer II
+            if (questManager != null) {
+                questManager.incrementQuestProgress(2, 1);
+                questManager.incrementQuestProgress(5, 1);
+            }
             playSound(soundBlackExplosion);
         } else if (coloredBalls.size() > 0) {
             Ball b = coloredBalls.get(random.nextInt(coloredBalls.size()));
@@ -1018,6 +1036,11 @@ public class GameView extends SurfaceView implements Runnable {
                 // Grant Reward for Boss Defeat - 100 Coins
                 int oldCoins = coins;
                 coins += 100; // Reward 100 coins
+                // Quest 31-32: Collect coins
+                if (questManager != null) {
+                    questManager.incrementQuestProgress(31, 100);
+                    questManager.incrementQuestProgress(32, 100);
+                }
                 lastCoinAwardedLevel = level; // Mark level as rewarded to prevent double reward
 
                 saveProgress(); // Save coins
@@ -1194,6 +1217,11 @@ public class GameView extends SurfaceView implements Runnable {
             // Award 5 coins for stage completion
             int oldCoins = coins;
             coins += 5;
+            // Quest 31-32: Collect coins
+            if (questManager != null) {
+                questManager.incrementQuestProgress(31, 5);
+                questManager.incrementQuestProgress(32, 5);
+            }
             lastCoinAwardedLevel = level;
             lastCoinAwardedStage = stage; // Track stage too
             android.util.Log.d("GameView",
@@ -1265,7 +1293,40 @@ public class GameView extends SurfaceView implements Runnable {
                 playSound(soundPower); // Victory sound
 
                 level++; // Go to next level
+                // Quest 21-23, 30: Reach specific levels
+                // Quest 24: Century (100 stages)
+                if (questManager != null) {
+                    questManager.incrementQuestProgress(24, 1); // 100 stages
+                    if (level >= 10)
+                        questManager.incrementQuestProgress(21, level);
+                    if (level >= 30)
+                        questManager.incrementQuestProgress(22, level);
+                    if (level >= 50)
+                        questManager.incrementQuestProgress(23, level);
+                    if (level >= 100)
+                        questManager.incrementQuestProgress(30, level);
+                    // Quest 25-27: Clear spaces
+                    int space = ((level - 1) / 10) + 1;
+                    if (space >= 3)
+                        questManager.incrementQuestProgress(25, space);
+                    if (space >= 5)
+                        questManager.incrementQuestProgress(26, space);
+                    if (space >= 10)
+                        questManager.incrementQuestProgress(27, space);
+                }
                 android.util.Log.d("GameView", "Advancing to Next Level: " + level);
+
+                // Quest tracking: Level completion
+                if (questManager != null) {
+                    // Quest 28: Perfection (no damage)
+                    if (!tookDamageInLevel)
+                        questManager.incrementQuestProgress(28, 1);
+                    // Quest 29: Unstoppable (10 consecutive)
+                    consecutiveLevelWins++;
+                    if (consecutiveLevelWins >= 10)
+                        questManager.incrementQuestProgress(29, consecutiveLevelWins);
+                }
+                tookDamageInLevel = false; // Reset for next level
 
                 if (level > maxUnlockedLevel) {
                     maxUnlockedLevel = level;
@@ -1744,6 +1805,10 @@ public class GameView extends SurfaceView implements Runnable {
                 barrierActive = true;
                 barrierEndTime = System.currentTimeMillis() + 5000;
                 playSound(soundShield);
+                // Quest 9: Shielded (20 barrier uses)
+                if (questManager != null) {
+                    questManager.incrementQuestProgress(9, 1);
+                }
                 break;
             case "multiball":
                 multiBallActive = true;
@@ -1758,6 +1823,10 @@ public class GameView extends SurfaceView implements Runnable {
                 triggerElectric();
                 playSound(soundElectric);
                 electricModeEndTime = System.currentTimeMillis() + 10000; // 10 Seconds Electric Mode
+                // Quest 7: Electric Storm (10 electric uses)
+                if (questManager != null) {
+                    questManager.incrementQuestProgress(7, 1);
+                }
                 break;
             case "clone":
                 // Ghost mode aktifse orijinal boyutu kullan
@@ -1768,6 +1837,10 @@ public class GameView extends SurfaceView implements Runnable {
             case "freeze":
                 freezeActive = true;
                 freezeEndTime = System.currentTimeMillis() + 5000;
+                // Quest 8: Ice Age (5 freeze uses)
+                if (questManager != null) {
+                    questManager.incrementQuestProgress(8, 1);
+                }
                 playSound(soundFreeze);
                 break;
             case "missile":
@@ -2026,6 +2099,11 @@ public class GameView extends SurfaceView implements Runnable {
                 if (distSq < radSum * radSum) {
                     createParticles(ball.x, ball.y, Color.BLACK);
                     blackBalls.remove(j);
+                    // Quest 2: Dark Matter & Quest 5: Destroyer II
+                    if (questManager != null) {
+                        questManager.incrementQuestProgress(2, 1);
+                        questManager.incrementQuestProgress(5, 1);
+                    }
                     missiles.remove(i);
                     playSound(soundBlackExplosion);
                     hit = true;
@@ -2046,6 +2124,11 @@ public class GameView extends SurfaceView implements Runnable {
                 if (distSq < radSum * radSum) {
                     createParticles(ball.x, ball.y, ball.color);
                     coloredBalls.remove(j);
+                    // Quest 1 & 5: Colored ball destruction
+                    if (questManager != null) {
+                        questManager.incrementQuestProgress(1, 1);
+                        questManager.incrementQuestProgress(5, 1);
+                    }
                     missiles.remove(i);
                     playSound(soundBlackExplosion);
                     hit = true;
@@ -2430,6 +2513,10 @@ public class GameView extends SurfaceView implements Runnable {
                         long now = System.currentTimeMillis();
                         if (now < electricModeEndTime) {
                             currentBoss.hp -= 40;
+                            // Quest 18: Heavy Hitter (5000 damage)
+                            if (questManager != null) {
+                                questManager.incrementQuestProgress(18, 40);
+                            }
                             floatingTexts.add(new FloatingText("-40", wBall.x, wBall.y - 50, Color.CYAN));
                             electricEffects.add(new ElectricEffect(wBall.x, wBall.y, currentBoss.x, currentBoss.y, 0));
                             createImpactBurst(wBall.x, wBall.y, Color.CYAN);
@@ -2437,6 +2524,10 @@ public class GameView extends SurfaceView implements Runnable {
                             playSound(soundBlackExplosion);
                         } else {
                             currentBoss.hp -= 25;
+                            // Quest 18: Heavy Hitter
+                            if (questManager != null) {
+                                questManager.incrementQuestProgress(18, 25);
+                            }
                             createParticles(wBall.x, wBall.y, currentBoss.color);
                             playSound(soundCollision);
                             floatingTexts.add(new FloatingText("-25", wBall.x, wBall.y - 50, Color.WHITE));
@@ -2454,6 +2545,23 @@ public class GameView extends SurfaceView implements Runnable {
                     wBall.y += Math.sin(angle) * overlap;
 
                     if (currentBoss.hp <= 0) {
+                        // Boss defeated - track quests
+                        String bossName = currentBoss.name;
+                        if (questManager != null) {
+                            // Quest 11-13, 19: Specific boss defeats
+                            if (bossName.equals("VOID TITAN"))
+                                questManager.incrementQuestProgress(11, 1);
+                            else if (bossName.equals("SOLARION"))
+                                questManager.incrementQuestProgress(12, 1);
+                            else if (bossName.equals("GRAVITON"))
+                                questManager.incrementQuestProgress(13, 1);
+                            else if (bossName.equals("CHRONO-SHIFTER"))
+                                questManager.incrementQuestProgress(19, 1);
+                            // Quest 15: Boss Hunter (3 bosses)
+                            // Quest 20: Ultimate Champion (10 bosses)
+                            questManager.incrementQuestProgress(15, 1);
+                            questManager.incrementQuestProgress(20, 1);
+                        }
                         currentBoss = null;
                         showBossDefeated = true;
                         bossDefeatedTime = System.currentTimeMillis();
@@ -2479,6 +2587,10 @@ public class GameView extends SurfaceView implements Runnable {
                         comboHits++;
                         if (comboHits > maxCombo)
                             maxCombo = comboHits;
+                        // Quest 4: Combo Master (20 combos)
+                        if (questManager != null && comboHits >= 3) {
+                            questManager.incrementQuestProgress(4, 1);
+                        }
                         if (comboHits >= 3) {
                             floatingTexts.add(new FloatingText("COMBO x" + (comboHits), centerX,
                                     centerY - screenHeight * 0.15f, Color.rgb(255, 215, 0)));
@@ -2490,6 +2602,7 @@ public class GameView extends SurfaceView implements Runnable {
 
                     createImpactBurst(ball.x, ball.y, ball.color);
                     coloredBalls.remove(i);
+                    ballsHitThisShot++; // Quest 3: Count balls hit
                     // QUEST TRACKING - MAIN GAMEPLAY COLORED BALL DESTRUCTION!
                     if (questManager != null) {
                         android.util.Log.d("QUEST_DEBUG", "BALL HIT! Colored ball destroyed in main collision!");
@@ -2632,6 +2745,12 @@ public class GameView extends SurfaceView implements Runnable {
                     activateSpecialPower(ball.type, wBall);
                     createParticles(ball.x, ball.y, ball.getColor());
                     specialBalls.remove(i);
+                    // Quest 6: Special Hunter (5 special balls)
+                    // Quest 5: Destroyer II (200 balls total)
+                    if (questManager != null) {
+                        questManager.incrementQuestProgress(6, 1);
+                        questManager.incrementQuestProgress(5, 1);
+                    }
                 }
             }
         }
@@ -2653,6 +2772,10 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     private void createImpactBurst(float x, float y, int color) {
+        // Quest 10: Demolition (50 explosions)
+        if (questManager != null) {
+            questManager.incrementQuestProgress(10, 1);
+        }
         // Always add some base particles
         int particleCount = 6;
         for (int i = 0; i < particleCount; i++) {
@@ -7531,6 +7654,12 @@ public class GameView extends SurfaceView implements Runnable {
                     score += 5;
                     createParticles(ball.x, ball.y, Color.BLACK);
                     blackBalls.remove(i);
+                    // Quest 2: Dark Matter (50 black balls)
+                    // Quest 5: Destroyer II (200 balls total)
+                    if (questManager != null) {
+                        questManager.incrementQuestProgress(2, 1);
+                        questManager.incrementQuestProgress(5, 1);
+                    }
                     ballsDestroyed = true;
                 }
             }
@@ -7656,6 +7785,11 @@ public class GameView extends SurfaceView implements Runnable {
                     if (distance < 60 || ball.radius < originalRadius * 0.4f) {
                         blackBalls.remove(i);
                         score += 5;
+                        // Quest 2: Dark Matter & Quest 5: Destroyer II
+                        if (questManager != null) {
+                            questManager.incrementQuestProgress(2, 1);
+                            questManager.incrementQuestProgress(5, 1);
+                        }
                         createParticles(ball.x, ball.y, Color.BLACK);
                         createImpactBurst(ball.x, ball.y, Color.CYAN);
                         if (!soundPlayed) {
@@ -9610,6 +9744,11 @@ public class GameView extends SurfaceView implements Runnable {
                             }
                         }
 
+                        // Quest tracking for black ball destruction
+                        if (questManager != null && toRemove.size() > 0) {
+                            questManager.incrementQuestProgress(2, toRemove.size());
+                            questManager.incrementQuestProgress(5, toRemove.size());
+                        }
                         blackBalls.removeAll(toRemove);
                     } else {
                         // NO BLACK BALLS - DIRECT ATTACK ON COLORED BALLS (Kamikaze style)

@@ -122,6 +122,7 @@ public class QuestManager {
         for (Quest quest : allQuests) {
             editor.putInt("quest_" + quest.getId() + "_progress", quest.getCurrentProgress());
             editor.putBoolean("quest_" + quest.getId() + "_completed", quest.isCompleted());
+            editor.putBoolean("quest_" + quest.getId() + "_claimed", quest.isClaimed());
         }
         editor.apply();
     }
@@ -130,8 +131,10 @@ public class QuestManager {
         for (Quest quest : allQuests) {
             int progress = prefs.getInt("quest_" + quest.getId() + "_progress", 0);
             boolean completed = prefs.getBoolean("quest_" + quest.getId() + "_completed", false);
+            boolean claimed = prefs.getBoolean("quest_" + quest.getId() + "_claimed", false);
             quest.setCurrentProgress(progress);
             quest.setCompleted(completed);
+            quest.setClaimed(claimed);
         }
     }
 

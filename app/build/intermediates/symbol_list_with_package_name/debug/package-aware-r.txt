@@ -1170,6 +1170,7 @@ id btnBottomShop
 id btnBottomSpecial
 id btnBottomUpgrades
 id btnCancel
+id btnClaimReward
 id btnClose
 id btnConfirm
 id btnCreate

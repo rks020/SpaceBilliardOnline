@@ -94,6 +94,19 @@
             android:gravity="center"
             android:layout_marginTop="8dp"
             android:visibility="gone" />
+        
+        <!-- Claim Button -->
+        <Button
+            android:id="@+id/btnClaimReward"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="💰 CLAIM REWARD"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:backgroundTint="#FFD700"
+            android:layout_marginTop="8dp"
+            android:visibility="gone" />
 
     </LinearLayout>
 

@@ -8,6 +8,7 @@ public class Quest {
     private int targetProgress;
     private int coinReward;
     private boolean isCompleted;
+    private boolean isClaimed; // For reward claiming
     private QuestType type;
 
     public enum QuestType {
@@ -81,5 +82,13 @@ public class Quest {
         if (targetProgress == 0)
             return 0;
         return Math.min(100f, (currentProgress * 100f) / targetProgress);
+    }
+
+    public boolean isClaimed() {
+        return isClaimed;
+    }
+
+    public void setClaimed(boolean claimed) {
+        this.isClaimed = claimed;
     }
 }
