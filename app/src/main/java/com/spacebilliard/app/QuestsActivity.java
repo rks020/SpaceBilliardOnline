@@ -3,7 +3,7 @@ package com.spacebilliard.app;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageButton;
+import android.widget.Button;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -28,7 +28,7 @@ public class QuestsActivity extends AppCompatActivity {
         // Setup UI
         tvQuestCount = findViewById(R.id.tvQuestCount);
         rvQuests = findViewById(R.id.rvQuests);
-        ImageButton btnBack = findViewById(R.id.btnBack);
+        Button btnBack = findViewById(R.id.btnBack);
 
         // Setup RecyclerView
         rvQuests.setLayoutManager(new LinearLayoutManager(this));
@@ -40,7 +40,17 @@ public class QuestsActivity extends AppCompatActivity {
         updateQuestCount();
 
         // Back button
-        btnBack.setOnClickListener(v -> finish());
+        btnBack.setOnClickListener(v -> {
+            v.animate()
+                    .scaleX(0.96f)
+                    .scaleY(0.96f)
+                    .setDuration(80)
+                    .withEndAction(() -> {
+                        v.animate().scaleX(1f).scaleY(1f).setDuration(80).start();
+                        finish();
+                    })
+                    .start();
+        });
     }
 
     @Override

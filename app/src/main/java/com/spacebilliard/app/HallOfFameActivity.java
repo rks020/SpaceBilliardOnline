@@ -12,8 +12,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.graphics.Color;
 
-import com.spacebilliard.app.ui.NeonButton;
-
 public class HallOfFameActivity extends Activity {
 
     private TextView textBestLevel;
@@ -38,23 +36,34 @@ public class HallOfFameActivity extends Activity {
         textHighScore = findViewById(R.id.textHighScore);
         textMaxCombo = findViewById(R.id.textMaxCombo);
 
-        NeonButton btnReset = findViewById(R.id.btnReset);
-        btnReset.setText("RESET STATS");
-        btnReset.setThemeColor(Color.parseColor("#FF1744")); // Red
-
-        NeonButton btnBack = findViewById(R.id.btnBack);
-        btnBack.setText("BACK");
-        btnBack.setThemeColor(Color.parseColor("#00E5FF")); // Cyan
+        Button btnReset = findViewById(R.id.btnReset);
+        Button btnBack = findViewById(R.id.btnBack);
 
         loadStats();
 
         btnReset.setOnClickListener(v -> {
-            resetStats();
+            v.animate()
+                    .scaleX(0.96f)
+                    .scaleY(0.96f)
+                    .setDuration(80)
+                    .withEndAction(() -> {
+                        v.animate().scaleX(1f).scaleY(1f).setDuration(80).start();
+                        resetStats();
+                    })
+                    .start();
         });
 
         btnBack.setOnClickListener(v -> {
-            finish();
-            overridePendingTransition(0, 0); // No animation
+            v.animate()
+                    .scaleX(0.96f)
+                    .scaleY(0.96f)
+                    .setDuration(80)
+                    .withEndAction(() -> {
+                        v.animate().scaleX(1f).scaleY(1f).setDuration(80).start();
+                        finish();
+                        overridePendingTransition(0, 0); // No animation
+                    })
+                    .start();
         });
     }
 

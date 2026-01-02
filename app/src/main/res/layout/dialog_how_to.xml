@@ -11,13 +11,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="HOW TO PLAY"
-        android:textColor="#00FFFF"
+        android:textColor="#00E5FF"
         android:textSize="32sp"
         android:textStyle="bold"
-        android:shadowColor="#00FFFF"
+        android:fontFamily="sans-serif-black"
+        android:shadowColor="#00E5FF"
         android:shadowRadius="20"
-        android:layout_marginBottom="30dp"
-        android:layout_marginTop="20dp"/>
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="10dp"/>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -27,122 +28,187 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingBottom="16dp">
 
-            <!-- Item 1 -->
-            <LinearLayout
+            <!-- Objective -->
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="16dp">
-                <View
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:background="@drawable/bg_button_rounded_orange" 
-                    android:layout_marginRight="10dp"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Extra Time: +5 Seconds"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"/>
-            </LinearLayout>
-
-             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="16dp">
-                <View
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:background="@drawable/bg_button_rounded_gold" 
-                    android:layout_marginRight="10dp"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Power Boost: Strong shot"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="16dp">
-                <View
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:background="@drawable/bg_button_rounded_purple" 
-                    android:layout_marginRight="10dp"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Barrier: Shield protection"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"/>
-            </LinearLayout>
+                android:text="🎯 OBJECTIVE"
+                android:textColor="#00E5FF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
             
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Clear all colored balls before time runs out!\nAim, drag, and release to shoot the white ball."
+                android:textColor="#CCCCCC"
+                android:textSize="14sp"
+                android:layout_marginBottom="20dp"
+                android:lineSpacingExtra="4dp"/>
+
+            <!-- Special Balls -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="⚡ SPECIAL BALLS"
+                android:textColor="#00E5FF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp"/>
+
+            <!-- Orange -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="16dp">
-                 <View
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:background="@drawable/bg_button_rounded_cyan" 
-                    android:layout_marginRight="10dp"/>
+                android:layout_marginBottom="12dp">
+                <View
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@drawable/bg_button_rounded_orange" 
+                    android:layout_marginRight="12dp"/>
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Electric: Chain reaction"
+                    android:layout_weight="1"
+                    android:text="Extra Time (+5s)\nGrants 5 extra seconds"
                     android:textColor="#FFFFFF"
-                    android:textSize="14sp"/>
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="2dp"/>
             </LinearLayout>
 
-             <LinearLayout
+            <!-- Gold -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="16dp">
-                 <View
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                android:layout_marginBottom="12dp">
+                <View
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@drawable/bg_button_rounded_gold" 
+                    android:layout_marginRight="12dp"/>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Power Boost\nYour next shot is super strong"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="2dp"/>
+            </LinearLayout>
+
+            <!-- Purple -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="12dp">
+                <View
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@drawable/bg_button_rounded_purple" 
+                    android:layout_marginRight="12dp"/>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Barrier Shield\nProtects you from damage"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="2dp"/>
+            </LinearLayout>
+
+            <!-- Cyan -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="12dp">
+                <View
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@drawable/bg_button_rounded_cyan" 
+                    android:layout_marginRight="12dp"/>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Electric Ball\nChain destruction effect"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="2dp"/>
+            </LinearLayout>
+
+            <!-- Red -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="12dp">
+                <View
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
                     android:background="@drawable/bg_button_rounded_red"
-                    android:layout_marginRight="10dp"/>
+                    android:layout_marginRight="12dp"/>
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Missile: Homing attack"
+                    android:layout_weight="1"
+                    android:text="Missile Ball\nHoming attack on targets"
                     android:textColor="#FFFFFF"
-                    android:textSize="14sp"/>
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="2dp"/>
             </LinearLayout>
-             
-             <LinearLayout
+
+            <!-- Green -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="16dp">
-                 <View
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                android:layout_marginBottom="20dp">
+                <View
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
                     android:background="@drawable/bg_button_rounded_green"
-                    android:layout_marginRight="10dp"/>
+                    android:layout_marginRight="12dp"/>
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Teleport: Instant jump"
+                    android:layout_weight="1"
+                    android:text="Teleport Ball\nInstant jump to safety"
                     android:textColor="#FFFFFF"
-                    android:textSize="14sp"/>
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="2dp"/>
             </LinearLayout>
+
+            <!-- Tips -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="💡 PRO TIPS"
+                android:textColor="#00E5FF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+            
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="• Use the aiming line to plan bounces\n• Collect special balls for power-ups\n• Upgrade your abilities for better performance\n• Complete quests to earn extra coins"
+                android:textColor="#CCCCCC"
+                android:textSize="14sp"
+                android:lineSpacingExtra="4dp"/>
 
         </LinearLayout>
     </ScrollView>
@@ -150,12 +216,16 @@
     <Button
         android:id="@+id/btnClose"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:text="TAP TO CLOSE"
-        android:background="@drawable/bg_button_rounded_red"
-        android:textColor="#FFFFFF"
+        android:layout_height="56dp"
+        android:text="GOT IT"
+        android:background="@drawable/btn_return_hq"
+        android:textColor="#EAFBFF"
+        android:textSize="16sp"
         android:textStyle="bold"
+        android:letterSpacing="0.08"
+        android:elevation="6dp"
         android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"/>
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"/>
 
 </LinearLayout>

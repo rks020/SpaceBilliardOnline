@@ -9,8 +9,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.graphics.Color;
 
-import com.spacebilliard.app.ui.NeonButton;
-
 public class HowToPlayActivity extends Activity {
 
     @Override
@@ -27,13 +25,19 @@ public class HowToPlayActivity extends Activity {
         // Prevent closing by touching outside (modal behavior)
         setFinishOnTouchOutside(false);
 
-        NeonButton btnGotIt = findViewById(R.id.btnGotIt);
-        btnGotIt.setText("GOT IT!");
-        btnGotIt.setThemeColor(Color.parseColor("#00E5FF")); // Cyan
+        Button btnGotIt = findViewById(R.id.btnGotIt);
 
         btnGotIt.setOnClickListener(v -> {
-            finish();
-            overridePendingTransition(0, 0); // No animation
+            v.animate()
+                    .scaleX(0.96f)
+                    .scaleY(0.96f)
+                    .setDuration(80)
+                    .withEndAction(() -> {
+                        v.animate().scaleX(1f).scaleY(1f).setDuration(80).start();
+                        finish();
+                        overridePendingTransition(0, 0); // No animation
+                    })
+                    .start();
         });
     }
 

@@ -1,58 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#000000">
+    android:background="#121212">
 
-    <!-- Header -->
-    <RelativeLayout
+    <!-- Background -->
+    <com.spacebilliard.app.ui.StarfieldBackgroundView
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:background="#1a1a1a"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
         android:padding="16dp">
 
-        <ImageButton
+        <!-- HEADER -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="16dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-black"
+                android:text="QUESTS"
+                android:textColor="#00E5FF"
+                android:textSize="28sp"
+                android:letterSpacing="0.1"/>
+
+            <TextView
+                android:id="@+id/tvQuestCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0/40"
+                android:textColor="#00FF00"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium" />
+        </LinearLayout>
+
+        <!-- Quest List -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvQuests"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:scrollbars="vertical" />
+
+        <Button
             android:id="@+id/btnBack"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_centerVertical="true"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_close_clear_cancel"
-            android:tint="#FFFFFF" />
-
-        <TextView
-            android:id="@+id/tvTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="QUESTS"
-            android:textColor="#FFFFFF"
-            android:textSize="32sp"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:background="@drawable/btn_return_hq"
+            android:text="RETURN TO HQ"
+            android:textColor="#EAFBFF"
+            android:textSize="16sp"
             android:textStyle="bold"
-            android:fontFamily="monospace" />
+            android:letterSpacing="0.08"
+            android:elevation="6dp" />
 
-        <TextView
-            android:id="@+id/tvQuestCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="16dp"
-            android:text="0/40"
-            android:textColor="#00FF00"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-    </RelativeLayout>
-
-    <!-- Quest List -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvQuests"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:padding="8dp"
-        android:clipToPadding="false"
-        android:scrollbars="vertical" />
-
-</LinearLayout>
+    </LinearLayout>
+</FrameLayout>

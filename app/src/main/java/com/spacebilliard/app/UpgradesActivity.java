@@ -55,12 +55,32 @@ public class UpgradesActivity extends Activity {
         setupUpgradeCard(R.id.cardVampire, "upgrade_vampire", "VAMPIRE CORE", "+ Heal on Kill", 400, 1.3f,
                 R.drawable.ic_upgrade_vampire);
 
-        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+        findViewById(R.id.btnBack).setOnClickListener(v -> {
+            v.animate()
+                    .scaleX(0.96f)
+                    .scaleY(0.96f)
+                    .setDuration(80)
+                    .withEndAction(() -> {
+                        v.animate().scaleX(1f).scaleY(1f).setDuration(80).start();
+                        finish();
+                    })
+                    .start();
+        });
 
         // Guide Panel Logic
         View helpOverlay = findViewById(R.id.helpOverlay);
         findViewById(R.id.btnGuide).setOnClickListener(v -> helpOverlay.setVisibility(View.VISIBLE));
-        findViewById(R.id.btnCloseHelp).setOnClickListener(v -> helpOverlay.setVisibility(View.GONE));
+        findViewById(R.id.btnCloseHelp).setOnClickListener(v -> {
+            v.animate()
+                    .scaleX(0.96f)
+                    .scaleY(0.96f)
+                    .setDuration(80)
+                    .withEndAction(() -> {
+                        v.animate().scaleX(1f).scaleY(1f).setDuration(80).start();
+                        helpOverlay.setVisibility(View.GONE);
+                    })
+                    .start();
+        });
     }
 
     private void updateCoinDisplay() {

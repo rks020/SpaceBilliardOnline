@@ -100,11 +100,16 @@
         <Button
             android:id="@+id/btnBack"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="#33FFFFFF"
-            android:text="BACK"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold" />
+            android:layout_height="56dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:background="@drawable/btn_return_hq"
+            android:text="RETURN TO HQ"
+            android:textColor="#EAFBFF"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.08"
+            android:elevation="6dp" />
 
     </LinearLayout>
 
@@ -132,31 +137,36 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:text="UPGRADES GUIDE"
-                android:textColor="#FFFFFF"
+                android:textColor="#00E5FF"
                 android:textSize="22sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="16dp"/>
 
             <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="250dp">
+                android:layout_height="350dp">
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="• LASER SIGHT: Increases the length of the aiming line for better precision.\n\n• ENERGY CORE: Increases the duration of all active skills (Shield, Freeze, etc.).\n\n• LUCKY CHARM: Increases the amount of coins earned when clearing a stage.\n\n• SHIELD GEN: Grants a chance to start every level with a protective shield (100% chance at Max Level)."
+                    android:text="• LASER SIGHT: Increases the length of the aiming line for better precision.\n\n• ENERGY CORE: Increases the duration of all active skills (Shield, Freeze, etc.).\n\n• LUCKY CHARM: Increases the amount of coins earned when clearing a stage.\n\n• SHIELD GEN: Grants a chance to start every level with a protective shield (100% chance at Max Level).\n\n• NOVA MODULE: Increases the explosion radius of the special ball.\n\n• BOSS HUNTER: Increases damage dealt to boss enemies.\n\n• IMPULSE ENG: Increases bounce speed when hitting walls.\n\n• MIDAS CHIP: Increases coin drop chance from destroyed balls.\n\n• VAMPIRE CORE: Restores HP when blocking projectiles or destroying colored balls during boss fights."
                     android:textColor="#CCCCCC"
-                    android:textSize="16sp"
-                    android:lineSpacingExtra="4dp"/>
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="6dp"/>
             </ScrollView>
 
             <Button
                 android:id="@+id/btnCloseHelp"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginTop="16dp"
-                android:background="#FF1744"
+                android:layout_height="56dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp"
                 android:text="CLOSE"
-                android:textColor="#FFFFFF"
+                android:background="@drawable/btn_close_red"
+                android:textColor="#EAFBFF"
+                android:textSize="16sp"
+                android:letterSpacing="0.08"
+                android:elevation="6dp"
                 android:textStyle="bold"/>
         </LinearLayout>
     </FrameLayout>

@@ -952,6 +952,7 @@ int drawable admob_close_button_white_circle_black_cross 0x7f070050
 int drawable admob_close_button_white_cross 0x7f070051
 int drawable app_icon 0x7f070052
 int drawable bg_bottom_bar 0x7f070053
+int drawable bg_button_back 0x7f0700cd
 int drawable bg_button_dark 0x7f070054
 int drawable bg_button_glossy_cyan 0x7f070055
 int drawable bg_button_glossy_gold 0x7f070056
@@ -981,10 +982,12 @@ int drawable bg_pill_cyan 0x7f07006d
 int drawable bg_pill_gold 0x7f07006e
 int drawable bg_play_button 0x7f07006f
 int drawable btn_boss 0x7f070070
+int drawable btn_buy_green 0x7f0700d0
 int drawable btn_checkbox_checked_mtrl 0x7f070071
 int drawable btn_checkbox_checked_to_unchecked_mtrl_animation 0x7f070072
 int drawable btn_checkbox_unchecked_mtrl 0x7f070073
 int drawable btn_checkbox_unchecked_to_checked_mtrl_animation 0x7f070074
+int drawable btn_close_red 0x7f0700cf
 int drawable btn_level 0x7f070075
 int drawable btn_locked 0x7f070076
 int drawable btn_radio_off_mtrl 0x7f070077
@@ -992,6 +995,7 @@ int drawable btn_radio_off_to_on_mtrl_animation 0x7f070078
 int drawable btn_radio_on_mtrl 0x7f070079
 int drawable btn_radio_on_to_off_mtrl_animation 0x7f07007a
 int drawable btn_return 0x7f07007b
+int drawable btn_return_hq 0x7f0700ce
 int drawable common_full_open_on_phone 0x7f07007d
 int drawable common_google_signin_btn_icon_dark 0x7f07007e
 int drawable common_google_signin_btn_icon_dark_focused 0x7f07007f
@@ -1456,7 +1460,6 @@ int id tvProgress 0x7f090174
 int id tvQuestCount 0x7f090175
 int id tvQuestDescription 0x7f090176
 int id tvQuestTitle 0x7f090177
-int id tvTitle 0x7f090178
 int id txtBilliards 0x7f090179
 int id txtBossLabel 0x7f09017a
 int id txtCoins 0x7f09017b
@@ -1542,6 +1545,7 @@ int layout dialog_how_to 0x7f0c0027
 int layout dialog_leave_game 0x7f0c0028
 int layout dialog_match_finished 0x7f0c0029
 int layout dialog_nickname 0x7f0c002a
+int layout help_overlay_upgrades 0x7f0c003c
 int layout ime_base_split_test_activity 0x7f0c002b
 int layout ime_secondary_split_test_activity 0x7f0c002c
 int layout item_level 0x7f0c002d

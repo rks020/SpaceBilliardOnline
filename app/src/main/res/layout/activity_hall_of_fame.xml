@@ -129,17 +129,31 @@
             android:gravity="center">
 
             <!-- Reset Button -->
-            <com.spacebilliard.app.ui.NeonButton
+            <Button
                 android:id="@+id/btnReset"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginBottom="12dp" />
+                android:layout_height="56dp"
+                android:layout_marginBottom="12dp"
+                android:text="RESET STATS"
+                android:background="@drawable/btn_close_red"
+                android:textColor="#EAFBFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.08"
+                android:elevation="6dp" />
 
             <!-- Back Button -->
-            <com.spacebilliard.app.ui.NeonButton
+            <Button
                 android:id="@+id/btnBack"
                 android:layout_width="match_parent"
-                android:layout_height="50dp" />
+                android:layout_height="56dp"
+                android:text="RETURN TO HQ"
+                android:background="@drawable/btn_return_hq"
+                android:textColor="#EAFBFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.08"
+                android:elevation="6dp" />
                 
         </LinearLayout>
 

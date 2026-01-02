@@ -53,7 +53,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
                     android:text="OBJECTIVE"
-                    android:textColor="#AAAAAA"
+                    android:textColor="#00E5FF"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
@@ -62,7 +62,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
                     android:lineSpacingExtra="4dp"
-                    android:text="Clear all colored balls to advance to the next stage. Complete 10 stages to unlock the next Space Level."
+                    android:text="Clear all colored balls before time runs out!\nAim, drag, and release to shoot the white ball.\nComplete 10 stages to unlock the next Space."
                     android:textColor="#FFFFFF"
                     android:textSize="16sp" />
 
@@ -72,7 +72,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
                     android:text="CONTROLS"
-                    android:textColor="#AAAAAA"
+                    android:textColor="#00E5FF"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
@@ -91,7 +91,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
                     android:text="RULES"
-                    android:textColor="#AAAAAA"
+                    android:textColor="#00E5FF"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
@@ -110,7 +110,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
                     android:text="POWER-UPS"
-                    android:textColor="#AAAAAA"
+                    android:textColor="#00E5FF"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
@@ -119,15 +119,21 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="32dp"
                     android:lineSpacingExtra="4dp"
-                    android:text="Collect floating icons to gain advantages:\n❤️ Extra Life\n🛡️ Shield (Protects from one black ball hit)\n⚡ Speed Boost"
+                    android:text="Collect special colored balls for power-ups:\n🟠 Orange: +5 seconds extra time\n🟡 Gold: Power boost for strong shot\n🟣 Purple: Barrier shield protection\n🔵 Cyan: Electric chain reaction\n🔴 Red: Missile homing attack\n🟢 Green: Teleport to safety"
                     android:textColor="#FFFFFF"
                     android:textSize="16sp" />
 
-                <!-- Got It Button -->
-                <com.spacebilliard.app.ui.NeonButton
+                <Button
                     android:id="@+id/btnGotIt"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp" />
+                    android:layout_height="56dp"
+                    android:text="GOT IT"
+                    android:background="@drawable/btn_return_hq"
+                    android:textColor="#EAFBFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08"
+                    android:elevation="6dp" />
 
             </LinearLayout>
         </LinearLayout>

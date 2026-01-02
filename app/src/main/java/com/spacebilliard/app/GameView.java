@@ -277,16 +277,18 @@ public class GameView extends SurfaceView implements Runnable {
         maxCombo = prefs.getInt("maxCombo", 0);
         // maxUnlockedLevel'ı yükle (ilerlemeyi kaydet)
         maxUnlockedLevel = prefs.getInt("maxUnlockedLevel", 1);
-        maxUnlockedLevel = 500; // TEST MODE: Unlock all levels
+        // maxUnlockedLevel = 500; // TEST MODE: Unlock all levels
         // Coinleri yükle
         coins = prefs.getInt("coins", 0);
         // TEST MODE: Grant 10,000 coins for testing
-        if (coins < 10000) {
-            coins = 10000;
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putInt("coins", coins);
-            editor.apply();
-        }
+        /*
+         * if (coins < 10000) {
+         * coins = 10000;
+         * SharedPreferences.Editor editor = prefs.edit();
+         * editor.putInt("coins", coins);
+         * editor.apply();
+         * }
+         */
 
         // Initialize Quest Manager
         questManager = QuestManager.getInstance(context);
@@ -2681,6 +2683,12 @@ public class GameView extends SurfaceView implements Runnable {
                             coins++;
                             floatingTexts.add(new FloatingText("+1 💰", ball.x, ball.y, Color.YELLOW));
                         }
+                    }
+                    // Vampire Core Healing (Boss Fight Only)
+                    if (upgradeVampire > 0 && currentBoss != null) {
+                        int heal = 2 * upgradeVampire;
+                        playerHp = Math.min(playerHp + heal, playerMaxHp);
+                        floatingTexts.add(new FloatingText("+" + heal, wBall.x, wBall.y, Color.GREEN));
                     }
                     ballsHitThisShot++; // Quest 3: Count balls hit
                     // QUEST TRACKING - MAIN GAMEPLAY COLORED BALL DESTRUCTION!

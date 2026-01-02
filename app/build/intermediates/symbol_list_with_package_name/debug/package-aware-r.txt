@@ -953,6 +953,7 @@ drawable admob_close_button_white_circle_black_cross
 drawable admob_close_button_white_cross
 drawable app_icon
 drawable bg_bottom_bar
+drawable bg_button_back
 drawable bg_button_dark
 drawable bg_button_glossy_cyan
 drawable bg_button_glossy_gold
@@ -982,10 +983,12 @@ drawable bg_pill_cyan
 drawable bg_pill_gold
 drawable bg_play_button
 drawable btn_boss
+drawable btn_buy_green
 drawable btn_checkbox_checked_mtrl
 drawable btn_checkbox_checked_to_unchecked_mtrl_animation
 drawable btn_checkbox_unchecked_mtrl
 drawable btn_checkbox_unchecked_to_checked_mtrl_animation
+drawable btn_close_red
 drawable btn_level
 drawable btn_locked
 drawable btn_radio_off_mtrl
@@ -993,6 +996,7 @@ drawable btn_radio_off_to_on_mtrl_animation
 drawable btn_radio_on_mtrl
 drawable btn_radio_on_to_off_mtrl_animation
 drawable btn_return
+drawable btn_return_hq
 drawable common_full_open_on_phone
 drawable common_google_signin_btn_icon_dark
 drawable common_google_signin_btn_icon_dark_focused
@@ -1457,7 +1461,6 @@ id tvProgress
 id tvQuestCount
 id tvQuestDescription
 id tvQuestTitle
-id tvTitle
 id txtBilliards
 id txtBossLabel
 id txtCoins
@@ -1543,6 +1546,7 @@ layout dialog_how_to
 layout dialog_leave_game
 layout dialog_match_finished
 layout dialog_nickname
+layout help_overlay_upgrades
 layout ime_base_split_test_activity
 layout ime_secondary_split_test_activity
 layout item_level

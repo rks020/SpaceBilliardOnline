@@ -699,17 +699,53 @@ public class ShopActivity extends Activity {
                 footer.setPadding(0, 20, 0, 40);
 
                 // BUY BUTTON
-                NeonButton buyBtn = new NeonButton(this, "BUY", Color.rgb(0, 255, 100));
-                buyBtn.setOnClickListener(v -> handlePurchase());
+                android.widget.Button buyBtn = new android.widget.Button(this);
+                buyBtn.setText("BUY");
+                buyBtn.setBackgroundResource(R.drawable.btn_buy_green);
+                buyBtn.setTextColor(Color.rgb(234, 251, 255)); // #EAFBFF
+                buyBtn.setTextSize(16);
+                buyBtn.setTypeface(Typeface.DEFAULT_BOLD);
+                buyBtn.setAllCaps(true);
+                buyBtn.setLetterSpacing(0.08f);
+                buyBtn.setElevation(6 * getResources().getDisplayMetrics().density);
+                buyBtn.setOnClickListener(v -> {
+                        v.animate()
+                                        .scaleX(0.96f)
+                                        .scaleY(0.96f)
+                                        .setDuration(80)
+                                        .withEndAction(() -> {
+                                                v.animate().scaleX(1f).scaleY(1f).setDuration(80).start();
+                                                handlePurchase();
+                                        })
+                                        .start();
+                });
 
                 // BACK BUTTON
-                NeonButton back = new NeonButton(this, "BACK", Color.rgb(255, 50, 255));
-                back.setOnClickListener(v -> finish());
+                android.widget.Button back = new android.widget.Button(this);
+                back.setText("RETURN TO HQ");
+                back.setBackgroundResource(R.drawable.btn_return_hq);
+                back.setTextColor(Color.rgb(234, 251, 255)); // #EAFBFF
+                back.setTextSize(13);
+                back.setTypeface(Typeface.DEFAULT_BOLD);
+                back.setAllCaps(true);
+                back.setLetterSpacing(0.05f);
+                back.setElevation(4 * getResources().getDisplayMetrics().density);
+                back.setOnClickListener(v -> {
+                        v.animate()
+                                        .scaleX(0.96f)
+                                        .scaleY(0.96f)
+                                        .setDuration(80)
+                                        .withEndAction(() -> {
+                                                v.animate().scaleX(1f).scaleY(1f).setDuration(80).start();
+                                                finish();
+                                        })
+                                        .start();
+                });
 
                 LinearLayout.LayoutParams btnParams = new LinearLayout.LayoutParams(
-                                (int) (120 * getResources().getDisplayMetrics().density),
-                                (int) (45 * getResources().getDisplayMetrics().density));
-                btnParams.setMargins(20, 0, 20, 0);
+                                (int) (140 * getResources().getDisplayMetrics().density),
+                                (int) (56 * getResources().getDisplayMetrics().density));
+                btnParams.setMargins(10, 0, 10, 0);
 
                 footer.addView(buyBtn, btnParams);
                 footer.addView(back, btnParams);

@@ -17,7 +17,6 @@ public class NeonInfoPanel extends View {
     private Paint glowPaint;
     private Paint textPaint;
     private Paint valuePaint;
-    private Paint coinIconPaint;
 
     private String line1Label = "TIME:";
     private String line1Value = "20";
@@ -25,8 +24,7 @@ public class NeonInfoPanel extends View {
     private String line2Value = "0";
     private String coinsValue = "0";
     private int themeColor = Color.CYAN;
-    private Paint coinPaint;
-    private Paint coinGlowPaint;
+
     private java.util.List<String> wrappedLines = new java.util.ArrayList<>();
 
     public NeonInfoPanel(Context context) {
@@ -64,9 +62,6 @@ public class NeonInfoPanel extends View {
         valuePaint.setTextSize(11 * getResources().getDisplayMetrics().scaledDensity);
         valuePaint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
 
-        coinPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        coinGlowPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        coinGlowPaint.setStyle(Paint.Style.FILL);
     }
 
     public void setData(String l1Label, String l1Value, String l2Label, String l2Value) {
@@ -288,11 +283,15 @@ public class NeonInfoPanel extends View {
                     valuePaint);
         }
 
-        // Line 3: COINS
-        float iconSize = 18 * density;
+        // Coin emoji
         float iconX = leftContent;
-        float iconY = startY + (spacing * 2) - iconSize / 1.5f;
-        drawVectorCoin(canvas, iconX + iconSize / 2, iconY + iconSize / 2, iconSize / 2);
+        textPaint.setTextSize(16 * density);
+        textPaint.setColor(Color.rgb(255, 215, 0)); // Gold color
+        String coinEmoji = "💰";
+        float emojiW = textPaint.measureText(coinEmoji);
+        canvas.drawText(coinEmoji, iconX, startY + spacing * 2 + 3 * density, textPaint);
+        textPaint.setTextSize(baseTextSize); // Restore
+        textPaint.setColor(themeColor); // Restore
 
         // APPLY ANIMATION SCALE
         valuePaint.setTextSize(baseTextSize * coinTextScale);
@@ -302,7 +301,7 @@ public class NeonInfoPanel extends View {
             valuePaint.setColor(themeColor);
         }
 
-        canvas.drawText(coinsValue, iconX + iconSize + 10, startY + spacing * 2, valuePaint);
+        canvas.drawText(coinsValue, iconX + 24 * density, startY + spacing * 2, valuePaint);
 
         // Reset Paint
         valuePaint.setTextSize(baseTextSize);
@@ -315,32 +314,4 @@ public class NeonInfoPanel extends View {
         canvas.drawCircle(w - margin - sDist, h - margin - sDist, 1.5f * density, bgPaint);
     }
 
-    private void drawVectorCoin(Canvas canvas, float cx, float cy, float radius) {
-        // Outer glow
-        coinGlowPaint.setShader(new android.graphics.RadialGradient(cx, cy, radius * 1.5f,
-                new int[] { Color.argb(100, 255, 200, 0), Color.TRANSPARENT }, null,
-                android.graphics.Shader.TileMode.CLAMP));
-        canvas.drawCircle(cx, cy, radius * 1.5f, coinGlowPaint);
-
-        // Gold base
-        coinPaint.setStyle(Paint.Style.FILL);
-        coinPaint.setColor(Color.rgb(255, 215, 0));
-        canvas.drawCircle(cx, cy, radius, coinPaint);
-
-        // Inner rim
-        coinPaint.setStyle(Paint.Style.STROKE);
-        coinPaint.setColor(Color.rgb(255, 165, 0));
-        coinPaint.setStrokeWidth(2f);
-        canvas.drawCircle(cx, cy, radius * 0.8f, coinPaint);
-
-        // Neon 'C'
-        textPaint.setTextSize(radius * 1.2f);
-        textPaint.setColor(Color.BLACK);
-        float tw = textPaint.measureText("C");
-        canvas.drawText("C", cx - tw / 2, cy + radius * 0.4f, textPaint);
-
-        // Restore paint size
-        textPaint.setTextSize(11 * getResources().getDisplayMetrics().scaledDensity);
-        textPaint.setColor(themeColor);
-    }
 }

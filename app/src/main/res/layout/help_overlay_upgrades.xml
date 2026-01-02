@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#DD000000"
+    android:clickable="true"
+    android:focusable="true"
+    android:visibility="gone"
+    android:id="@+id/helpOverlay">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="32dp"
+        android:background="@drawable/bg_menu_panel"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="UPGRADES GUIDE"
+            android:textColor="#00E5FF"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-black"
+            android:layout_marginBottom="16dp"/>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="350dp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="• LASER SIGHT: Increases the length of the aiming line for better precision.\n\n• ENERGY CORE: Increases the duration of all active skills (Shield, Freeze, etc.).\n\n• LUCKY CHARM: Increases the amount of coins earned when clearing a stage.\n\n• SHIELD GEN: Grants a chance to start every level with a protective shield (100% chance at Max Level).\n\n• NOVA MODULE: Increases the explosion radius of the special ball.\n\n• BOSS HUNTER: Increases damage dealt to boss enemies.\n\n• IMPULSE ENG: Increases bounce speed when hitting walls.\n\n• MIDAS CHIP: Increases coin drop chance from destroyed balls.\n\n• VAMPIRE CORE: Restores HP when blocking projectiles or destroying colored balls during boss fights."
+                android:textColor="#CCCCCC"
+                android:textSize="14sp"
+                android:lineSpacingExtra="6dp"/>
+        </ScrollView>
+
+        <Button
+            android:id="@+id/btnCloseHelp"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:background="@drawable/btn_close_red"
+            android:text="CLOSE"
+            android:textColor="#EAFBFF"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.08"
+            android:elevation="6dp"/>
+
+    </LinearLayout>
+</FrameLayout>

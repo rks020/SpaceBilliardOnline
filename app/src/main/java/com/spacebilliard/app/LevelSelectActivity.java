@@ -30,7 +30,7 @@ public class LevelSelectActivity extends Activity {
         // Load progress (legacy variable for display, actual logic uses stars)
         SharedPreferences prefs = getSharedPreferences("SpaceBilliard", MODE_PRIVATE);
         maxUnlockedLevel = prefs.getInt("maxUnlockedLevel", 1);
-        maxUnlockedLevel = 500; // TEST MODE: SHOW ALL UNLOCKED
+        // maxUnlockedLevel = 500; // TEST MODE: SHOW ALL UNLOCKED
 
         levelGrid = findViewById(R.id.levelGrid);
         txtProgress = findViewById(R.id.progress);
@@ -39,7 +39,17 @@ public class LevelSelectActivity extends Activity {
         ImageButton btnNextSpace = findViewById(R.id.btnNextSpace);
         Button btnBack = findViewById(R.id.btnReturn);
 
-        btnBack.setOnClickListener(v -> finish());
+        btnBack.setOnClickListener(v -> {
+            v.animate()
+                    .scaleX(0.96f)
+                    .scaleY(0.96f)
+                    .setDuration(80)
+                    .withEndAction(() -> {
+                        v.animate().scaleX(1f).scaleY(1f).setDuration(80).start();
+                        finish();
+                    })
+                    .start();
+        });
 
         btnPrevSpace.setOnClickListener(v -> {
             if (currentSpace > 1) {
@@ -65,7 +75,7 @@ public class LevelSelectActivity extends Activity {
         // Reload progress data when returning from gameplay
         SharedPreferences prefs = getSharedPreferences("SpaceBilliard", MODE_PRIVATE);
         maxUnlockedLevel = prefs.getInt("maxUnlockedLevel", 1);
-        maxUnlockedLevel = 500; // TEST MODE: SHOW ALL UNLOCKED
+        // maxUnlockedLevel = 500; // TEST MODE: SHOW ALL UNLOCKED
 
         // Refresh the UI to show updated stars and unlocked levels
         updateUI();
@@ -110,19 +120,13 @@ public class LevelSelectActivity extends Activity {
             LinearLayout starsContainer = itemView.findViewById(R.id.starsContainer);
 
             // Logic: Determine if unlocked based on stars of previous level
-            boolean isUnlocked = true; // TEST MODE: UNLOCK ALL LEVELS
-            /*
-             * boolean isUnlocked;
-             * if (levelNum <= 10) {
-             * // TEST: Auto-unlock first 10 levels
-             * isUnlocked = true;
-             * } else if (levelNum == 1) {
-             * isUnlocked = true;
-             * } else {
-             * int prevStars = starPrefs.getInt("level_" + (levelNum - 1) + "_stars", 0);
-             * isUnlocked = (prevStars == 3);
-             * }
-             */
+            boolean isUnlocked;
+            if (levelNum == 1) {
+                isUnlocked = true;
+            } else {
+                int prevStars = starPrefs.getInt("level_" + (levelNum - 1) + "_stars", 0);
+                isUnlocked = (prevStars == 3);
+            }
 
             int currentStars = starPrefs.getInt("level_" + levelNum + "_stars", 0);
             boolean isCompleted = (currentStars == 3);
