@@ -1027,6 +1027,8 @@ int drawable ic_call_answer_video 0x7f070097
 int drawable ic_call_answer_video_low 0x7f070098
 int drawable ic_call_decline 0x7f070099
 int drawable ic_call_decline_low 0x7f07009a
+int drawable ic_hand_pointer 0x7f0700d3
+int drawable ic_hand_swipe 0x7f0700d4
 int drawable ic_info 0x7f07009b
 int drawable ic_launcher_background 0x7f07009c
 int drawable ic_lock 0x7f07009d

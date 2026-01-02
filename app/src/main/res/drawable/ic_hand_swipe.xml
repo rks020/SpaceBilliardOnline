@@ -1,0 +1,23 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp"
+    android:height="64dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Swipe Trail (Clean Curve) -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M 4,14 C 6,6 12,6 16,8" />
+        
+    <!-- Hand (Index Finger Pointing/Swiping) - Clean Standard Design -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#000000"
+        android:strokeWidth="1"
+        android:strokeLineJoin="round"
+        android:pathData="M 12,4 L 12,12 L 9,12 L 8,8 C 8,8 6,9 6.5,11 L 8.5,15 C 9.5,17 12,19 15,19 C 18,19 20,17 20,14 L 20,10 C 20,8.5 18,8 18,8 L 14,8 L 14,4 C 14,3 12.5,3 12,4 Z" />
+
+</vector>

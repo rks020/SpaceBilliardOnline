@@ -30,6 +30,8 @@ import android.graphics.Path;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
+import androidx.core.content.ContextCompat;
 
 public class GameView extends SurfaceView implements Runnable {
 
@@ -144,6 +146,13 @@ public class GameView extends SurfaceView implements Runnable {
     private long lastShieldSoundTime = 0; // Kalkan sesi zamanlayıcısı
     // Son fırlatma gücü
     private float lastLaunchPower = 0;
+
+    // Tutorial State
+    private boolean showTutorial = false;
+    private Bitmap handIcon;
+    private float tutAnimOffset = 0;
+    private boolean tutAnimGrowing = true;
+
     // Sürükleme
     private boolean isDragging = false;
     private Ball draggedBall = null;
@@ -277,8 +286,27 @@ public class GameView extends SurfaceView implements Runnable {
 
         cachedXfermode = new android.graphics.PorterDuffXfermode(android.graphics.PorterDuff.Mode.SRC_ATOP);
 
-        // Kayıtlı skoru yükle
+        // Initialize Tutorial
         SharedPreferences prefs = context.getSharedPreferences("SpaceBilliard", Context.MODE_PRIVATE);
+        // Reset tutorial for testing if needed:
+        // prefs.edit().remove("tutorial_shown").apply();
+        showTutorial = !prefs.getBoolean("tutorial_shown", false);
+
+        if (showTutorial) {
+            // Load Vector Drawable as Bitmap
+            Drawable vector = ContextCompat.getDrawable(context, R.drawable.ic_hand_swipe);
+            if (vector != null) {
+                vector.setBounds(0, 0, vector.getIntrinsicWidth(), vector.getIntrinsicHeight());
+                handIcon = Bitmap.createBitmap(vector.getIntrinsicWidth(), vector.getIntrinsicHeight(),
+                        Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(handIcon);
+                vector.draw(canvas);
+                // Resize hand for better visibility
+                handIcon = Bitmap.createScaledBitmap(handIcon, 100, 100, true);
+            }
+        }
+
+        // Kayıtlı skoru yükle
         highScore = prefs.getInt("highScore", 0);
         highLevel = prefs.getInt("highLevel", 1);
         highScore = prefs.getInt("highScore", 0);
@@ -429,6 +457,13 @@ public class GameView extends SurfaceView implements Runnable {
 
     // Called when user watches rewarded ad to continue from current stage
     public void continueAfterAd() {
+        // Disable tutorial on first touch
+        if (showTutorial) {
+            showTutorial = false;
+            SharedPreferences prefs = getContext().getSharedPreferences("SpaceBilliard", Context.MODE_PRIVATE);
+            prefs.edit().putBoolean("tutorial_shown", true).apply();
+        }
+
         if (gameOver) {
             // CRITICAL: Reset defeat flags to prevent loop
             showPlayerDefeated = false;
@@ -3671,6 +3706,11 @@ public class GameView extends SurfaceView implements Runnable {
                 paint.setTypeface(Typeface.DEFAULT);
             }
 
+            // Draw Tutorial Hand
+            if (showTutorial && !isDragging && whiteBall != null) {
+                drawTutorialHand(canvas);
+            }
+
             canvas.restore();
             holder.unlockCanvasAndPost(canvas);
         }
@@ -5594,6 +5634,70 @@ public class GameView extends SurfaceView implements Runnable {
         return "-";
     }
 
+    private void drawTutorialHand(Canvas canvas) {
+        if (handIcon == null)
+            return;
+
+        float ballX = whiteBall.x;
+        float ballY = whiteBall.y;
+
+        // Animate offset (simulating drag back)
+        float maxOffset = 200f;
+        if (tutAnimGrowing) {
+            tutAnimOffset += 5f;
+            if (tutAnimOffset >= maxOffset)
+                tutAnimGrowing = false;
+        } else {
+            tutAnimOffset -= 5f;
+            if (tutAnimOffset <= 0)
+                tutAnimGrowing = true;
+        }
+
+        // Drag direction (e.g., bottom-left to imply shooting top-right)
+        // Let's simulate dragging DOWN to shoot UP
+        float dragX = ballX;
+        float dragY = ballY + tutAnimOffset;
+
+        // Draw Aim Line (Ghost) from Ball to Drag (simulated)
+        // In actual game logic: Aim line goes opposite to drag
+        // If we drag DOWN, we shoot UP.
+        // So we draw line from Ball UPWARDS.
+        paint.setColor(Color.WHITE);
+        paint.setStrokeWidth(5);
+        paint.setAlpha(150);
+        // canvas.drawLine(ballX, ballY, ballX, ballY - tutAnimOffset * 2, paint);
+        // Just simple line pointing target direction
+
+        // Draw Hand
+        canvas.drawBitmap(handIcon, dragX - handIcon.getWidth() / 2f, dragY, null);
+
+        // Draw "Drag to Shoot" text near the hand
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.WHITE);
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setTextSize(30); // Slightly larger for emphasis
+        paint.setShadowLayer(10, 0, 0, Color.BLACK);
+
+        // Use Montserrat Black font
+        try {
+            Typeface montserrat = androidx.core.content.res.ResourcesCompat.getFont(getContext(),
+                    R.font.montserrat_black);
+            if (montserrat != null) {
+                paint.setTypeface(montserrat);
+            } else {
+                paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+            }
+        } catch (Exception e) {
+            paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+        }
+
+        canvas.drawText("Drag to Shoot!", dragX, dragY + handIcon.getHeight() + 60, paint);
+
+        // Reset typeface
+        paint.setTypeface(Typeface.DEFAULT);
+        paint.setShadowLayer(0, 0, 0, 0);
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
@@ -5602,6 +5706,13 @@ public class GameView extends SurfaceView implements Runnable {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                // Disable tutorial on first touch
+                if (showTutorial) {
+                    showTutorial = false;
+                    SharedPreferences prefs = getContext().getSharedPreferences("SpaceBilliard", Context.MODE_PRIVATE);
+                    prefs.edit().putBoolean("tutorial_shown", true).apply();
+                }
+
                 // Overlay kapatma
                 if (showInstructions || showHighScore) {
                     showInstructions = false;

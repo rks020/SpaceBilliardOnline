@@ -1028,6 +1028,8 @@ drawable ic_call_answer_video
 drawable ic_call_answer_video_low
 drawable ic_call_decline
 drawable ic_call_decline_low
+drawable ic_hand_pointer
+drawable ic_hand_swipe
 drawable ic_info
 drawable ic_launcher_background
 drawable ic_lock
