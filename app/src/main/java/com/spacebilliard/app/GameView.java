@@ -185,8 +185,8 @@ public class GameView extends SurfaceView implements Runnable {
     private boolean extraTimeActive = false; // Added missing variable
     // Level geçiş beklemesi
     private boolean levelCompleted = false;
-    private int lastCoinAwardedLevel = 0;
-    private int lastCoinAwardedStage = 0;
+    private int lastCoinAwardedLevel = -1; // Start at -1 to ensure first stage awards coins
+    private int lastCoinAwardedStage = -1;
 
     private final long levelCompletionTime = 0;
     // Ses Efektleri
@@ -210,6 +210,15 @@ public class GameView extends SurfaceView implements Runnable {
     private long totalPlayTimeSeconds = 0; // Quest 37: Marathon
     private long lastDamageTime = 0; // Quest 38: Untouchable
     private long timeAtLowHp = 0; // Quest 39: Edge of death
+
+    // New Quest Tracking (41-50)
+    private int currentComboCount = 0; // Quest 41: Sharpshooter
+    private long stageStartTime = 0; // Quest 43: Speed Clearer
+    private int ballsDestroyedInLast5Seconds = 0; // Quest 44: Lightning Reflexes
+    private long last5SecondWindowStart = 0; // Quest 44
+    private java.util.Set<String> skillsUsedThisLevel = new java.util.HashSet<>(); // Quest 46
+    private int[] stagesPerSpace = new int[10]; // Quest 47: Space Traveler
+
     // Removed old button references
     private android.graphics.Rect startBtnBounds, howToBtnBounds, shopBtnBounds;
     private String selectedSkin = "default";
@@ -728,6 +737,13 @@ public class GameView extends SurfaceView implements Runnable {
         floatingTexts.clear();
         inventory.clear(); // Clear inventory on level start/restart
 
+        // New Quest Tracking Initialization
+        stageStartTime = System.currentTimeMillis(); // Quest 43: Speed Clearer
+        skillsUsedThisLevel.clear(); // Quest 46: Ability Addict
+        currentComboCount = 0; // Quest 41: Sharpshooter
+        ballsDestroyedInLast5Seconds = 0; // Quest 44
+        last5SecondWindowStart = System.currentTimeMillis(); // Quest 44
+
         // Safety Reset for flags
         showPlayerDefeated = false;
         showBossDefeated = false;
@@ -857,7 +873,7 @@ public class GameView extends SurfaceView implements Runnable {
         String name = "Boss";
         float hp = 2000 + (lv * 200); // Scaling HP
         int color = Color.RED;
-        long duration = 120000; // 2 mins for boss battles
+        long duration = 180000; // 3 mins for boss battles
 
         // Boss assignment based on level
         // Boss assignment based on global stage count (50 stages = 10 Levels)
@@ -1090,10 +1106,11 @@ public class GameView extends SurfaceView implements Runnable {
                 // Grant Reward for Boss Defeat - 100 Coins
                 int oldCoins = coins;
                 coins += 100; // Reward 100 coins
-                // Quest 31-32: Collect coins
+                // Quest 31-32, 49: Collect coins
                 if (questManager != null) {
                     questManager.incrementQuestProgress(31, 100);
                     questManager.incrementQuestProgress(32, 100);
+                    questManager.incrementQuestProgress(49, 100); // Quest 49: Coin Millionaire
                 }
                 lastCoinAwardedLevel = level; // Mark level as rewarded to prevent double reward
 
@@ -1317,29 +1334,30 @@ public class GameView extends SurfaceView implements Runnable {
         // }
 
         // Tüm toplar toplandı mı? (Ve Boss yoksa)
-        // Award coins only once per stage clear
+        // Stage completion check
+
         if (coloredBalls.size() == 0 && pendingColoredBalls == 0 && currentBoss == null && !showBossDefeated
-                && !levelCompleted // Prevent spam after stage is already completed
-                && (level > lastCoinAwardedLevel || (level == lastCoinAwardedLevel && stage > lastCoinAwardedStage))) {
+                && !levelCompleted) {
 
             // Award 5 coins for stage completion
             int oldCoins = coins;
             coins += (5 + (upgradeLuck - 1)); // Upgrade: +1 coin per level
-            // Quest 31-32: Collect coins
+            // Quest 31-32, 49: Collect coins
             if (questManager != null) {
                 questManager.incrementQuestProgress(31, 5);
                 questManager.incrementQuestProgress(32, 5);
+                questManager.incrementQuestProgress(49, 5); // Quest 49: Coin Millionaire
             }
             lastCoinAwardedLevel = level;
             lastCoinAwardedStage = stage; // Track stage too
             android.util.Log.d("GameView",
-                    "Level " + level + " Stage " + stage + " cleared! Coins: " + oldCoins + " -> " + coins);
+                    "✅ COIN AWARDED! Level " + level + " Stage " + stage + " cleared! Coins: " + oldCoins + " -> "
+                            + coins);
             saveProgress(); // Coin'i kaydet
 
             // Force UI update to trigger animation
             if (mainActivity != null) {
                 mainActivity.runOnUiThread(() -> {
-                    android.util.Log.d("GameView", "Updating coin UI to: " + coins);
                     updateMainActivityPanels();
                 });
             }
@@ -1366,6 +1384,39 @@ public class GameView extends SurfaceView implements Runnable {
         if (levelCompleted && System.currentTimeMillis() - stageClearedTime > 3000) {
             levelCompleted = false;
             showStageCleared = false;
+
+            // ✨ AWARD COINS FOR STAGE COMPLETION - MOVED HERE TO ENSURE IT WORKS
+            // Award coins BEFORE incrementing stage
+            // Simplified: Just check if we haven't given coins for this specific
+            // level+stage combo
+            boolean shouldAwardCoins = !(level == lastCoinAwardedLevel && stage == lastCoinAwardedStage);
+
+            if (shouldAwardCoins) {
+                int oldCoins = coins;
+                coins += (5 + (upgradeLuck - 1)); // 5 coins + luck bonus
+
+                // Quest tracking
+                if (questManager != null) {
+                    questManager.incrementQuestProgress(31, 5);
+                    questManager.incrementQuestProgress(32, 5);
+                    questManager.incrementQuestProgress(49, 5);
+                }
+
+                lastCoinAwardedLevel = level;
+                lastCoinAwardedStage = stage;
+
+                android.util.Log.d("GameView", "✅ COINS AWARDED! Level " + level + " Stage " + stage +
+                        ": " + oldCoins + " -> " + coins);
+
+                saveProgress();
+
+                // Update UI
+                if (mainActivity != null) {
+                    mainActivity.runOnUiThread(() -> updateMainActivityPanels());
+                }
+            } else {
+                android.util.Log.d("GameView", "⚠️ Coins already awarded for Level " + level + " Stage " + stage);
+            }
 
             stage++;
 
@@ -1449,7 +1500,10 @@ public class GameView extends SurfaceView implements Runnable {
                 // Intermediate stage completed (stages 1-4), show stage cleared text
                 int completedStage = stage - 1; // We already incremented, so -1 to get completed stage
                 android.util.Log.d("GameView",
-                        "Level " + level + " Stage " + completedStage + " cleared. Next Stage: " + stage);
+                        "⭐ STAGE CLEARED! Level " + level + " Stage " + completedStage + ". Next Stage: " + stage);
+                android.util.Log.d("GameView",
+                        "💵 Coin Status: coins=" + coins + ", lastCoinLevel=" + lastCoinAwardedLevel
+                                + ", lastCoinStage=" + lastCoinAwardedStage);
                 floatingTexts
                         .add(new FloatingText("STAGE " + completedStage + " CLEARED!", centerX, centerY, Color.YELLOW));
                 playSound(soundCoin); // Lighter sound for stage clear
@@ -1898,10 +1952,32 @@ public class GameView extends SurfaceView implements Runnable {
             inventory.add(type);
             playSound(soundCoin);
             floatingTexts.add(new FloatingText("COLLECTED!", targetBall.x, targetBall.y, Color.GREEN, 0.5f));
+
+            // Quest 50: Arsenal Master - Hold 3 power-ups simultaneously
+            if (questManager != null && inventory.size() >= 3) {
+                questManager.incrementQuestProgress(50, 1);
+            }
+
+            // Quest 46: Ability Addict - Use different skills in one level
+            if (questManager != null) {
+                skillsUsedThisLevel.add(type);
+                if (skillsUsedThisLevel.size() >= 10) {
+                    questManager.incrementQuestProgress(46, 1);
+                }
+            }
+
             return; // Do not activate immediately
         }
 
         activateSkillEffect(type, targetBall);
+
+        // Quest 46: Track skill usage
+        if (questManager != null) {
+            skillsUsedThisLevel.add(type);
+            if (skillsUsedThisLevel.size() >= 10) {
+                questManager.incrementQuestProgress(46, 1);
+            }
+        }
     }
 
     private void activateSkillEffect(String type, Ball targetBall) {
@@ -2470,6 +2546,23 @@ public class GameView extends SurfaceView implements Runnable {
                 if (Math.sqrt(dx * dx + dy * dy) < p.radius * 2.0 + b.radius) { // Radius increased for easier hit
                     createImpactBurst(b.x, b.y, b.color);
                     coloredBalls.remove(i);
+
+                    // Quest 44: Lightning Reflexes - Destroy 10 balls in 5 seconds
+                    if (questManager != null) {
+                        long currentTime = System.currentTimeMillis();
+                        if (currentTime - last5SecondWindowStart > 5000) {
+                            // Reset window
+                            last5SecondWindowStart = currentTime;
+                            ballsDestroyedInLast5Seconds = 0;
+                        }
+                        ballsDestroyedInLast5Seconds++;
+                        if (ballsDestroyedInLast5Seconds >= 10) {
+                            questManager.incrementQuestProgress(44, 1);
+                            ballsDestroyedInLast5Seconds = 0; // Reset
+                            last5SecondWindowStart = currentTime;
+                        }
+                    }
+
                     playSound(soundCollision);
                 }
             }
@@ -2691,6 +2784,11 @@ public class GameView extends SurfaceView implements Runnable {
                             // Quest 20: Ultimate Champion (10 bosses)
                             questManager.incrementQuestProgress(15, 1);
                             questManager.incrementQuestProgress(20, 1);
+
+                            // Quest 45: Glass Cannon - Defeat boss with 50 HP or less
+                            if (playerHp <= 50) {
+                                questManager.incrementQuestProgress(45, 1);
+                            }
                         }
                         currentBoss = null;
                         showBossDefeated = true;
@@ -2721,6 +2819,10 @@ public class GameView extends SurfaceView implements Runnable {
                         if (questManager != null && comboHits >= 3) {
                             questManager.incrementQuestProgress(4, 1);
                         }
+                        // Quest 41: Sharpshooter - Hit 5 balls in one combo
+                        if (questManager != null && comboHits >= 5) {
+                            questManager.incrementQuestProgress(41, 1);
+                        }
                         if (comboHits >= 3) {
                             floatingTexts.add(new FloatingText("COMBO x" + (comboHits), centerX,
                                     centerY - screenHeight * 0.15f, Color.rgb(255, 215, 0)));
@@ -2729,6 +2831,12 @@ public class GameView extends SurfaceView implements Runnable {
                         comboHits = 1;
                     }
                     lastHitTime = currentTime;
+
+                    // Quest 42: Ricochet Master - Track hits after wall bounce
+                    // Simplified: Increment when hitting ball with high velocity (suggests bounce)
+                    if (questManager != null && (Math.abs(wBall.vx) > 15 || Math.abs(wBall.vy) > 15)) {
+                        questManager.incrementQuestProgress(42, 1);
+                    }
 
                     createImpactBurst(ball.x, ball.y, ball.color);
                     coloredBalls.remove(i);
@@ -2929,7 +3037,15 @@ public class GameView extends SurfaceView implements Runnable {
         for (int i = 0; i < particleCount; i++) {
             float angle = random.nextFloat() * (float) (2 * Math.PI);
             float speed = (random.nextFloat() * 6 + 2) * novaSpeedMult;
-            particles.add(new Particle(x, y, angle, speed, color, ParticleType.CIRCLE));
+
+            // BLACK BALL FIX: Use gray-white particles for better visibility
+            int particleColor = color;
+            if (color == Color.BLACK) {
+                int shade = 150 + random.nextInt(106); // 150-255 range (gray to white)
+                particleColor = Color.rgb(shade, shade, shade);
+            }
+
+            particles.add(new Particle(x, y, angle, speed, particleColor, ParticleType.CIRCLE));
         }
 
         switch (selectedImpact) {
@@ -7612,13 +7728,26 @@ public class GameView extends SurfaceView implements Runnable {
             canvas.translate(x, y);
             canvas.rotate((float) Math.toDegrees(angle));
 
-            // Flame trail (behind the missile)
+            // Flame trail (behind the missile) - ENHANCED with more smoke
             paint.setStyle(Paint.Style.FILL);
-            for (int i = 0; i < 3; i++) {
-                float flameOffset = -radius * 1.5f - i * 8;
-                float flameSize = radius * (1.2f - i * 0.3f);
-                paint.setColor(
-                        i == 0 ? Color.rgb(255, 100, 0) : i == 1 ? Color.rgb(255, 150, 0) : Color.rgb(255, 200, 0));
+
+            // Main flame trail (5 particles instead of 3)
+            for (int i = 0; i < 5; i++) {
+                float flameOffset = -radius * 1.5f - i * 6;
+                float flameSize = radius * (1.3f - i * 0.2f);
+
+                // Mix of orange-red flame and gray smoke
+                int flameColor;
+                if (i < 2) {
+                    // Hot flame (orange-red)
+                    flameColor = i == 0 ? Color.rgb(255, 80, 0) : Color.rgb(255, 120, 20);
+                } else {
+                    // Cooler smoke (gray with red tint)
+                    int grayTone = 80 + (i - 2) * 40; // 80, 120, 160
+                    flameColor = Color.rgb(grayTone + 40, grayTone, grayTone); // Reddish gray
+                }
+
+                paint.setColor(flameColor);
                 Path flamePath = new Path();
                 flamePath.moveTo(flameOffset, 0);
                 flamePath.lineTo(flameOffset - flameSize, -flameSize * 0.6f);

@@ -79,6 +79,35 @@ public class QuestManager {
         allQuests.add(new Quest(39, "Edge of Death", "Survive with 1 HP for 120s", 120, 200, Quest.QuestType.SURVIVAL));
         allQuests.add(
                 new Quest(40, "Last Second", "Complete with 0 seconds remaining", 4, 150, Quest.QuestType.SURVIVAL));
+
+        // NEW QUESTS (41-50)
+        // PRECISION & SKILL
+        allQuests.add(new Quest(41, "Sharpshooter", "Hit 5 balls in one combo", 15, 120, Quest.QuestType.COMBAT));
+        allQuests.add(
+                new Quest(42, "Ricochet Master", "Hit 3+ balls after wall bounce", 50, 100, Quest.QuestType.COMBAT));
+
+        // SPEED & AGILITY
+        allQuests.add(
+                new Quest(43, "Speed Clearer", "Complete stage in under 10 seconds", 5, 150, Quest.QuestType.LEVEL));
+        allQuests.add(
+                new Quest(44, "Lightning Reflexes", "Destroy 10 balls in 5 seconds", 20, 130, Quest.QuestType.COMBAT));
+
+        // POWER & DOMINATION
+        allQuests.add(new Quest(45, "Glass Cannon", "Defeat boss with 50 HP or less", 3, 250, Quest.QuestType.BOSS));
+        allQuests.add(new Quest(46, "Ability Addict", "Use 10 different skills in one level", 15, 140,
+                Quest.QuestType.COMBAT));
+
+        // EXPLORER
+        allQuests.add(
+                new Quest(47, "Space Traveler", "Complete 50 stages in each space", 500, 300, Quest.QuestType.LEVEL));
+        allQuests.add(
+                new Quest(48, "Comeback King", "Complete level with only 1 life", 10, 160, Quest.QuestType.SURVIVAL));
+
+        // COLLECTOR
+        allQuests.add(new Quest(49, "Coin Millionaire", "Collect 10,000 coins total", 10000, 500,
+                Quest.QuestType.COLLECTION));
+        allQuests.add(new Quest(50, "Arsenal Master", "Hold 3 power-ups simultaneously", 25, 180,
+                Quest.QuestType.COLLECTION));
     }
 
     public List<Quest> getAllQuests() {

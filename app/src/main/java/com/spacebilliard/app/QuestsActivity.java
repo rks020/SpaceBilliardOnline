@@ -64,6 +64,6 @@ public class QuestsActivity extends AppCompatActivity {
 
     private void updateQuestCount() {
         int completed = questManager.getCompletedQuestsCount();
-        tvQuestCount.setText(completed + "/40");
+        tvQuestCount.setText(completed + "/50");
     }
 }
