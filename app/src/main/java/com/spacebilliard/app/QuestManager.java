@@ -28,11 +28,11 @@ public class QuestManager {
         allQuests = new ArrayList<>();
 
         // COMBAT QUESTS (1-10)
-        allQuests.add(new Quest(1, "Destroyer I", "Destroy 1000 colored balls", 1000, 50, Quest.QuestType.COMBAT));
+        allQuests.add(new Quest(1, "Destroyer I", "Destroy 2000 colored balls", 2000, 50, Quest.QuestType.COMBAT));
         allQuests.add(new Quest(2, "Dark Matter", "Destroy 500 black balls", 500, 75, Quest.QuestType.COMBAT));
         allQuests.add(new Quest(3, "Multi-Hit", "Hit 10 balls with one shot", 10, 100, Quest.QuestType.COMBAT));
         allQuests.add(new Quest(4, "Combo Master", "Get 180 combo hits", 180, 60, Quest.QuestType.COMBAT));
-        allQuests.add(new Quest(5, "Destroyer II", "Destroy 2000 balls total", 2000, 100, Quest.QuestType.COMBAT));
+        allQuests.add(new Quest(5, "Destroyer II", "Destroy 4000 balls total", 4000, 100, Quest.QuestType.COMBAT));
         allQuests.add(new Quest(6, "Special Hunter", "Hit 700 special balls", 700, 80, Quest.QuestType.COMBAT));
         allQuests.add(new Quest(7, "Electric Storm", "Use Electric skill 40 times", 40, 70, Quest.QuestType.COMBAT));
         allQuests.add(new Quest(8, "Ice Age", "Activate Freeze 20 times", 20, 60, Quest.QuestType.COMBAT));
@@ -45,7 +45,7 @@ public class QuestManager {
         allQuests.add(new Quest(13, "Gravity Crusher", "Defeat GRAVITON", 1, 150, Quest.QuestType.BOSS));
         allQuests
                 .add(new Quest(14, "Flawless Victory", "Defeat any boss without damage", 1, 200, Quest.QuestType.BOSS));
-        allQuests.add(new Quest(15, "Boss Hunter", "Defeat 12 bosses", 12, 180, Quest.QuestType.BOSS));
+        allQuests.add(new Quest(15, "Boss Hunter", "Defeat 10 bosses", 10, 180, Quest.QuestType.BOSS));
         allQuests.add(new Quest(16, "Speed Demon", "Win boss fight in under 60s", 1, 250, Quest.QuestType.BOSS));
         allQuests.add(new Quest(17, "Anti-Freeze", "Defeat CRYO-STASIS without freeze", 1, 200, Quest.QuestType.BOSS));
         allQuests.add(new Quest(18, "Heavy Hitter", "Deal 200000 damage to bosses", 200000, 120, Quest.QuestType.BOSS));
@@ -73,18 +73,18 @@ public class QuestManager {
 
         // SURVIVAL QUESTS (36-40)
         allQuests.add(
-                new Quest(36, "Endurance", "Survive 20 minutes in one level", 1200, 100, Quest.QuestType.SURVIVAL));
+                new Quest(36, "Endurance", "Survive 2 minutes in one level", 120, 100, Quest.QuestType.SURVIVAL));
         allQuests.add(new Quest(37, "Marathon", "Play for 120 minutes total", 7200, 150, Quest.QuestType.SURVIVAL));
-        allQuests.add(new Quest(38, "Untouchable", "No damage for 8 minutes", 480, 120, Quest.QuestType.SURVIVAL));
+        allQuests.add(new Quest(38, "Untouchable", "No damage for 2 minutes", 120, 120, Quest.QuestType.SURVIVAL));
         allQuests.add(new Quest(39, "Edge of Death", "Survive with 1 HP for 120s", 120, 200, Quest.QuestType.SURVIVAL));
         allQuests.add(
                 new Quest(40, "Last Second", "Complete with 0 seconds remaining", 4, 150, Quest.QuestType.SURVIVAL));
 
         // NEW QUESTS (41-50)
         // PRECISION & SKILL
-        allQuests.add(new Quest(41, "Sharpshooter", "Hit 5 balls in one combo", 15, 120, Quest.QuestType.COMBAT));
+        allQuests.add(new Quest(41, "Sharpshooter", "Hit 5 balls in one combo", 40, 120, Quest.QuestType.COMBAT));
         allQuests.add(
-                new Quest(42, "Ricochet Master", "Hit 3+ balls after wall bounce", 50, 100, Quest.QuestType.COMBAT));
+                new Quest(42, "Ricochet Master", "Hit 3+ balls after wall bounce", 100, 100, Quest.QuestType.COMBAT));
 
         // SPEED & AGILITY
         allQuests.add(
