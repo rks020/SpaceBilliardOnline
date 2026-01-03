@@ -1086,7 +1086,8 @@ public class GameView extends SurfaceView implements Runnable {
             coloredBalls.remove(b);
             // Quest progress: Destroyer I (Quest 1)
             if (questManager != null) {
-                android.util.Log.d("QUEST_DEBUG", "Colored ball destroyed - incrementing quest 1 and 5");
+                // android.util.Log.d("QUEST_DEBUG", "Colored ball destroyed - incrementing
+                // quest 1 and 5");
                 questManager.incrementQuestProgress(1, 1); // Destroy 100 colored balls
                 questManager.incrementQuestProgress(5, 1); // Destroy 200 balls total
             }
@@ -1406,9 +1407,10 @@ public class GameView extends SurfaceView implements Runnable {
             }
             lastCoinAwardedLevel = level;
             lastCoinAwardedStage = stage; // Track stage too
-            android.util.Log.d("GameView",
-                    "✅ COIN AWARDED! Level " + level + " Stage " + stage + " cleared! Coins: " + oldCoins + " -> "
-                            + coins);
+            // android.util.Log.d("GameView",
+            // "✅ COIN AWARDED! Level " + level + " Stage " + stage + " cleared! Coins: " +
+            // oldCoins + " -> "
+            // + coins);
             saveProgress(); // Coin'i kaydet
 
             // Force UI update to trigger animation
@@ -1461,8 +1463,9 @@ public class GameView extends SurfaceView implements Runnable {
                 lastCoinAwardedLevel = level;
                 lastCoinAwardedStage = stage;
 
-                android.util.Log.d("GameView", "✅ COINS AWARDED! Level " + level + " Stage " + stage +
-                        ": " + oldCoins + " -> " + coins);
+                // android.util.Log.d("GameView", "✅ COINS AWARDED! Level " + level + " Stage "
+                // + stage +
+                // ": " + oldCoins + " -> " + coins);
 
                 saveProgress();
 
@@ -1471,7 +1474,8 @@ public class GameView extends SurfaceView implements Runnable {
                     mainActivity.runOnUiThread(() -> updateMainActivityPanels());
                 }
             } else {
-                android.util.Log.d("GameView", "⚠️ Coins already awarded for Level " + level + " Stage " + stage);
+                // android.util.Log.d("GameView", "⚠️ Coins already awarded for Level " + level
+                // + " Stage " + stage);
             }
 
             stage++;
@@ -1480,7 +1484,8 @@ public class GameView extends SurfaceView implements Runnable {
                 stage = 1;
 
                 // Log Debug
-                android.util.Log.d("GameView", "Level Completed! Saving stars for Level: " + level);
+                // android.util.Log.d("GameView", "Level Completed! Saving stars for Level: " +
+                // level);
 
                 // Save 3 stars for the completed level
                 android.content.Context ctx = getContext();
@@ -1488,19 +1493,21 @@ public class GameView extends SurfaceView implements Runnable {
                     android.content.SharedPreferences prefs = ctx.getSharedPreferences("SPACE_PROGRESS",
                             android.content.Context.MODE_PRIVATE);
                     String key = "level_" + level + "_stars";
-                    android.util.Log.d("GameView", "Attempting to save: " + key + " = 3");
+                    // android.util.Log.d("GameView", "Attempting to save: " + key + " = 3");
 
                     android.content.SharedPreferences.Editor editor = prefs.edit();
                     editor.putInt(key, 3);
                     boolean success = editor.commit(); // Use commit() instead of apply() for immediate save
 
-                    android.util.Log.d("GameView", "Save result for " + key + ": " + (success ? "SUCCESS" : "FAILED"));
+                    // android.util.Log.d("GameView", "Save result for " + key + ": " + (success ?
+                    // "SUCCESS" : "FAILED"));
 
                     // Verify the save by reading it back
                     int savedStars = prefs.getInt(key, 0);
-                    android.util.Log.d("GameView", "Verification read: " + key + " = " + savedStars);
+                    // android.util.Log.d("GameView", "Verification read: " + key + " = " +
+                    // savedStars);
                 } else {
-                    android.util.Log.e("GameView", "ERROR: Context is null, cannot save stars!");
+                    // android.util.Log.e("GameView", "ERROR: Context is null, cannot save stars!");
                 }
 
                 // Show "LEVEL COMPLETE" text
@@ -1529,7 +1536,7 @@ public class GameView extends SurfaceView implements Runnable {
                     if (space >= 10)
                         questManager.incrementQuestProgress(27, space);
                 }
-                android.util.Log.d("GameView", "Advancing to Next Level: " + level);
+                // android.util.Log.d("GameView", "Advancing to Next Level: " + level);
 
                 // Quest tracking: Level completion
                 if (questManager != null) {
@@ -1546,7 +1553,8 @@ public class GameView extends SurfaceView implements Runnable {
                 if (level > maxUnlockedLevel) {
                     maxUnlockedLevel = level;
                     saveProgress(); // This saves 'maxUnlockedLevel' to 'SpaceBilliard' prefs
-                    android.util.Log.d("GameView", "New Max Unlocked Level: " + maxUnlockedLevel);
+                    // android.util.Log.d("GameView", "New Max Unlocked Level: " +
+                    // maxUnlockedLevel);
 
                     // Show "LEVEL UNLOCKED" text
                     floatingTexts
@@ -1556,11 +1564,12 @@ public class GameView extends SurfaceView implements Runnable {
             } else {
                 // Intermediate stage completed (stages 1-4), show stage cleared text
                 int completedStage = stage - 1; // We already incremented, so -1 to get completed stage
-                android.util.Log.d("GameView",
-                        "⭐ STAGE CLEARED! Level " + level + " Stage " + completedStage + ". Next Stage: " + stage);
-                android.util.Log.d("GameView",
-                        "💵 Coin Status: coins=" + coins + ", lastCoinLevel=" + lastCoinAwardedLevel
-                                + ", lastCoinStage=" + lastCoinAwardedStage);
+                // android.util.Log.d("GameView",
+                // "⭐ STAGE CLEARED! Level " + level + " Stage " + completedStage + ". Next
+                // Stage: " + stage);
+                // android.util.Log.d("GameView",
+                // "💵 Coin Status: coins=" + coins + ", lastCoinLevel=" + lastCoinAwardedLevel
+                // + ", lastCoinStage=" + lastCoinAwardedStage);
                 floatingTexts
                         .add(floatingTextPool.obtain("STAGE " + completedStage + " CLEARED!", centerX, centerY,
                                 Color.YELLOW));
@@ -2931,7 +2940,8 @@ public class GameView extends SurfaceView implements Runnable {
                     ballsHitThisShot++; // Quest 3: Count balls hit
                     // QUEST TRACKING - MAIN GAMEPLAY COLORED BALL DESTRUCTION!
                     if (questManager != null) {
-                        android.util.Log.d("QUEST_DEBUG", "BALL HIT! Colored ball destroyed in main collision!");
+                        // android.util.Log.d("QUEST_DEBUG", "BALL HIT! Colored ball destroyed in main
+                        // collision!");
                         questManager.incrementQuestProgress(1, 1); // Destroy 100 colored balls
                         questManager.incrementQuestProgress(5, 1); // Destroy 200 balls total
                     }
@@ -9528,7 +9538,8 @@ public class GameView extends SurfaceView implements Runnable {
                 // Dynamic cooldown: Faster transitions when HP is low (enrage)
                 long stateChangeCooldown = (hp > maxHp / 2) ? 5000 : 3000; // 5s normal, 3s enraged
                 if (now - lastStateChangeTime > stateChangeCooldown) {
-                    android.util.Log.d("BOSS_DEBUG", "STATE CHANGE TRIGGERED! HP: " + hp + "/" + maxHp);
+                    // android.util.Log.d("BOSS_DEBUG", "STATE CHANGE TRIGGERED! HP: " + hp + "/" +
+                    // maxHp);
                     if (hp > maxHp / 2) {
                         state = 1; // Scatter Shot (Phase 1)
                     } else {
@@ -9538,7 +9549,8 @@ public class GameView extends SurfaceView implements Runnable {
                     chargeStartTime = now;
                     playSound(soundPower); // Charging Up
                     lastStateChangeTime = now;
-                    android.util.Log.d("BOSS_DEBUG", "New state: " + state + " charging: " + charging);
+                    // android.util.Log.d("BOSS_DEBUG", "New state: " + state + " charging: " +
+                    // charging);
                 }
             } else if (state == 1) { // Scatter Shot
                 if (charging && now - chargeStartTime > 1500) {
@@ -9559,11 +9571,12 @@ public class GameView extends SurfaceView implements Runnable {
 
         void shootMoonRock() {
             if (whiteBall != null) {
-                android.util.Log.d("BOSS_DEBUG", "shootMoonRock called");
+                // android.util.Log.d("BOSS_DEBUG", "shootMoonRock called");
                 float angle = (float) Math.atan2(whiteBall.y - y, whiteBall.x - x);
                 float speed = 8; // Slow
                 Ball proj = new MoonRock(x, y, 40, Color.LTGRAY); // Big Rock
-                android.util.Log.d("BOSS_DEBUG", "Created MoonRock: " + proj.getClass().getName());
+                // android.util.Log.d("BOSS_DEBUG", "Created MoonRock: " +
+                // proj.getClass().getName());
                 proj.vx = (float) Math.cos(angle) * speed;
                 proj.vy = (float) Math.sin(angle) * speed;
                 bossProjectiles.add(proj);
@@ -9572,7 +9585,7 @@ public class GameView extends SurfaceView implements Runnable {
         }
 
         void doMeteorShower() {
-            android.util.Log.d("BOSS_DEBUG", "doMeteorShower called");
+            // android.util.Log.d("BOSS_DEBUG", "doMeteorShower called");
             for (int i = 0; i < 20; i++) {
                 float startX = (random.nextFloat() * screenWidth);
                 float startY = -50 - random.nextFloat() * 200; // Spawn closer to top (visible sooner)
@@ -9593,7 +9606,7 @@ public class GameView extends SurfaceView implements Runnable {
                 }
                 bossProjectiles.add(proj);
             }
-            android.util.Log.d("BOSS_DEBUG", "Meteor shower spawned 20 Meteors");
+            // android.util.Log.d("BOSS_DEBUG", "Meteor shower spawned 20 Meteors");
             playSound(soundBlackExplosion); // Rumble sound
         }
 
@@ -9635,7 +9648,7 @@ public class GameView extends SurfaceView implements Runnable {
         void doScatterShot() {
             playSound(soundRetroLaser);
             // Triple Scatter Shot (Standard Phase)
-            android.util.Log.d("BOSS_DEBUG", "doScatterShot called");
+            // android.util.Log.d("BOSS_DEBUG", "doScatterShot called");
             for (int i = -1; i <= 1; i++) {
                 if (whiteBall == null)
                     break;
@@ -10194,8 +10207,8 @@ public class GameView extends SurfaceView implements Runnable {
                                 // Remove destroyed balls
                                 // Quest tracking for batch destruction
                                 if (questManager != null && toDestroy.size() > 0) {
-                                    android.util.Log.d("QUEST_DEBUG",
-                                            "Teleport destroyed " + toDestroy.size() + " colored balls!");
+                                    // android.util.Log.d("QUEST_DEBUG",
+                                    // "Teleport destroyed " + toDestroy.size() + " colored balls!");
                                     questManager.incrementQuestProgress(1, toDestroy.size());
                                     questManager.incrementQuestProgress(5, toDestroy.size());
                                 }
