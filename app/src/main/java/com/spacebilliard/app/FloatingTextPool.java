@@ -28,7 +28,7 @@ public class FloatingTextPool {
     }
 
     public void free(GameView.FloatingText text) {
-        if (text != null && pool.size() < 50) {
+        if (text != null && pool.size() < 20) {
             pool.push(text);
         }
     }

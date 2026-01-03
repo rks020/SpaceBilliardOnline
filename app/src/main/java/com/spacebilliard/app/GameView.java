@@ -8391,10 +8391,10 @@ public class GameView extends SurfaceView implements Runnable {
         int life = 60; // Frames
         int maxLife = 60;
         float floatSpeed = 3f;
-        float sizeScale = 1.0f;
+        float sizeScale = 0.5f;
 
         FloatingText(String text, float x, float y, int color) {
-            this(text, x, y, color, 1.0f);
+            this(text, x, y, color, 0.5f);
         }
 
         FloatingText(String text, float x, float y, int color, float sizeScale) {
@@ -8416,7 +8416,7 @@ public class GameView extends SurfaceView implements Runnable {
 
         // Reset methods for object pooling
         FloatingText reset(String text, float x, float y, int color) {
-            return reset(text, x, y, color, 1.0f);
+            return reset(text, x, y, color, 0.5f);
         }
 
         FloatingText reset(String text, float x, float y, int color, float sizeScale) {
